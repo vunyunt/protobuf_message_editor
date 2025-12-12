@@ -19,7 +19,6 @@ class _ProtobufMessageEditorExampleAppState
     extends State<ProtobufMessageEditorExampleApp>
     with TickerProviderStateMixin {
   late final GeneratedMessage _rootMessage;
-  late final ProtoNavigationState _navigationState;
   late final TabController _tabController;
 
   @override
@@ -27,7 +26,6 @@ class _ProtobufMessageEditorExampleAppState
     super.initState();
 
     _rootMessage = ExampleMessage();
-    _navigationState = ProtoNavigationState.fromRootMessage(_rootMessage);
     _tabController = TabController(length: 2, initialIndex: 0, vsync: this);
   }
 
@@ -50,8 +48,8 @@ class _ProtobufMessageEditorExampleAppState
           children: [
             Padding(
               padding: EdgeInsets.all(12.0),
-              child: ProtoDualPanelMessageEditor(
-                navigationState: _navigationState,
+              child: ProtoDualPanelMessageEditor.withRootMessage(
+                rootMessage: _rootMessage,
               ),
             ),
             Padding(

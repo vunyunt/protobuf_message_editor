@@ -5,15 +5,28 @@ import 'package:protobuf_message_editor/src/proto_message_editor.dart';
 import 'package:protobuf_message_editor/src/proto_navigation_breadcrumb.dart';
 import 'package:protobuf_message_editor/src/proto_navigation_state.dart';
 
+/// A dual panel message editor that shows the parent message (if available)
+/// on the left panel, the current message on the right panel, and a
+/// breadcrumb on top for navigation.
+///
+/// If [rootMessage] is provided instead of [navigationState], an internal
+/// [navigationState] will be created and managed
 class ProtoDualPanelMessageEditor extends StatefulWidget {
-  final ProtoNavigationState navigationState;
+  final ProtoNavigationState? navigationState;
+  final GeneratedMessage? rootMessage;
   final CustomEditorRegistry? customEditorRegistry;
 
   const ProtoDualPanelMessageEditor({
     super.key,
     required this.navigationState,
     this.customEditorRegistry,
-  });
+  }) : rootMessage = null;
+
+  const ProtoDualPanelMessageEditor.withRootMessage({
+    super.key,
+    required this.rootMessage,
+    this.customEditorRegistry,
+  }) : navigationState = null;
 
   @override
   State<ProtoDualPanelMessageEditor> createState() =>
@@ -22,6 +35,31 @@ class ProtoDualPanelMessageEditor extends StatefulWidget {
 
 class _ProtoDualPanelMessageEditorState
     extends State<ProtoDualPanelMessageEditor> {
+  late ProtoNavigationState _navigationState;
+
+  @override
+  void initState() {
+    super.initState();
+
+    assert(
+      !(widget.navigationState == null && widget.rootMessage == null),
+      'Either navigationState or rootMessage must be provided',
+    );
+
+    _navigationState =
+        widget.navigationState ??
+        ProtoNavigationState.fromRootMessage(widget.rootMessage!);
+  }
+
+  @override
+  dispose() {
+    if (_navigationState != widget.navigationState) {
+      _navigationState.dispose();
+    }
+
+    super.dispose();
+  }
+
   Widget _buildNavigableSubmessage(
     BuildContext context, {
     required GeneratedMessage submessage,
@@ -31,8 +69,8 @@ class _ProtoDualPanelMessageEditorState
   }) {
     return GestureDetector(
       onTap: () => useReplace
-          ? widget.navigationState.replace(submessage)
-          : widget.navigationState.push(submessage),
+          ? _navigationState.replace(submessage)
+          : _navigationState.push(submessage),
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -112,10 +150,10 @@ class _ProtoDualPanelMessageEditorState
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: widget.navigationState,
+      listenable: _navigationState,
       builder: (context, child) {
-        final current = widget.navigationState.getCurrent();
-        final parent = widget.navigationState.getParent();
+        final current = _navigationState.getCurrent();
+        final parent = _navigationState.getParent();
         final editor = Row(
           spacing: 6,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +174,7 @@ class _ProtoDualPanelMessageEditorState
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ProtoNavigationBreadcrumb(navigationState: widget.navigationState),
+            ProtoNavigationBreadcrumb(navigationState: _navigationState),
             Expanded(child: editor),
           ],
         );

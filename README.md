@@ -38,14 +38,13 @@ There are two main widgets provided by this package:
 Simple editor with expansion tiles for submessages:
 
 ```dart
-import 'package:protobuf/protobuf.dart';
-import 'package:protobuf_message_editor/protobuf_message_editor.dart';
+Widget build(context) {
+  final message = YourGeneratedMessage();
 
-final message = YourGeneratedMessage();
-
-SingleChildScrollView(
-  child: ProtoMessageEditor(message: message),
-)
+  return SingleChildScrollView(
+    child: ProtoMessageEditor(message: message),
+  );
+}
 ```
 
 ### ProtoDualPanelMessageEditor
@@ -53,15 +52,36 @@ SingleChildScrollView(
 Dual panel editor with navigation support for nested messages:
 
 ```dart
-import 'package:protobuf/protobuf.dart';
-import 'package:protobuf_message_editor/protobuf_message_editor.dart';
+late final GeneratedMessage _rootMessage;
+late final ProtoNavigationState _navigationState;
 
-final rootMessage = YourGeneratedMessage();
-final navigationState = ProtoNavigationState.fromRootMessage(rootMessage);
+@override
+initState() {
+  super.initState();
+  _rootMessage = YourGeneratedMessage();
+  _navigationState = ProtoNavigationState.fromRootMessage(_rootMessage);
+}
 
-ProtoDualPanelMessageEditor(
-  navigationState: navigationState,
-)
+@override
+dispose() {
+  _navigationState.dispose();
+
+  super.dispose();
+}
+
+Widget build(context) {
+  // With a manually created navigation state
+  return ProtoDualPanelMessageEditor(
+    navigationState: _navigationState,
+  );
+
+  // Or with a root message
+  // The widget will create an internally managed navigation state, and dispose
+  // of it when the widget is disposed.
+  return ProtoDualPanelMessageEditor.withRootMessage(
+    rootMessage: _rootMessage,
+  );
+}
 ```
 
 See the `/example` folder for a complete working example with both editors.
