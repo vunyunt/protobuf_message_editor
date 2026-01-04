@@ -1,3 +1,7 @@
+## 0.0.3
+
+Added missing exports relevant to custom field editors
+
 ## 0.0.2
 
 `ProtoDualPanelMessageEditor` can now accept a root message instead of a `ProtoNavigationState`.
