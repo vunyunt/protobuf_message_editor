@@ -96,6 +96,7 @@ class _ProtoFieldEditorState extends State<ProtoFieldEditor> {
   Widget _buildEditableField(BuildContext context) {
     final repeatedFieldAddBuilder = widget.repeatedFieldAddBuilder;
 
+    // Probably wanna separate these out at some point
     if (widget.fieldInfo.isRepeated && widget.listIndex == null) {
       return ProtoListFieldEditor(
         message: widget.message,
@@ -106,6 +107,7 @@ class _ProtoFieldEditorState extends State<ProtoFieldEditor> {
             ProtoListFieldEditor.defaultRepeatedFieldAddBuilder,
       );
     } else if (widget.fieldInfo.isGroupOrMessage) {
+      // TODO: submessage could be map entry here, we need to handle it
       var submessage =
           widget.message.getField(widget.fieldInfo.tagNumber)
               as GeneratedMessage;

@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package protobuf_message_editor_example;
 
+import "google/protobuf/wrappers.proto";
+
 enum ExampleEnum {
   value_zero = 0;
   value_one = 1;
@@ -21,4 +23,6 @@ message ExampleMessage {
   repeated string example_repeated_string_field = 4;
   repeated int64 example_repeated_int_field = 5;
   repeated ExampleSubmessage example_repeated_submessage_field = 6;
+
+  google.protobuf.BoolValue exampleBoolValue = 7;
 }

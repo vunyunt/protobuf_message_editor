@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
@@ -29,12 +31,40 @@ class _ProtobufMessageEditorExampleAppState
     _tabController = TabController(length: 2, initialIndex: 0, vsync: this);
   }
 
+  void _showMessageJson(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Message JSON'),
+        content: SingleChildScrollView(
+          child: Text(jsonEncode(_rootMessage.toProto3Json())),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Dual Panel Usage Example',
       home: Scaffold(
         appBar: AppBar(
+          actions: [
+            Builder(
+              builder: (context) {
+                return TextButton(
+                  onPressed: () => _showMessageJson(context),
+                  child: Text('Show JSON'),
+                );
+              },
+            ),
+          ],
           bottom: TabBar(
             tabs: [
               Tab(text: 'Dual Panel Editor'),

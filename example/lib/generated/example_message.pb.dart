@@ -14,6 +14,8 @@ import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
+import 'package:protobuf/well_known_types/google/protobuf/wrappers.pb.dart'
+    as $0;
 
 import 'example_message.pbenum.dart';
 
@@ -109,6 +111,7 @@ class ExampleMessage extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? exampleRepeatedStringField,
     $core.Iterable<$fixnum.Int64>? exampleRepeatedIntField,
     $core.Iterable<ExampleSubmessage>? exampleRepeatedSubmessageField,
+    $0.BoolValue? exampleBoolValue,
   }) {
     final result = create();
     if (exampleStringField != null)
@@ -122,6 +125,7 @@ class ExampleMessage extends $pb.GeneratedMessage {
     if (exampleRepeatedSubmessageField != null)
       result.exampleRepeatedSubmessageField
           .addAll(exampleRepeatedSubmessageField);
+    if (exampleBoolValue != null) result.exampleBoolValue = exampleBoolValue;
     return result;
   }
 
@@ -149,6 +153,8 @@ class ExampleMessage extends $pb.GeneratedMessage {
     ..pPM<ExampleSubmessage>(
         6, _omitFieldNames ? '' : 'exampleRepeatedSubmessageField',
         subBuilder: ExampleSubmessage.create)
+    ..aOM<$0.BoolValue>(7, _omitFieldNames ? '' : 'exampleBoolValue',
+        protoName: 'exampleBoolValue', subBuilder: $0.BoolValue.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -208,6 +214,17 @@ class ExampleMessage extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $pb.PbList<ExampleSubmessage> get exampleRepeatedSubmessageField =>
       $_getList(5);
+
+  @$pb.TagNumber(7)
+  $0.BoolValue get exampleBoolValue => $_getN(6);
+  @$pb.TagNumber(7)
+  set exampleBoolValue($0.BoolValue value) => $_setField(7, value);
+  @$pb.TagNumber(7)
+  $core.bool hasExampleBoolValue() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearExampleBoolValue() => $_clearField(7);
+  @$pb.TagNumber(7)
+  $0.BoolValue ensureExampleBoolValue() => $_ensure(6);
 }
 
 const $core.bool _omitFieldNames =

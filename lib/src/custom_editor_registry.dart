@@ -70,6 +70,23 @@ class CustomEditorRegistry {
     );
   }
 
+  /// Creates a new [CustomEditorRegistry] by merging the current instance with another.
+  /// If there are any conflicts, the values from the other registry take precedence.
+  CustomEditorRegistry mergeWith(CustomEditorRegistry other) {
+    return CustomEditorRegistry(
+      customFieldBuilders: {
+        ...customFieldBuilders,
+        ...other.customFieldBuilders,
+      },
+      customMessageEditors: {
+        ...customMessageEditors,
+        ...other.customMessageEditors,
+      },
+      repeatedFieldAddBuilder:
+          other.repeatedFieldAddBuilder ?? repeatedFieldAddBuilder,
+    );
+  }
+
   CustomFieldEditorBuilder? getCustomFieldBuilder(FieldIdentifier identifier) {
     return customFieldBuilders[identifier];
   }

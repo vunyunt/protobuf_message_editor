@@ -95,6 +95,14 @@ const ExampleMessage$json = {
       '6': '.protobuf_message_editor_example.ExampleSubmessage',
       '10': 'exampleRepeatedSubmessageField'
     },
+    {
+      '1': 'exampleBoolValue',
+      '3': 7,
+      '4': 1,
+      '5': 11,
+      '6': '.google.protobuf.BoolValue',
+      '10': 'exampleBoolValue'
+    },
   ],
 };
 
@@ -108,4 +116,5 @@ final $typed_data.Uint8List exampleMessageDescriptor = $convert.base64Decode(
     'sKGmV4YW1wbGVfcmVwZWF0ZWRfaW50X2ZpZWxkGAUgAygDUhdleGFtcGxlUmVwZWF0ZWRJbnRG'
     'aWVsZBJ9CiFleGFtcGxlX3JlcGVhdGVkX3N1Ym1lc3NhZ2VfZmllbGQYBiADKAsyMi5wcm90b2'
     'J1Zl9tZXNzYWdlX2VkaXRvcl9leGFtcGxlLkV4YW1wbGVTdWJtZXNzYWdlUh5leGFtcGxlUmVw'
-    'ZWF0ZWRTdWJtZXNzYWdlRmllbGQ=');
+    'ZWF0ZWRTdWJtZXNzYWdlRmllbGQSRgoQZXhhbXBsZUJvb2xWYWx1ZRgHIAEoCzIaLmdvb2dsZS'
+    '5wcm90b2J1Zi5Cb29sVmFsdWVSEGV4YW1wbGVCb29sVmFsdWU=');

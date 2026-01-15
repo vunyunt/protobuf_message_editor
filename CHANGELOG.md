@@ -1,3 +1,7 @@
+## 0.0.4
+
+Added support for `google.protobuf.BoolValue` via a default custom editor registry
+
 ## 0.0.3
 
 Added missing exports relevant to custom field editors
