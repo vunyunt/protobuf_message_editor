@@ -24,6 +24,7 @@ class ProtoFieldEditor extends StatefulWidget {
   repeatedFieldAddBuilder;
   final Widget Function({
     required GeneratedMessage submessage,
+    required GeneratedMessage parentMessage,
     required FieldInfo fieldInfo,
   })
   submessageBuilder;
@@ -42,13 +43,18 @@ class ProtoFieldEditor extends StatefulWidget {
 
   static Widget defaultSubmessageBuilder({
     required GeneratedMessage submessage,
+    required GeneratedMessage parentMessage,
     required FieldInfo fieldInfo,
-  }) => Padding(
-    padding: EdgeInsets.only(left: 12),
-    child: ProtoMessageEditor(
-      message: submessage,
-      expansionsTileTitle: fieldInfo.name,
-    ),
+  }) => ExpansionTile(
+    dense: true,
+    title: Text(fieldInfo.name),
+    expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Padding(
+        padding: EdgeInsets.only(left: 12),
+        child: ProtoMessageEditor(message: submessage),
+      ),
+    ],
   );
 }
 
@@ -112,15 +118,9 @@ class _ProtoFieldEditorState extends State<ProtoFieldEditor> {
           widget.message.getField(widget.fieldInfo.tagNumber)
               as GeneratedMessage;
 
-      // We automatically deep copy the submessage if it's frozen.
-      // Might wanna consider letting the user decide/control this.
-      if (submessage.isFrozen) {
-        submessage = submessage.deepCopy();
-        widget.message.setField(widget.fieldInfo.tagNumber, submessage);
-      }
-
       return widget.submessageBuilder(
         submessage: submessage,
+        parentMessage: widget.message,
         fieldInfo: widget.fieldInfo,
       );
     } else if (widget.fieldInfo.containsString()) {

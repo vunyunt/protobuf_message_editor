@@ -105,6 +105,7 @@ class _ProtoDualPanelMessageEditorState
         submessageBuilder:
             ({
               required GeneratedMessage submessage,
+              required GeneratedMessage parentMessage,
               required FieldInfo fieldInfo,
             }) {
               return _buildNavigableSubmessage(
@@ -131,6 +132,7 @@ class _ProtoDualPanelMessageEditorState
         submessageBuilder:
             ({
               required GeneratedMessage submessage,
+              required GeneratedMessage parentMessage,
               required FieldInfo fieldInfo,
             }) {
               final isSelected = identical(submessage, currentSubmessage);

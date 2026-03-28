@@ -6,15 +6,23 @@ import 'package:protobuf_message_editor/src/field_editors/proto_field_editor.dar
 import 'package:protobuf_message_editor/src/utils/proto_message_extensions.dart';
 import 'package:provider/provider.dart';
 
+typedef SubmessageBuilder =
+    Widget Function({
+      required GeneratedMessage submessage,
+      required GeneratedMessage parentMessage,
+      required FieldInfo fieldInfo,
+    });
+
 class ProtoMessageEditor extends StatefulWidget {
   final GeneratedMessage message;
+
+  @Deprecated(
+    "Users should wrap the ProtoMessageEditor in an ExpansionTile instead",
+  )
   final String? expansionsTileTitle;
+
   final CustomEditorRegistry? customEditorRegistry;
-  final Widget Function({
-    required GeneratedMessage submessage,
-    required FieldInfo fieldInfo,
-  })
-  submessageBuilder;
+  final SubmessageBuilder submessageBuilder;
 
   const ProtoMessageEditor({
     super.key,

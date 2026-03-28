@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
+import 'package:protobuf_message_editor/protobuf_message_editor.dart';
 import 'package:protobuf_message_editor/src/field_editors/proto_field_editor.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 import 'package:protobuf_message_editor/src/utils/proto_message_extensions.dart';
@@ -23,11 +24,7 @@ class ProtoListFieldEditor extends StatefulWidget {
     required FieldInfo fieldInfo,
   })
   repeatedFieldAddBuilder;
-  final Widget Function({
-    required GeneratedMessage submessage,
-    required FieldInfo fieldInfo,
-  })
-  submessageBuilder;
+  final SubmessageBuilder submessageBuilder;
 
   const ProtoListFieldEditor({
     super.key,
@@ -109,6 +106,7 @@ class _ProtoListFieldEditorState extends State<ProtoListFieldEditor> {
 
             return widget.submessageBuilder(
               fieldInfo: widget.fieldInfo,
+              parentMessage: widget.message,
               submessage: item,
             );
           }),
