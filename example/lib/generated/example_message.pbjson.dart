@@ -53,6 +53,21 @@ final $typed_data.Uint8List exampleSubmessageDescriptor = $convert.base64Decode(
     'hzb21lX2ludBgCIAEoA1IHc29tZUludBJJCglzb21lX2VudW0YAyABKA4yLC5wcm90b2J1Zl9t'
     'ZXNzYWdlX2VkaXRvcl9leGFtcGxlLkV4YW1wbGVFbnVtUghzb21lRW51bQ==');
 
+@$core.Deprecated('Use anotherExampleSubmessageDescriptor instead')
+const AnotherExampleSubmessage$json = {
+  '1': 'AnotherExampleSubmessage',
+  '2': [
+    {'1': 'another_string', '3': 1, '4': 1, '5': 9, '10': 'anotherString'},
+    {'1': 'another_int', '3': 2, '4': 1, '5': 3, '10': 'anotherInt'},
+  ],
+};
+
+/// Descriptor for `AnotherExampleSubmessage`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List anotherExampleSubmessageDescriptor =
+    $convert.base64Decode(
+        'ChhBbm90aGVyRXhhbXBsZVN1Ym1lc3NhZ2USJQoOYW5vdGhlcl9zdHJpbmcYASABKAlSDWFub3'
+        'RoZXJTdHJpbmcSHwoLYW5vdGhlcl9pbnQYAiABKANSCmFub3RoZXJJbnQ=');
+
 @$core.Deprecated('Use exampleMessageDescriptor instead')
 const ExampleMessage$json = {
   '1': 'ExampleMessage',
@@ -103,6 +118,14 @@ const ExampleMessage$json = {
       '6': '.google.protobuf.BoolValue',
       '10': 'exampleBoolValue'
     },
+    {
+      '1': 'exampleAny',
+      '3': 8,
+      '4': 1,
+      '5': 11,
+      '6': '.google.protobuf.Any',
+      '10': 'exampleAny'
+    },
   ],
 };
 
@@ -117,4 +140,5 @@ final $typed_data.Uint8List exampleMessageDescriptor = $convert.base64Decode(
     'aWVsZBJ9CiFleGFtcGxlX3JlcGVhdGVkX3N1Ym1lc3NhZ2VfZmllbGQYBiADKAsyMi5wcm90b2'
     'J1Zl9tZXNzYWdlX2VkaXRvcl9leGFtcGxlLkV4YW1wbGVTdWJtZXNzYWdlUh5leGFtcGxlUmVw'
     'ZWF0ZWRTdWJtZXNzYWdlRmllbGQSRgoQZXhhbXBsZUJvb2xWYWx1ZRgHIAEoCzIaLmdvb2dsZS'
-    '5wcm90b2J1Zi5Cb29sVmFsdWVSEGV4YW1wbGVCb29sVmFsdWU=');
+    '5wcm90b2J1Zi5Cb29sVmFsdWVSEGV4YW1wbGVCb29sVmFsdWUSNAoKZXhhbXBsZUFueRgIIAEo'
+    'CzIULmdvb2dsZS5wcm90b2J1Zi5BbnlSCmV4YW1wbGVBbnk=');

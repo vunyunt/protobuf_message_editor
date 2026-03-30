@@ -9,6 +9,15 @@ void main() {
   runApp(ProtobufMessageEditorExampleApp());
 }
 
+final exampleRegistry = AnyEditorRegistry([
+  AnotherExampleSubmessage.getDefault(),
+  ExampleSubmessage.getDefault(),
+]);
+
+final exampleCustomEditors = CustomEditorRegistry.fromIterable(
+  customMessageEditors: [AnyEditor(registry: exampleRegistry)],
+);
+
 class ProtobufMessageEditorExampleApp extends StatefulWidget {
   const ProtobufMessageEditorExampleApp({super.key});
 
@@ -37,7 +46,11 @@ class _ProtobufMessageEditorExampleAppState
       builder: (context) => AlertDialog(
         title: Text('Message JSON'),
         content: SingleChildScrollView(
-          child: Text(jsonEncode(_rootMessage.toProto3Json())),
+          child: Text(
+            jsonEncode(
+              _rootMessage.toProto3Json(typeRegistry: exampleRegistry),
+            ),
+          ),
         ),
         actions: [
           TextButton(
@@ -80,12 +93,16 @@ class _ProtobufMessageEditorExampleAppState
               padding: EdgeInsets.all(12.0),
               child: ProtoDualPanelMessageEditor.withRootMessage(
                 rootMessage: _rootMessage,
+                customEditorRegistry: exampleCustomEditors,
               ),
             ),
             Padding(
               padding: EdgeInsets.all(12.0),
               child: SingleChildScrollView(
-                child: ProtoMessageEditor(message: _rootMessage),
+                child: ProtoMessageEditor(
+                  message: _rootMessage,
+                  customEditorRegistry: exampleCustomEditors,
+                ),
               ),
             ),
           ],

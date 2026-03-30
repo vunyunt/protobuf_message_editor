@@ -1,5 +1,8 @@
 ## 0.0.5
 
+- Add `AnyEditor` for editing `google.protobuf.Any` messages
+- Add `AnyEditorRegistry` for managing available message types for `AnyEditor`
+
 Breaking changes:
 
 - `SubmessageBuilder` typedef has been updated to include `parentMessage` and `onRebuildRequested` parameters.

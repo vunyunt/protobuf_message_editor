@@ -7,3 +7,5 @@ export 'src/field_editors/enum_field_editor.dart';
 export 'src/custom_editor_registry.dart';
 export 'src/utils/proto_field_type_extensions.dart';
 export 'src/utils/proto_message_extensions.dart';
+export 'src/default_editors/well_known/any/any_editor.dart';
+export 'src/default_editors/well_known/any/any_editor_registry.dart';

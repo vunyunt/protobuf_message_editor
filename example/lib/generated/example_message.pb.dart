@@ -14,6 +14,7 @@ import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
+import 'package:protobuf/well_known_types/google/protobuf/any.pb.dart' as $1;
 import 'package:protobuf/well_known_types/google/protobuf/wrappers.pb.dart'
     as $0;
 
@@ -103,6 +104,74 @@ class ExampleSubmessage extends $pb.GeneratedMessage {
   void clearSomeEnum() => $_clearField(3);
 }
 
+class AnotherExampleSubmessage extends $pb.GeneratedMessage {
+  factory AnotherExampleSubmessage({
+    $core.String? anotherString,
+    $fixnum.Int64? anotherInt,
+  }) {
+    final result = create();
+    if (anotherString != null) result.anotherString = anotherString;
+    if (anotherInt != null) result.anotherInt = anotherInt;
+    return result;
+  }
+
+  AnotherExampleSubmessage._();
+
+  factory AnotherExampleSubmessage.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory AnotherExampleSubmessage.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'AnotherExampleSubmessage',
+      package: const $pb.PackageName(
+          _omitMessageNames ? '' : 'protobuf_message_editor_example'),
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'anotherString')
+    ..aInt64(2, _omitFieldNames ? '' : 'anotherInt')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  AnotherExampleSubmessage clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  AnotherExampleSubmessage copyWith(
+          void Function(AnotherExampleSubmessage) updates) =>
+      super.copyWith((message) => updates(message as AnotherExampleSubmessage))
+          as AnotherExampleSubmessage;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static AnotherExampleSubmessage create() => AnotherExampleSubmessage._();
+  @$core.override
+  AnotherExampleSubmessage createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static AnotherExampleSubmessage getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<AnotherExampleSubmessage>(create);
+  static AnotherExampleSubmessage? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get anotherString => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set anotherString($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasAnotherString() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAnotherString() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get anotherInt => $_getI64(1);
+  @$pb.TagNumber(2)
+  set anotherInt($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAnotherInt() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAnotherInt() => $_clearField(2);
+}
+
 class ExampleMessage extends $pb.GeneratedMessage {
   factory ExampleMessage({
     $core.String? exampleStringField,
@@ -112,6 +181,7 @@ class ExampleMessage extends $pb.GeneratedMessage {
     $core.Iterable<$fixnum.Int64>? exampleRepeatedIntField,
     $core.Iterable<ExampleSubmessage>? exampleRepeatedSubmessageField,
     $0.BoolValue? exampleBoolValue,
+    $1.Any? exampleAny,
   }) {
     final result = create();
     if (exampleStringField != null)
@@ -126,6 +196,7 @@ class ExampleMessage extends $pb.GeneratedMessage {
       result.exampleRepeatedSubmessageField
           .addAll(exampleRepeatedSubmessageField);
     if (exampleBoolValue != null) result.exampleBoolValue = exampleBoolValue;
+    if (exampleAny != null) result.exampleAny = exampleAny;
     return result;
   }
 
@@ -155,6 +226,8 @@ class ExampleMessage extends $pb.GeneratedMessage {
         subBuilder: ExampleSubmessage.create)
     ..aOM<$0.BoolValue>(7, _omitFieldNames ? '' : 'exampleBoolValue',
         protoName: 'exampleBoolValue', subBuilder: $0.BoolValue.create)
+    ..aOM<$1.Any>(8, _omitFieldNames ? '' : 'exampleAny',
+        protoName: 'exampleAny', subBuilder: $1.Any.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -225,6 +298,17 @@ class ExampleMessage extends $pb.GeneratedMessage {
   void clearExampleBoolValue() => $_clearField(7);
   @$pb.TagNumber(7)
   $0.BoolValue ensureExampleBoolValue() => $_ensure(6);
+
+  @$pb.TagNumber(8)
+  $1.Any get exampleAny => $_getN(7);
+  @$pb.TagNumber(8)
+  set exampleAny($1.Any value) => $_setField(8, value);
+  @$pb.TagNumber(8)
+  $core.bool hasExampleAny() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearExampleAny() => $_clearField(8);
+  @$pb.TagNumber(8)
+  $1.Any ensureExampleAny() => $_ensure(7);
 }
 
 const $core.bool _omitFieldNames =

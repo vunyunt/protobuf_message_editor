@@ -3,6 +3,7 @@ syntax = "proto3";
 package protobuf_message_editor_example;
 
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
 
 enum ExampleEnum {
   value_zero = 0;
@@ -16,6 +17,11 @@ message ExampleSubmessage {
   ExampleEnum some_enum = 3;
 }
 
+message AnotherExampleSubmessage {
+  string another_string = 1;
+  int64 another_int = 2;
+}
+
 message ExampleMessage {
   string example_string_field = 1;
   int64 example_int_field = 2;
@@ -25,4 +31,5 @@ message ExampleMessage {
   repeated ExampleSubmessage example_repeated_submessage_field = 6;
 
   google.protobuf.BoolValue exampleBoolValue = 7;
+  google.protobuf.Any exampleAny = 8;
 }
