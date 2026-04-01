@@ -20,20 +20,24 @@ class AnyEditorBuilder extends CustomMessageEditorBuilder {
     BuildContext context, {
     required GeneratedMessage data,
     GeneratedMessage? parentMessage,
-  }) => _AnyEditorWidget(registry: registry, data: data as Any);
+  }) => AnyEditorWidget(registry: registry, data: data as Any);
 }
 
-class _AnyEditorWidget extends StatefulWidget {
+class AnyEditorWidget extends StatefulWidget {
   final AnyEditorRegistry registry;
   final Any data;
 
-  const _AnyEditorWidget({required this.registry, required this.data});
+  const AnyEditorWidget({
+    super.key,
+    required this.registry,
+    required this.data,
+  });
 
   @override
-  State<_AnyEditorWidget> createState() => __AnyEditorWidgetState();
+  State<AnyEditorWidget> createState() => _AnyEditorWidgetState();
 }
 
-class __AnyEditorWidgetState extends State<_AnyEditorWidget> {
+class _AnyEditorWidgetState extends State<AnyEditorWidget> {
   GeneratedMessage? _unpackedMessage;
   String? _selectedType;
   bool _hasUnsavedChanges = false;
