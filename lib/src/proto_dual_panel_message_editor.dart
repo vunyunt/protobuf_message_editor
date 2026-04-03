@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/custom_editor_provider.dart';
-import 'package:protobuf_message_editor/src/custom_editor_registry.dart';
 import 'package:protobuf_message_editor/src/proto_message_editor.dart';
 import 'package:protobuf_message_editor/src/proto_navigation_breadcrumb.dart';
 import 'package:protobuf_message_editor/src/proto_navigation_state.dart';

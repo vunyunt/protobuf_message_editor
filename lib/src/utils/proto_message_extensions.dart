@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
-import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 import 'package:protobuf/protobuf.dart';
+import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// Represents a field identifier for a protobuf message.
 /// Note that [qualifiedMessageName] represents the *parent*'s type
