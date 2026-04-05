@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_add_field_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
@@ -13,6 +14,7 @@ class ProtobufJsonEditor extends StatefulWidget {
   final TypeRegistry? typeRegistry;
   final ProtobufJsonEditingController? controller;
   final void Function(GeneratedMessage message)? onSave;
+  final ProtobufJsonEditorProvider? provider;
 
   const ProtobufJsonEditor({
     super.key,
@@ -20,6 +22,7 @@ class ProtobufJsonEditor extends StatefulWidget {
     this.typeRegistry,
     this.controller,
     this.onSave,
+    this.provider,
   });
 
   @override
@@ -101,6 +104,7 @@ class _ProtobufJsonEditorState extends State<ProtobufJsonEditor> {
                         controller: _controller,
                         jsonKey: key,
                         depth: 0,
+                        provider: widget.provider,
                       ),
                     ),
                     ProtobufJsonAddFieldButton(

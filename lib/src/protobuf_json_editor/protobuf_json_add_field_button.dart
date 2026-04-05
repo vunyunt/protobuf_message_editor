@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/default_editors/well_known/any/any_editor_registry.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_components.dart';
-import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 class ProtobufJsonAddFieldButton extends StatelessWidget {
   final ProtobufJsonEditingController controller;
@@ -50,36 +48,7 @@ class ProtobufJsonAddFieldButton extends StatelessWidget {
             );
 
             if (selected != null) {
-              final fieldInfo = controller.getFieldInfo(selected);
-              String? typeUrl;
-
-              if (fieldInfo != null && fieldInfo.isAnyField) {
-                final registry = controller.typeRegistry;
-                if (registry is AnyEditorRegistry) {
-                  final typeNames = registry.availableMessageNames.toList();
-                  final selectedType = await showMenu<String>(
-                    context: context,
-                    position: _getMenuPosition(context),
-                    items: typeNames.map((name) {
-                      return PopupMenuItem(
-                        value: name,
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 13,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                  if (selectedType == null) return;
-
-                  typeUrl = 'type.googleapis.com/$selectedType';
-                }
-              }
-
-              controller.addField(selected, typeUrl: typeUrl);
+              controller.addField(selected);
             }
           },
           child: Row(

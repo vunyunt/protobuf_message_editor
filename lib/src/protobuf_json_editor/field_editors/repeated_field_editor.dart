@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
-import 'package:protobuf_message_editor/src/default_editors/well_known/any/any_editor_registry.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
@@ -14,6 +14,7 @@ class ProtobufJsonRepeatedFieldEditor extends StatefulWidget {
   final int depth;
   final String label;
   final FieldInfo fieldInfo;
+  final ProtobufJsonEditorProvider? provider;
 
   const ProtobufJsonRepeatedFieldEditor({
     super.key,
@@ -22,6 +23,7 @@ class ProtobufJsonRepeatedFieldEditor extends StatefulWidget {
     required this.depth,
     required this.label,
     required this.fieldInfo,
+    this.provider,
   });
 
   @override
@@ -63,6 +65,7 @@ class _ProtobufJsonRepeatedFieldEditorState
               jsonKey: widget.jsonKey,
               index: index,
               depth: widget.depth + 1,
+              provider: widget.provider,
             );
           }),
         if (!_isCollapsed)
@@ -76,34 +79,6 @@ class _ProtobufJsonRepeatedFieldEditorState
                   dynamic defaultValue = widget.fieldInfo.getDefaultValue(
                     forElement: true,
                   );
-
-                  if (widget.fieldInfo.isAnyField) {
-                    final registry = widget.controller.typeRegistry;
-                    if (registry is AnyEditorRegistry) {
-                      final typeNames = registry.availableMessageNames.toList();
-                      final selectedType = await showMenu<String>(
-                        context: context,
-                        position: _getMenuPosition(context),
-                        items: typeNames.map((name) {
-                          return PopupMenuItem(
-                            value: name,
-                            child: Text(
-                              name,
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 13,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      );
-                      if (selectedType == null) return;
-
-                      defaultValue = <String, dynamic>{
-                        '@type': 'type.googleapis.com/$selectedType',
-                      };
-                    }
-                  }
 
                   newList.add(defaultValue);
                   widget.controller.updateField(widget.jsonKey, newList);
@@ -131,22 +106,6 @@ class _ProtobufJsonRepeatedFieldEditorState
             ),
           ),
       ],
-    );
-  }
-
-  RelativeRect _getMenuPosition(BuildContext context) {
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay =
-        Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
-    return RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(
-          button.size.bottomRight(Offset.zero),
-          ancestor: overlay,
-        ),
-      ),
-      Offset.zero & overlay.size,
     );
   }
 }

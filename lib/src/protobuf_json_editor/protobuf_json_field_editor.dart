@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_add_field_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
@@ -9,6 +10,7 @@ class ProtobufJsonFieldEditor extends StatefulWidget {
   final String jsonKey;
   final int? index;
   final int depth;
+  final ProtobufJsonEditorProvider? provider;
 
   const ProtobufJsonFieldEditor({
     super.key,
@@ -16,6 +18,7 @@ class ProtobufJsonFieldEditor extends StatefulWidget {
     required this.jsonKey,
     this.index,
     this.depth = 0,
+    this.provider,
   });
 
   @override
@@ -36,6 +39,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
               controller: widget.controller,
               jsonKey: key,
               depth: widget.depth,
+              provider: widget.provider,
             ),
           ),
           ProtobufJsonAddFieldButton(
@@ -73,6 +77,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
         depth: widget.depth,
         label: label,
         fieldInfo: fieldInfo,
+        provider: widget.provider,
       );
     }
 
@@ -87,6 +92,18 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
     }
 
     if (fieldInfo.isMessageField && !fieldInfo.isScalarMessage) {
+      if (fieldInfo.isAnyField) {
+        return ProtobufJsonAnyFieldEditor(
+          controller: widget.controller,
+          jsonKey: widget.jsonKey,
+          index: widget.index,
+          depth: widget.depth,
+          label: label,
+          fieldInfo: fieldInfo,
+          provider: widget.provider,
+        );
+      }
+
       return ProtobufJsonMessageFieldEditor(
         controller: widget.controller,
         jsonKey: widget.jsonKey,
@@ -94,6 +111,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
         depth: widget.depth,
         label: label,
         fieldInfo: fieldInfo,
+        provider: widget.provider,
       );
     }
 

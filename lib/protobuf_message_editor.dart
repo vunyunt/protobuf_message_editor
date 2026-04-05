@@ -15,3 +15,4 @@ export 'src/protobuf_json_editor/protobuf_json_editor.dart';
 export 'src/protobuf_json_editor/protobuf_json_controller.dart';
 export 'src/protobuf_json_editor/field_editors.dart';
 export 'src/protobuf_json_editor/protobuf_json_field_editor.dart';
+export 'src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
