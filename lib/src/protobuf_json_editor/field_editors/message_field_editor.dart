@@ -10,6 +10,7 @@ import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_com
 class ProtobufJsonMessageFieldEditor extends StatefulWidget {
   final ProtobufJsonEditingController controller;
   final String jsonKey;
+  final int? index;
   final int depth;
   final String label;
   final FieldInfo fieldInfo;
@@ -18,6 +19,7 @@ class ProtobufJsonMessageFieldEditor extends StatefulWidget {
     super.key,
     required this.controller,
     required this.jsonKey,
+    this.index,
     required this.depth,
     required this.label,
     required this.fieldInfo,
@@ -34,8 +36,10 @@ class _ProtobufJsonMessageFieldEditorState
 
   @override
   Widget build(BuildContext context) {
-    final value =
-        widget.controller.jsonMap[widget.jsonKey] as Map<String, dynamic>;
+    final rawValue = widget.controller.jsonMap[widget.jsonKey];
+    final value = (widget.index != null && rawValue is List)
+        ? rawValue[widget.index!] as Map<String, dynamic>
+        : rawValue as Map<String, dynamic>;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,6 +56,7 @@ class _ProtobufJsonMessageFieldEditorState
             trailing: ProtobufJsonRemoveButton(
               controller: widget.controller,
               jsonKey: widget.jsonKey,
+              index: widget.index,
             ),
           ),
         ),
@@ -61,8 +66,17 @@ class _ProtobufJsonMessageFieldEditorState
               initialValue: value,
               builderInfo: widget.fieldInfo.subBuilder!().info_,
               typeRegistry: widget.controller.typeRegistry,
-              onChanged: (newMap) =>
-                  widget.controller.updateField(widget.jsonKey, newMap),
+              onChanged: (newMap) {
+                if (widget.index != null) {
+                  final list = List.from(
+                    widget.controller.jsonMap[widget.jsonKey] as List,
+                  );
+                  list[widget.index!] = newMap;
+                  widget.controller.updateField(widget.jsonKey, list);
+                } else {
+                  widget.controller.updateField(widget.jsonKey, newMap);
+                }
+              },
             );
             return ProtobufJsonFieldEditor(
               controller: subController,
@@ -75,8 +89,17 @@ class _ProtobufJsonMessageFieldEditorState
               initialValue: value,
               builderInfo: widget.fieldInfo.subBuilder!().info_,
               typeRegistry: widget.controller.typeRegistry,
-              onChanged: (newMap) =>
-                  widget.controller.updateField(widget.jsonKey, newMap),
+              onChanged: (newMap) {
+                if (widget.index != null) {
+                  final list = List.from(
+                    widget.controller.jsonMap[widget.jsonKey] as List,
+                  );
+                  list[widget.index!] = newMap;
+                  widget.controller.updateField(widget.jsonKey, list);
+                } else {
+                  widget.controller.updateField(widget.jsonKey, newMap);
+                }
+              },
             ),
             depth: widget.depth + 1,
           ),

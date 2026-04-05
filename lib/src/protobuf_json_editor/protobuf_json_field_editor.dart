@@ -7,12 +7,14 @@ import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.da
 class ProtobufJsonFieldEditor extends StatefulWidget {
   final ProtobufJsonEditingController controller;
   final String jsonKey;
+  final int? index;
   final int depth;
 
   const ProtobufJsonFieldEditor({
     super.key,
     required this.controller,
     required this.jsonKey,
+    this.index,
     this.depth = 0,
   });
 
@@ -57,11 +59,14 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
 
     final oneofIndex =
         widget.controller.builderInfo.oneofs[fieldInfo.tagNumber];
-    final label = oneofIndex != null
-        ? '${widget.jsonKey} (oneof)'
-        : widget.jsonKey;
 
-    if (fieldInfo.isRepeated) {
+    final label = widget.index != null
+        ? '[${widget.index}]'
+        : (oneofIndex != null ? '${widget.jsonKey} (oneof)' : widget.jsonKey);
+
+    // If index != null, we are editing an element of a repeated field.
+    // We should skip the isRepeated check and go straight to the type's editor.
+    if (fieldInfo.isRepeated && widget.index == null) {
       return ProtobufJsonRepeatedFieldEditor(
         controller: widget.controller,
         jsonKey: widget.jsonKey,
@@ -75,6 +80,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
       return ProtobufJsonBooleanFieldEditor(
         controller: widget.controller,
         jsonKey: widget.jsonKey,
+        index: widget.index,
         depth: widget.depth,
         label: label,
       );
@@ -84,6 +90,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
       return ProtobufJsonMessageFieldEditor(
         controller: widget.controller,
         jsonKey: widget.jsonKey,
+        index: widget.index,
         depth: widget.depth,
         label: label,
         fieldInfo: fieldInfo,
@@ -94,6 +101,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
       return ProtobufJsonEnumFieldEditor(
         controller: widget.controller,
         jsonKey: widget.jsonKey,
+        index: widget.index,
         depth: widget.depth,
         label: label,
         fieldInfo: fieldInfo,
@@ -103,6 +111,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
     return ProtobufJsonScalarFieldEditor(
       controller: widget.controller,
       jsonKey: widget.jsonKey,
+      index: widget.index,
       depth: widget.depth,
       label: label,
       fieldInfo: fieldInfo,

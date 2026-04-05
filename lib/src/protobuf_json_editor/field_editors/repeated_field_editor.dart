@@ -58,62 +58,11 @@ class _ProtobufJsonRepeatedFieldEditorState
         if (!_isCollapsed)
           ...value.asMap().entries.map((entry) {
             final index = entry.key;
-            final item = entry.value;
-
-            if (widget.fieldInfo.isGroupOrMessage &&
-                !widget.fieldInfo.isScalarMessage) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  YamlIndent(
-                    depth: widget.depth + 1,
-                    child: YamlFieldRow(label: '[$index]'),
-                  ),
-                  ProtobufJsonFieldEditor(
-                    controller: ProtobufJsonEditingController.submessage(
-                      initialValue: item as Map<String, dynamic>,
-                      builderInfo: widget.fieldInfo.subBuilder!().info_,
-                      typeRegistry: widget.controller.typeRegistry,
-                      onChanged: (newItem) {
-                        final newList = List.from(value);
-                        newList[index] = newItem;
-                        widget.controller.updateField(widget.jsonKey, newList);
-                      },
-                    ),
-                    jsonKey: '', // Empty key triggers "naked message" rendering
-                    depth: widget.depth + 2,
-                  ),
-                ],
-              );
-            }
-
-            return YamlIndent(
+            return ProtobufJsonFieldEditor(
+              controller: widget.controller,
+              jsonKey: widget.jsonKey,
+              index: index,
               depth: widget.depth + 1,
-              child: YamlFieldRow(
-                label: '[$index]',
-                value: SizedBox(
-                  height: 24,
-                  child: TextField(
-                    controller: TextEditingController(
-                      text: item?.toString() ?? '',
-                    ),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontFamily: 'monospace',
-                    ),
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                      border: InputBorder.none,
-                    ),
-                    onChanged: (newValue) {
-                      final newList = List.from(value);
-                      newList[index] = widget.fieldInfo.castString(newValue);
-                      widget.controller.updateField(widget.jsonKey, newList);
-                    },
-                  ),
-                ),
-              ),
             );
           }),
         if (!_isCollapsed)

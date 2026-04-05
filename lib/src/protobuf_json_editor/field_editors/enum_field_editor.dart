@@ -9,6 +9,7 @@ import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.da
 class ProtobufJsonEnumFieldEditor extends StatelessWidget {
   final ProtobufJsonEditingController controller;
   final String jsonKey;
+  final int? index;
   final int depth;
   final String label;
   final FieldInfo fieldInfo;
@@ -17,6 +18,7 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
     super.key,
     required this.controller,
     required this.jsonKey,
+    this.index,
     required this.depth,
     required this.label,
     required this.fieldInfo,
@@ -24,7 +26,10 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = controller.jsonMap[jsonKey];
+    final rawValue = controller.jsonMap[jsonKey];
+    final value = (index != null && rawValue is List)
+        ? rawValue[index!]
+        : rawValue;
     final currentName = fieldInfo.getEnumName(value);
 
     return YamlIndent(
@@ -49,7 +54,13 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
                   .toList(),
               onChanged: (newName) {
                 if (newName != null) {
-                  controller.updateField(jsonKey, newName);
+                  if (index != null) {
+                    final list = List.from(controller.jsonMap[jsonKey] as List);
+                    list[index!] = newName;
+                    controller.updateField(jsonKey, list);
+                  } else {
+                    controller.updateField(jsonKey, newName);
+                  }
                 }
               },
             ),
@@ -58,6 +69,7 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
         trailing: ProtobufJsonRemoveButton(
           controller: controller,
           jsonKey: jsonKey,
+          index: index,
         ),
       ),
     );
