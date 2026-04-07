@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_add_field_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
 
 /// A new approach to editing protobuf messages.
 ///
@@ -57,8 +56,6 @@ class _ProtobufJsonEditorState extends State<ProtobufJsonEditor> {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
-        final jsonMap = _controller.jsonMap;
-
         return SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -96,22 +93,10 @@ class _ProtobufJsonEditorState extends State<ProtobufJsonEditor> {
               const Divider(height: 1),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ...jsonMap.keys.map(
-                      (key) => ProtobufJsonFieldEditor(
-                        controller: _controller,
-                        jsonKey: key,
-                        depth: 0,
-                        provider: widget.provider,
-                      ),
-                    ),
-                    ProtobufJsonAddFieldButton(
-                      controller: _controller,
-                      depth: 0,
-                    ),
-                  ],
+                child: ProtobufJsonMessageEditor(
+                  controller: _controller,
+                  depth: 0,
+                  provider: widget.provider,
                 ),
               ),
             ],

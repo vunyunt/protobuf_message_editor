@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_components.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
@@ -10,18 +10,12 @@ import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.da
 /// A field editor for repeated fields (lists).
 class ProtobufJsonRepeatedFieldEditor extends StatefulWidget {
   final ProtobufJsonEditingController controller;
-  final String jsonKey;
-  final int depth;
-  final String label;
-  final FieldInfo fieldInfo;
+  final ProtobufJsonFieldInfo fieldInfo;
   final ProtobufJsonEditorProvider? provider;
 
   const ProtobufJsonRepeatedFieldEditor({
     super.key,
     required this.controller,
-    required this.jsonKey,
-    required this.depth,
-    required this.label,
     required this.fieldInfo,
     this.provider,
   });
@@ -37,23 +31,29 @@ class _ProtobufJsonRepeatedFieldEditorState
 
   @override
   Widget build(BuildContext context) {
-    final value = widget.controller.jsonMap[widget.jsonKey] as List;
+    final controller = widget.controller;
+    final fieldInfo = widget.fieldInfo;
+    final jsonKey = fieldInfo.jsonKey!;
+    final depth = fieldInfo.depth;
+    final protoFieldInfo = fieldInfo.fieldInfo!;
+
+    final value = controller.jsonMap[jsonKey] as List;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         YamlIndent(
-          depth: widget.depth,
+          depth: depth,
           child: YamlFieldRow(
-            label: widget.label,
+            label: fieldInfo.label!,
             leading: YamlCollapseToggle(
               isCollapsed: _isCollapsed,
               onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
             ),
             onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
             trailing: ProtobufJsonRemoveButton(
-              controller: widget.controller,
-              jsonKey: widget.jsonKey,
+              controller: controller,
+              jsonKey: jsonKey,
             ),
           ),
         ),
@@ -61,27 +61,27 @@ class _ProtobufJsonRepeatedFieldEditorState
           ...value.asMap().entries.map((entry) {
             final index = entry.key;
             return ProtobufJsonFieldEditor(
-              controller: widget.controller,
-              jsonKey: widget.jsonKey,
+              controller: controller,
+              jsonKey: jsonKey,
               index: index,
-              depth: widget.depth + 1,
+              depth: depth + 1,
               provider: widget.provider,
             );
           }),
         if (!_isCollapsed)
           YamlIndent(
-            depth: widget.depth + 1,
+            depth: depth + 1,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: InkWell(
                 onTap: () async {
                   final newList = List.from(value);
-                  dynamic defaultValue = widget.fieldInfo.getDefaultValue(
+                  dynamic defaultValue = protoFieldInfo.getDefaultValue(
                     forElement: true,
                   );
 
                   newList.add(defaultValue);
-                  widget.controller.updateField(widget.jsonKey, newList);
+                  controller.updateField(jsonKey, newList);
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

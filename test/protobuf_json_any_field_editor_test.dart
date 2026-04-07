@@ -3,19 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:protobuf/well_known_types/google/protobuf/any.pb.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
 
-import '../example/lib/generated/example_message.pb.dart';
+import 'lib/generated/test_message.pb.dart';
 
 void main() {
   final registry = AnyEditorRegistry([
-    ExampleSubmessage.getDefault(),
-    AnotherExampleSubmessage.getDefault(),
+    TestSubmessage.getDefault(),
+    AnotherTestSubmessage.getDefault(),
   ]);
 
   testWidgets(
     'ProtobufJsonAnyFieldEditor renders type selector and submessage',
     (tester) async {
-      final submessage = ExampleSubmessage(someString: 'helloAny');
-      final message = ExampleMessage()..exampleAny = Any.pack(submessage);
+      final submessage = TestSubmessage(someString: 'helloAny');
+      final message = TestMessage()..exampleAny = Any.pack(submessage);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -27,7 +27,7 @@ void main() {
 
       // Should show the type name
       expect(
-        find.text('protobuf_message_editor_example.ExampleSubmessage'),
+        find.text('protobuf_message_editor_test.TestSubmessage'),
         findsWidgets,
       );
 
@@ -37,7 +37,7 @@ void main() {
   );
 
   testWidgets('ProtobufJsonAnyFieldEditor can change type', (tester) async {
-    final message = ExampleMessage();
+    final message = TestMessage();
     // Do NOT set exampleAny to Any() here.
 
     await tester.pumpWidget(
@@ -62,13 +62,70 @@ void main() {
 
     // Select AnotherExampleSubmessage
     await tester.tap(
-      find
-          .text('protobuf_message_editor_example.AnotherExampleSubmessage')
-          .last,
+      find.text('protobuf_message_editor_test.AnotherTestSubmessage').last,
     );
     await tester.pumpAndSettle();
 
     // Now it should show "Add field..." for the submessage
     expect(find.text('Add field...'), findsWidgets);
+  });
+
+  testWidgets('ProtobufJsonAnyFieldEditor handles null rawValue', (
+    tester,
+  ) async {
+    final message = TestMessage();
+    final controller = ProtobufJsonEditingController(
+      sourceMessage: message,
+      typeRegistry: registry,
+    );
+
+    // Manually force a null value for exampleAny which is an Any field
+    final json = Map<String, dynamic>.from(controller.jsonMap);
+    json['exampleAny'] = null;
+    controller.updateFullJson(json);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ProtobufJsonFieldEditor(
+            controller: controller,
+            jsonKey: 'exampleAny',
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Select type...'), findsOneWidget);
+  });
+
+  testWidgets('ProtobufJsonAnyFieldEditor handles null label', (tester) async {
+    final message = TestMessage();
+    final controller = ProtobufJsonEditingController(
+      sourceMessage: message,
+      typeRegistry: registry,
+    );
+
+    // Initialize the field in the map
+    controller.addField('exampleAny');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ProtobufJsonAnyFieldEditor(
+            controller: controller,
+            fieldInfo: ProtobufJsonFieldInfo(
+              fieldInfo: controller.getFieldInfo('exampleAny'),
+              jsonKey: 'exampleAny',
+              label: null, // Force null label
+              depth: 0,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Select type...'), findsOneWidget);
   });
 }

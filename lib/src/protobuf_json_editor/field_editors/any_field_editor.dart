@@ -3,10 +3,11 @@ import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/default_editors/well_known/any/any_editor_registry.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_add_field_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_components.dart';
+import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A specialized field editor for `google.protobuf.Any` fields.
 ///
@@ -14,21 +15,13 @@ import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_com
 /// the resolved submessage.
 class ProtobufJsonAnyFieldEditor extends StatefulWidget {
   final ProtobufJsonEditingController controller;
-  final String jsonKey;
-  final int? index;
-  final int depth;
-  final String label;
-  final FieldInfo fieldInfo;
+  final ProtobufJsonFieldInfo fieldInfo;
   final ProtobufJsonEditorProvider? provider;
   final TypeRegistry? customTypeRegistry;
 
   const ProtobufJsonAnyFieldEditor({
     super.key,
     required this.controller,
-    required this.jsonKey,
-    this.index,
-    required this.depth,
-    required this.label,
     required this.fieldInfo,
     this.provider,
     this.customTypeRegistry,
@@ -45,41 +38,59 @@ class _ProtobufJsonAnyFieldEditorState
 
   @override
   Widget build(BuildContext context) {
-    final rawValue = widget.controller.jsonMap[widget.jsonKey];
-    final value = (widget.index != null && rawValue is List)
-        ? rawValue[widget.index!] as Map<String, dynamic>
-        : rawValue as Map<String, dynamic>;
+    final controller = widget.controller;
+    final jsonKey = widget.fieldInfo.jsonKey ?? '';
+    final index = widget.fieldInfo.index;
+
+    final rawValue = controller.jsonMap[jsonKey];
+    final fieldInController = controller.getFieldInfo(jsonKey);
+    // If the controller has the expected Any field, we are at the parent message level.
+    // If not, we assume this is a sub-controller already focused on the Any message itself.
+    final isAtParentLevel =
+        fieldInController != null && fieldInController.isAnyField;
+
+    final Map<String, dynamic> value;
+    if (jsonKey.isEmpty || !isAtParentLevel) {
+      value = controller.jsonMap;
+    } else if (index != null && rawValue is List) {
+      value =
+          (index < rawValue.length ? rawValue[index] : null)
+              as Map<String, dynamic>? ??
+          <String, dynamic>{};
+    } else {
+      value = rawValue as Map<String, dynamic>? ?? <String, dynamic>{};
+    }
 
     final typeUrl = value['@type'] as String?;
-    final registry =
-        widget.customTypeRegistry ?? widget.controller.typeRegistry;
+    final registry = widget.customTypeRegistry ?? controller.typeRegistry;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        YamlIndent(
-          depth: widget.depth,
-          child: YamlFieldRow(
-            label: widget.label,
-            leading: YamlCollapseToggle(
-              isCollapsed: _isCollapsed,
-              onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
+        if (jsonKey.isNotEmpty)
+          YamlIndent(
+            depth: widget.fieldInfo.depth,
+            child: YamlFieldRow(
+              label: widget.fieldInfo.label ?? jsonKey,
+              leading: YamlCollapseToggle(
+                isCollapsed: _isCollapsed,
+                onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
+              ),
+              onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
+              value: _buildTypeSelector(context, typeUrl, registry),
+              trailing: ProtobufJsonRemoveButton(
+                controller: controller,
+                jsonKey: jsonKey,
+                index: index,
+              ),
             ),
-            onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
-            value: _buildTypeSelector(context, typeUrl, registry),
-            trailing: ProtobufJsonRemoveButton(
-              controller: widget.controller,
-              jsonKey: widget.jsonKey,
-              index: widget.index,
-            ),
-          ),
-        ),
-        if (!_isCollapsed && typeUrl != null) ...[
-          _buildSubmessageContent(value, registry),
-        ],
+          )
+        else
+          _buildTypeSelector(context, typeUrl, registry),
+        if (!_isCollapsed) ...[_buildSubmessageContent(value)],
         if (!_isCollapsed && typeUrl == null)
           YamlIndent(
-            depth: widget.depth + 1,
+            depth: widget.fieldInfo.depth + 1,
             child: const Padding(
               padding: EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
@@ -124,15 +135,28 @@ class _ProtobufJsonAnyFieldEditorState
           if (selected != null) {
             final newTypeUrl = 'type.googleapis.com/$selected';
             final newValue = <String, dynamic>{'@type': newTypeUrl};
+            final controller = widget.controller;
+            final jsonKey = widget.fieldInfo.jsonKey!;
 
-            if (widget.index != null) {
-              final list = List.from(
-                widget.controller.jsonMap[widget.jsonKey] as List,
-              );
-              list[widget.index!] = newValue;
-              widget.controller.updateField(widget.jsonKey, list);
+            final fieldInController = controller.getFieldInfo(jsonKey);
+            final isParentController =
+                fieldInController != null && fieldInController.isAnyField;
+
+            if (isParentController) {
+              if (widget.fieldInfo.index != null) {
+                final raw = controller.jsonMap[jsonKey];
+                final list = raw is List ? List.from(raw) : <dynamic>[];
+                if (widget.fieldInfo.index! < list.length) {
+                  list[widget.fieldInfo.index!] = newValue;
+                } else {
+                  list.add(newValue);
+                }
+                controller.updateField(jsonKey, list);
+              } else {
+                controller.updateField(jsonKey, newValue);
+              }
             } else {
-              widget.controller.updateField(widget.jsonKey, newValue);
+              controller.updateFullJson(newValue);
             }
           }
         }
@@ -166,60 +190,44 @@ class _ProtobufJsonAnyFieldEditorState
     );
   }
 
-  Widget _buildSubmessageContent(
-    Map<String, dynamic> value,
-    TypeRegistry registry,
-  ) {
-    final subBuilderInfo = widget.fieldInfo.subBuilder!().info_;
+  Widget _buildSubmessageContent(Map<String, dynamic> value) {
+    final controller = widget.controller;
+    final jsonKey = widget.fieldInfo.jsonKey ?? '';
+    final protoFieldInfo = widget.fieldInfo.fieldInfo;
+    if (protoFieldInfo == null) return const SizedBox.shrink();
+
+    final subBuilderInfo = protoFieldInfo.subBuilder?.call().info_;
+    if (subBuilderInfo == null) return const SizedBox.shrink();
     final subController = ProtobufJsonEditingController.submessage(
       initialValue: value,
       builderInfo: subBuilderInfo,
-      typeRegistry: registry,
+      typeRegistry: widget.customTypeRegistry ?? controller.typeRegistry,
       onChanged: (newMap) {
-        if (widget.index != null) {
-          final list = List.from(
-            widget.controller.jsonMap[widget.jsonKey] as List,
-          );
-          list[widget.index!] = newMap;
-          widget.controller.updateField(widget.jsonKey, list);
+        final fieldInController = controller.getFieldInfo(jsonKey);
+        final isParentController =
+            fieldInController != null && fieldInController.isAnyField;
+
+        if (jsonKey.isEmpty || !isParentController) {
+          controller.updateFullJson(newMap);
+        } else if (widget.fieldInfo.index != null) {
+          final raw = controller.jsonMap[jsonKey];
+          final list = raw is List ? List.from(raw) : <dynamic>[];
+          if (widget.fieldInfo.index! < list.length) {
+            list[widget.fieldInfo.index!] = newMap;
+          } else {
+            list.add(newMap);
+          }
+          controller.updateField(jsonKey, list);
         } else {
-          widget.controller.updateField(widget.jsonKey, newMap);
+          controller.updateField(jsonKey, newMap);
         }
       },
     );
 
-    final customEditor = widget.provider?.getSubmessageEditor(
-      messageType: subController.builderInfo.qualifiedMessageName,
-      parentMessageType: widget.controller.builderInfo.qualifiedMessageName,
-      fieldInfo: widget.fieldInfo,
+    return ProtobufJsonMessageEditor(
       controller: subController,
-    );
-
-    if (customEditor != null) {
-      return Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: customEditor,
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ...value.keys
-            .where((k) => k != '@type')
-            .map(
-              (key) => ProtobufJsonFieldEditor(
-                controller: subController,
-                jsonKey: key,
-                depth: widget.depth + 1,
-                provider: widget.provider,
-              ),
-            ),
-        ProtobufJsonAddFieldButton(
-          controller: subController,
-          depth: widget.depth + 1,
-        ),
-      ],
+      depth: widget.fieldInfo.depth + 1,
+      provider: widget.provider,
     );
   }
 

@@ -158,10 +158,94 @@ class ProtobufJsonEditingController extends ChangeNotifier {
   ///
   /// The returned message is always mutable (not frozen) and represents the
   /// current contents of the editor.
+  ///
+  /// Any `google.protobuf.Any` fields that are missing their required `@type`
+  /// key are stripped before deserialization to prevent [FormatException]s.
   GeneratedMessage getSavedMessage() {
+    final sanitized = _sanitizeForSave(_jsonMap, builderInfo);
     final message = builderInfo.createEmptyInstance!();
-    message.mergeFromProto3Json(_jsonMap, typeRegistry: typeRegistry);
+    message.mergeFromProto3Json(sanitized, typeRegistry: typeRegistry);
     return message;
+  }
+
+  /// Recursively sanitizes a JSON map for safe deserialization.
+  ///
+  /// Removes entries for `google.protobuf.Any` fields whose value is a map
+  /// missing the required `@type` key, which would otherwise cause
+  /// `mergeFromProto3Json` to throw a [FormatException].
+  ///
+  /// Also recurses into nested message and repeated message fields.
+  static Map<String, dynamic> _sanitizeForSave(
+    Map<String, dynamic> json,
+    BuilderInfo builderInfo,
+  ) {
+    final fieldsByName = {
+      for (final field in builderInfo.fieldInfo.values) field.name: field,
+    };
+
+    final sanitized = <String, dynamic>{};
+
+    for (final entry in json.entries) {
+      final fieldInfo = fieldsByName[entry.key];
+
+      if (fieldInfo == null) {
+        // Unknown key (e.g. @type in a resolved Any) — keep as-is.
+        sanitized[entry.key] = entry.value;
+        continue;
+      }
+
+      if (fieldInfo.isAnyField) {
+        if (fieldInfo.isRepeated && entry.value is List) {
+          // Filter out empty Any entries from repeated fields.
+          final filtered = (entry.value as List)
+              .where((e) => e is Map<String, dynamic> && e.containsKey('@type'))
+              .toList();
+          if (filtered.isNotEmpty) {
+            sanitized[entry.key] = filtered;
+          }
+        } else if (entry.value is Map<String, dynamic>) {
+          final map = entry.value as Map<String, dynamic>;
+          if (map.containsKey('@type')) {
+            sanitized[entry.key] = map;
+          }
+          // else: skip — empty Any field without @type
+        } else {
+          sanitized[entry.key] = entry.value;
+        }
+      } else if (fieldInfo.isGroupOrMessage &&
+          !fieldInfo.isRepeated &&
+          entry.value is Map<String, dynamic>) {
+        // Recurse into nested messages.
+        final subBuilderInfo = fieldInfo.subBuilder?.call().info_;
+        if (subBuilderInfo != null) {
+          sanitized[entry.key] = _sanitizeForSave(
+            entry.value as Map<String, dynamic>,
+            subBuilderInfo,
+          );
+        } else {
+          sanitized[entry.key] = entry.value;
+        }
+      } else if (fieldInfo.isGroupOrMessage &&
+          fieldInfo.isRepeated &&
+          entry.value is List) {
+        // Recurse into repeated message fields.
+        final subBuilderInfo = fieldInfo.subBuilder?.call().info_;
+        if (subBuilderInfo != null) {
+          sanitized[entry.key] = (entry.value as List).map((e) {
+            if (e is Map<String, dynamic>) {
+              return _sanitizeForSave(e, subBuilderInfo);
+            }
+            return e;
+          }).toList();
+        } else {
+          sanitized[entry.key] = entry.value;
+        }
+      } else {
+        sanitized[entry.key] = entry.value;
+      }
+    }
+
+    return sanitized;
   }
 
   /// Saves the current JSON state.

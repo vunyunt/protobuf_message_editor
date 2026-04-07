@@ -4,16 +4,16 @@ import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
 import 'package:protobuf_message_editor/src/field_editors/proto_field_editor.dart';
 import 'package:provider/provider.dart';
-import '../example/lib/generated/example_message.pb.dart';
+import 'lib/generated/test_message.pb.dart';
 
 void main() {
   testWidgets(
     'ProtoFieldEditor correctly indexes into repeated message fields',
     (WidgetTester tester) async {
-      final message = ExampleMessage()
+      final message = TestMessage()
         ..exampleRepeatedSubmessageField.addAll([
-          ExampleSubmessage(someString: 'item 0'),
-          ExampleSubmessage(someString: 'item 1'),
+          TestSubmessage(someString: 'item 0'),
+          TestSubmessage(someString: 'item 1'),
         ]);
 
       final fieldInfo =
@@ -44,8 +44,8 @@ void main() {
       );
 
       expect(passedSubmessage, isNotNull);
-      expect(passedSubmessage, isA<ExampleSubmessage>());
-      expect((passedSubmessage as ExampleSubmessage).someString, 'item 1');
+      expect(passedSubmessage, isA<TestSubmessage>());
+      expect((passedSubmessage as TestSubmessage).someString, 'item 1');
       expect(find.text('item 1'), findsOneWidget);
     },
   );
@@ -53,10 +53,10 @@ void main() {
   testWidgets(
     'ProtoMessageEditor calls getSubmessageEditorBuilder with correct submessage in a list',
     (WidgetTester tester) async {
-      final message = ExampleMessage()
+      final message = TestMessage()
         ..exampleRepeatedSubmessageField.addAll([
-          ExampleSubmessage(someString: 'item 0'),
-          ExampleSubmessage(someString: 'item 1'),
+          TestSubmessage(someString: 'item 0'),
+          TestSubmessage(someString: 'item 1'),
         ]);
 
       final fieldInfo =
@@ -67,7 +67,7 @@ void main() {
 
       final mockProvider = CustomEditorRegistry(
         customMessageEditors: {
-          ExampleSubmessage.getDefault().info_.qualifiedMessageName:
+          TestSubmessage.getDefault().info_.qualifiedMessageName:
               _MockMessageEditorBuilder((context, data, parent) {
                 capturedSubmessage = data;
                 capturedParent = parent;
@@ -97,8 +97,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(capturedSubmessage, isNotNull);
-      expect(capturedSubmessage, isA<ExampleSubmessage>());
-      expect((capturedSubmessage as ExampleSubmessage).someString, 'item 1');
+      expect(capturedSubmessage, isA<TestSubmessage>());
+      expect((capturedSubmessage as TestSubmessage).someString, 'item 1');
       expect(capturedParent, message);
       expect(find.text('Custom Editor for item 1'), findsOneWidget);
     },
@@ -106,19 +106,19 @@ void main() {
 }
 
 class _MockMessageEditorBuilder
-    extends CustomMessageEditorBuilder<ExampleSubmessage> {
-  final Widget Function(BuildContext, ExampleSubmessage, GeneratedMessage?)
+    extends CustomMessageEditorBuilder<TestSubmessage> {
+  final Widget Function(BuildContext, TestSubmessage, GeneratedMessage?)
   _builder;
   _MockMessageEditorBuilder(this._builder);
 
   @override
   String get qualifiedMessageName =>
-      ExampleSubmessage.getDefault().info_.qualifiedMessageName;
+      TestSubmessage.getDefault().info_.qualifiedMessageName;
 
   @override
   Widget build(
     BuildContext context, {
-    required ExampleSubmessage data,
+    required TestSubmessage data,
     GeneratedMessage? parentMessage,
   }) {
     return _builder(context, data, parentMessage);

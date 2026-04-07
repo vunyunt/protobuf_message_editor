@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:protobuf/protobuf.dart';
+import 'package:protobuf_message_editor/protobuf_message_editor.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_editor.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
 
 // Mock messages for testing
 class SubMessage extends GeneratedMessage {
@@ -50,25 +50,31 @@ class RootMessage extends GeneratedMessage {
 
 class MockProvider extends ProtobufJsonEditorProvider {
   bool called = false;
-  String? lastMessageType;
+  ProtobufJsonEditingController? lastController;
+  ProtobufJsonFieldInfo? lastFieldInfo;
 
   @override
   Widget? getSubmessageEditor({
-    required String messageType,
-    required String? parentMessageType,
-    required FieldInfo? fieldInfo,
     required ProtobufJsonEditingController controller,
+    required ProtobufJsonFieldInfo fieldInfo,
   }) {
     called = true;
-    lastMessageType = messageType;
-    if (messageType == 'test.SubMessage') {
+    lastController = controller;
+    lastFieldInfo = fieldInfo;
+    if (controller.builderInfo.qualifiedMessageName == 'test.SubMessage') {
       return const Text('CUSTOM_EDITOR_ACTIVE', key: Key('custom_editor'));
     }
     return null;
   }
 }
 
-class EmptyProvider extends ProtobufJsonEditorProvider {}
+class EmptyProvider extends ProtobufJsonEditorProvider {
+  @override
+  Widget? getSubmessageEditor({
+    required ProtobufJsonEditingController controller,
+    required ProtobufJsonFieldInfo fieldInfo,
+  }) => null;
+}
 
 void main() {
   testWidgets(
@@ -91,7 +97,14 @@ void main() {
 
       // Verify provider was called with correct arguments
       expect(provider.called, isTrue);
-      expect(provider.lastMessageType, 'test.SubMessage');
+      expect(
+        provider.lastController?.builderInfo.qualifiedMessageName,
+        'test.SubMessage',
+      );
+      expect(
+        provider.lastFieldInfo?.parentBuilderInfo?.qualifiedMessageName,
+        'test.RootMessage',
+      );
     },
   );
 
@@ -99,7 +112,6 @@ void main() {
     'ProtobufJsonEditor falls back to default editor if provider returns null',
     (WidgetTester tester) async {
       final root = RootMessage()..sub = (SubMessage()..foo = 'bar');
-      // Use an empty implementation since the base class is abstract
       final provider = EmptyProvider();
 
       await tester.pumpWidget(

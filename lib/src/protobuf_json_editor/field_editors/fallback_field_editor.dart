@@ -1,36 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_components.dart';
 
-/// A fallback editor for unknown keys.
+/// A fallback editor for fields without [FieldInfo].
 class ProtobufJsonFallbackFieldEditor extends StatelessWidget {
   final ProtobufJsonEditingController controller;
-  final String jsonKey;
-  final int depth;
+  final ProtobufJsonFieldInfo fieldInfo;
 
   const ProtobufJsonFallbackFieldEditor({
     super.key,
     required this.controller,
-    required this.jsonKey,
-    required this.depth,
+    required this.fieldInfo,
   });
 
   @override
   Widget build(BuildContext context) {
+    final jsonKey = fieldInfo.jsonKey!;
     final value = controller.jsonMap[jsonKey];
 
     return YamlIndent(
-      depth: depth,
+      depth: fieldInfo.depth,
       child: YamlFieldRow(
         label: jsonKey,
-        value: Text(value?.toString() ?? 'null'),
-        trailing: jsonKey == '@type'
-            ? null
-            : ProtobufJsonRemoveButton(
-                controller: controller,
-                jsonKey: jsonKey,
-              ),
+        value: Text(
+          value.toString(),
+          style: const TextStyle(
+            fontSize: 13,
+            fontFamily: 'monospace',
+            color: Colors.grey,
+          ),
+        ),
+        trailing: ProtobufJsonRemoveButton(
+          controller: controller,
+          jsonKey: jsonKey,
+        ),
       ),
     );
   }

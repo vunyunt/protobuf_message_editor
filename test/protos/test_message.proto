@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package protobuf_message_editor_test;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+
+enum TestEnum {
+  value_zero = 0;
+  value_one = 1;
+  value_two = 2;
+}
+
+message TestSubmessage {
+  string some_string = 1;
+  int64 some_int = 2;
+  TestEnum some_enum = 3;
+}
+
+message AnotherTestSubmessage {
+  string another_string = 1;
+  int64 another_int = 2;
+}
+
+message TestMessage {
+  string example_string_field = 1;
+  int64 example_int_field = 2;
+  TestSubmessage example_submessage = 3;
+  repeated string example_repeated_string_field = 4;
+  repeated int64 example_repeated_int_field = 5;
+  repeated TestSubmessage example_repeated_submessage_field = 6;
+
+  google.protobuf.BoolValue exampleBoolValue = 7;
+  google.protobuf.Any exampleAny = 8;
+  repeated google.protobuf.Any example_repeated_any = 9;
+}
