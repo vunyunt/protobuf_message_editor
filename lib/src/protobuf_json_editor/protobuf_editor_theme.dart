@@ -48,6 +48,11 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
   /// The size for small icons (add, remove).
   final double smallIconSize;
 
+  /// The colors to use for different nesting depths.
+  ///
+  /// If depth exceeds the length of this list, it wraps around.
+  final List<Color> depthColors;
+
   /// The size for collapse/expand toggle icons.
   final double collapseIconSize;
 
@@ -68,6 +73,7 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
     required this.fieldValueHeight,
     required this.smallIconSize,
     required this.collapseIconSize,
+    required this.depthColors,
   });
 
   /// Creates a [ProtobufEditorTheme] with default values that match the current hardcoded look.
@@ -107,9 +113,9 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
       removeButtonColor: Colors.grey,
       collapseToggleColor: Colors.grey[600]!,
       typeBadgeDecoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
+        color: Colors.blue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
       ),
       indentWidth: 16.0,
       fieldRowPadding: const EdgeInsets.symmetric(vertical: 2.0),
@@ -117,7 +123,21 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
       fieldValueHeight: 24.0,
       smallIconSize: 14.0,
       collapseIconSize: 16.0,
+      depthColors: [
+        primaryColor,
+        Colors.purple,
+        Colors.orange,
+        Colors.teal,
+        Colors.indigo,
+        Colors.pink,
+      ],
     );
+  }
+
+  /// Gets the color for a label at the given depth.
+  Color getLabelColor(int depth) {
+    if (depthColors.isEmpty) return fieldLabelStyle.color ?? Colors.black;
+    return depthColors[depth % depthColors.length];
   }
 
   /// Returns the [ProtobufEditorTheme] from the current [Theme].
@@ -146,6 +166,7 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
     double? fieldValueHeight,
     double? smallIconSize,
     double? collapseIconSize,
+    List<Color>? depthColors,
   }) {
     return ProtobufEditorTheme(
       fieldLabelStyle: fieldLabelStyle ?? this.fieldLabelStyle,
@@ -164,6 +185,7 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
       fieldValueHeight: fieldValueHeight ?? this.fieldValueHeight,
       smallIconSize: smallIconSize ?? this.smallIconSize,
       collapseIconSize: collapseIconSize ?? this.collapseIconSize,
+      depthColors: depthColors ?? this.depthColors,
     );
   }
 
@@ -231,6 +253,7 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
         other.collapseIconSize,
         t,
       )!,
+      depthColors: t < 0.5 ? depthColors : other.depthColors,
     );
   }
 

@@ -31,10 +31,21 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
 
     final theme = ProtobufEditorTheme.of(context);
 
+    final parentMessageName = fieldInfo.parentBuilderInfo?.qualifiedMessageName
+        .split('.')
+        .last;
+    final parentContext = [
+      if (parentMessageName != null) 'Message: $parentMessageName',
+      if (fieldInfo.parentFieldName != null)
+        'Field: ${fieldInfo.parentFieldName}',
+    ].join('\n');
+
     return YamlIndent(
       depth: fieldInfo.depth,
       child: YamlFieldRow(
-        label: fieldInfo.label!,
+        label: fieldInfo.label ?? fieldInfo.jsonKey ?? '',
+        labelColor: theme.getLabelColor(fieldInfo.depth),
+        tooltip: parentContext.isEmpty ? null : parentContext,
         value: SizedBox(
           height: theme.fieldValueHeight,
           child: DropdownButtonHideUnderline(

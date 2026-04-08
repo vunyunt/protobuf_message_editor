@@ -1,5 +1,4 @@
 import 'package:protobuf/protobuf.dart';
-import 'package:protobuf/well_known_types/google/protobuf/any.pb.dart';
 
 /// Metadata for a protobuf-json field being edited.
 class ProtobufJsonFieldInfo {
@@ -18,6 +17,9 @@ class ProtobufJsonFieldInfo {
   /// The display label for the field.
   final String? label;
 
+  /// The name of the parent field that contains this message/list.
+  final String? parentFieldName;
+
   /// The metadata of the parent message.
   final BuilderInfo? parentBuilderInfo;
 
@@ -30,6 +32,7 @@ class ProtobufJsonFieldInfo {
     this.index,
     this.depth = 0,
     this.label,
+    this.parentFieldName,
     this.parentBuilderInfo,
     this.submessageBuilderInfo,
   });
@@ -41,6 +44,7 @@ class ProtobufJsonFieldInfo {
     int? index,
     int? depth,
     String? label,
+    String? parentFieldName,
     BuilderInfo? parentBuilderInfo,
     BuilderInfo? submessageBuilderInfo,
   }) {
@@ -50,6 +54,7 @@ class ProtobufJsonFieldInfo {
       index: index ?? this.index,
       depth: depth ?? this.depth,
       label: label ?? this.label,
+      parentFieldName: parentFieldName ?? this.parentFieldName,
       parentBuilderInfo: parentBuilderInfo ?? this.parentBuilderInfo,
       submessageBuilderInfo:
           submessageBuilderInfo ?? this.submessageBuilderInfo,

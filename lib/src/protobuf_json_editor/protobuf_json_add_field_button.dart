@@ -6,11 +6,13 @@ import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_com
 class ProtobufJsonAddFieldButton extends StatelessWidget {
   final ProtobufJsonController controller;
   final int depth;
+  final String? parentFieldName;
 
   const ProtobufJsonAddFieldButton({
     super.key,
     required this.controller,
     required this.depth,
+    this.parentFieldName,
   });
 
   @override
@@ -23,49 +25,61 @@ class ProtobufJsonAddFieldButton extends StatelessWidget {
 
     if (unsetFields.isEmpty) return const SizedBox.shrink();
 
+    final theme = ProtobufEditorTheme.of(context);
+
+    final parentMessageName = controller.builderInfo.qualifiedMessageName
+        .split('.')
+        .last;
+    final parentContext = [
+      'Message: $parentMessageName',
+      if (parentFieldName != null) 'Field: $parentFieldName',
+    ].join('\n');
+
     return YamlIndent(
       depth: depth,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: InkWell(
-          onTap: () async {
-            final selected = await showMenu<String>(
-              context: context,
-              position: _getMenuPosition(context),
-              items: unsetFields.map((f) {
-                final oneofIndex = controller.builderInfo.oneofs[f.tagNumber];
-                final label = oneofIndex != null ? '${f.name} (oneof)' : f.name;
-                return PopupMenuItem(
-                  value: f.name,
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 13,
+        child: Tooltip(
+          message: 'Add field to $parentContext',
+          child: InkWell(
+            onTap: () async {
+              final selected = await showMenu<String>(
+                context: context,
+                position: _getMenuPosition(context),
+                items: unsetFields.map((f) {
+                  final oneofIndex = controller.builderInfo.oneofs[f.tagNumber];
+                  final label = oneofIndex != null
+                      ? '${f.name} (oneof)'
+                      : f.name;
+                  return PopupMenuItem(
+                    value: f.name,
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 13,
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
-            );
+                  );
+                }).toList(),
+              );
 
-            if (selected != null) {
-              controller.addField(selected);
-            }
-          },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.add,
-                size: ProtobufEditorTheme.of(context).smallIconSize,
-                color: Theme.of(context).primaryColor,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                'Add field...',
-                style: ProtobufEditorTheme.of(context).actionButtonStyle,
-              ),
-            ],
+              if (selected != null) {
+                controller.addField(selected);
+              }
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.add,
+                  size: theme.smallIconSize,
+                  color: Theme.of(context).primaryColor,
+                ),
+                const SizedBox(width: 4),
+                Text('Add field...', style: theme.actionButtonStyle),
+              ],
+            ),
           ),
         ),
       ),

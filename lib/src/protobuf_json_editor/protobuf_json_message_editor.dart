@@ -12,12 +12,14 @@ import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_f
 class ProtobufJsonMessageEditor extends StatelessWidget {
   final ProtobufJsonController controller;
   final int depth;
+  final String? parentFieldName;
   final ProtobufJsonEditorProvider? provider;
 
   const ProtobufJsonMessageEditor({
     super.key,
     required this.controller,
     this.depth = 0,
+    this.parentFieldName,
     this.provider,
   });
 
@@ -33,10 +35,15 @@ class ProtobufJsonMessageEditor extends StatelessWidget {
             controller: controller,
             jsonKey: key,
             depth: depth,
+            parentFieldName: parentFieldName,
             provider: provider,
           ),
         ),
-        ProtobufJsonAddFieldButton(controller: controller, depth: depth),
+        ProtobufJsonAddFieldButton(
+          controller: controller,
+          depth: depth,
+          parentFieldName: parentFieldName,
+        ),
       ],
     );
   }

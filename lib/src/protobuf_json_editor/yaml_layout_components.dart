@@ -20,9 +20,23 @@ class YamlIndent extends StatelessWidget {
     final width = indentWidth ?? theme.indentWidth;
     if (depth <= 0) return child;
 
-    return Padding(
-      padding: EdgeInsets.only(left: depth * width),
-      child: child,
+    return Stack(
+      children: [
+        for (int i = 0; i < depth; i++)
+          Positioned(
+            left: i * width + width / 2,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 1,
+              color: theme.getLabelColor(i).withValues(alpha: 0.3),
+            ),
+          ),
+        Padding(
+          padding: EdgeInsets.only(left: depth * width),
+          child: child,
+        ),
+      ],
     );
   }
 }
@@ -34,6 +48,8 @@ class YamlFieldRow extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final VoidCallback? onTapLabel;
+  final String? tooltip;
+  final Color? labelColor;
 
   const YamlFieldRow({
     super.key,
@@ -42,11 +58,22 @@ class YamlFieldRow extends StatelessWidget {
     this.leading,
     this.trailing,
     this.onTapLabel,
+    this.tooltip,
+    this.labelColor,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = ProtobufEditorTheme.of(context);
+
+    Widget labelWidget = Text(
+      '$label:',
+      style: theme.fieldLabelStyle.copyWith(color: labelColor),
+    );
+
+    if (tooltip != null) {
+      labelWidget = Tooltip(message: tooltip!, child: labelWidget);
+    }
 
     return Padding(
       padding: theme.fieldRowPadding,
@@ -54,10 +81,7 @@ class YamlFieldRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (leading != null) ...[leading!, const SizedBox(width: 4)],
-          GestureDetector(
-            onTap: onTapLabel,
-            child: Text('$label:', style: theme.fieldLabelStyle),
-          ),
+          GestureDetector(onTap: onTapLabel, child: labelWidget),
           const SizedBox(width: 8),
           if (value != null) Expanded(child: value!),
           if (trailing != null) ...[const SizedBox(width: 4), trailing!],

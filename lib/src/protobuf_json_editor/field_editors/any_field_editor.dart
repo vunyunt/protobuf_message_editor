@@ -68,6 +68,19 @@ class _ProtobufJsonAnyFieldEditorState
     // final registry = widget.customTypeRegistry ?? controller.typeRegistry;
     // Let me check any_field_editor.dart again.
 
+    final theme = ProtobufEditorTheme.of(context);
+    final parentMessageName = widget
+        .fieldInfo
+        .parentBuilderInfo
+        ?.qualifiedMessageName
+        .split('.')
+        .last;
+    final parentContext = [
+      if (parentMessageName != null) 'Message: $parentMessageName',
+      if (widget.fieldInfo.parentFieldName != null)
+        'Field: ${widget.fieldInfo.parentFieldName}',
+    ].join('\n');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -76,17 +89,14 @@ class _ProtobufJsonAnyFieldEditorState
             depth: widget.fieldInfo.depth,
             child: YamlFieldRow(
               label: widget.fieldInfo.label ?? jsonKey,
+              labelColor: theme.getLabelColor(widget.fieldInfo.depth),
+              tooltip: parentContext.isEmpty ? null : parentContext,
               leading: YamlCollapseToggle(
                 isCollapsed: _isCollapsed,
                 onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
               ),
               onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
-              value: _buildTypeSelector(
-                context,
-                typeUrl,
-                registry,
-                ProtobufEditorTheme.of(context),
-              ),
+              value: _buildTypeSelector(context, typeUrl, registry, theme),
               trailing: ProtobufJsonRemoveButton(
                 controller: controller,
                 jsonKey: jsonKey,
@@ -230,6 +240,7 @@ class _ProtobufJsonAnyFieldEditorState
     return ProtobufJsonMessageEditor(
       controller: subController,
       depth: widget.fieldInfo.depth + 1,
+      parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,
       provider: widget.provider,
     );
   }

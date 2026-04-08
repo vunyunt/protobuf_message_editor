@@ -29,7 +29,10 @@ class _ProtobufJsonScalarFieldEditorState
   dynamic _getValue() {
     final rawValue = widget.controller.jsonMap[widget.fieldInfo.jsonKey];
     if (widget.fieldInfo.index != null && rawValue is List) {
-      return rawValue[widget.fieldInfo.index!];
+      if (widget.fieldInfo.index! < rawValue.length) {
+        return rawValue[widget.fieldInfo.index!];
+      }
+      return null;
     }
     return rawValue;
   }
@@ -60,12 +63,25 @@ class _ProtobufJsonScalarFieldEditorState
 
   @override
   Widget build(BuildContext context) {
+    final controller = widget.controller;
+    final fieldInfo = widget.fieldInfo;
     final theme = ProtobufEditorTheme.of(context);
 
+    final parentMessageName = fieldInfo.parentBuilderInfo?.qualifiedMessageName
+        .split('.')
+        .last;
+    final parentContext = [
+      if (parentMessageName != null) 'Message: $parentMessageName',
+      if (fieldInfo.parentFieldName != null)
+        'Field: ${fieldInfo.parentFieldName}',
+    ].join('\n');
+
     return YamlIndent(
-      depth: widget.fieldInfo.depth,
+      depth: fieldInfo.depth,
       child: YamlFieldRow(
-        label: widget.fieldInfo.label!,
+        label: fieldInfo.label ?? fieldInfo.jsonKey ?? '',
+        labelColor: theme.getLabelColor(fieldInfo.depth),
+        tooltip: parentContext.isEmpty ? null : parentContext,
         value: SizedBox(
           height: theme.fieldValueHeight,
           child: TextField(
@@ -79,27 +95,28 @@ class _ProtobufJsonScalarFieldEditorState
               hintStyle: theme.hintTextStyle,
             ),
             onChanged: (newValue) {
-              final typedValue = widget.fieldInfo.fieldInfo!.castString(
-                newValue,
-              );
-              final jsonKey = widget.fieldInfo.jsonKey!;
+              final typedValue = fieldInfo.fieldInfo!.castString(newValue);
+              final jsonKey = fieldInfo.jsonKey!;
 
-              if (widget.fieldInfo.index != null) {
-                final list = List.from(
-                  widget.controller.jsonMap[jsonKey] as List,
-                );
-                list[widget.fieldInfo.index!] = typedValue;
-                widget.controller.updateField(jsonKey, list);
+              if (fieldInfo.index != null) {
+                final raw = controller.jsonMap[jsonKey];
+                final list = raw is List ? List.from(raw) : <dynamic>[];
+                if (fieldInfo.index! < list.length) {
+                  list[fieldInfo.index!] = typedValue;
+                } else {
+                  list.add(typedValue);
+                }
+                controller.updateField(jsonKey, list);
               } else {
-                widget.controller.updateField(jsonKey, typedValue);
+                controller.updateField(jsonKey, typedValue);
               }
             },
           ),
         ),
         trailing: ProtobufJsonRemoveButton(
-          controller: widget.controller,
-          jsonKey: widget.fieldInfo.jsonKey!,
-          index: widget.fieldInfo.index,
+          controller: controller,
+          jsonKey: fieldInfo.jsonKey!,
+          index: fieldInfo.index,
         ),
       ),
     );

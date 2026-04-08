@@ -3,7 +3,6 @@ import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
@@ -12,6 +11,7 @@ class ProtobufJsonFieldEditor extends StatefulWidget {
   final String jsonKey;
   final int? index;
   final int depth;
+  final String? parentFieldName;
   final ProtobufJsonEditorProvider? provider;
 
   const ProtobufJsonFieldEditor({
@@ -20,6 +20,7 @@ class ProtobufJsonFieldEditor extends StatefulWidget {
     required this.jsonKey,
     this.index,
     this.depth = 0,
+    this.parentFieldName,
     this.provider,
   });
 
@@ -85,6 +86,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
       jsonKey: widget.jsonKey,
       index: widget.index,
       depth: widget.depth,
+      parentFieldName: widget.parentFieldName,
       provider: widget.provider,
     );
   }
@@ -103,6 +105,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
       index: widget.index,
       depth: widget.depth,
       label: label,
+      parentFieldName: widget.parentFieldName,
       parentBuilderInfo: widget.controller.builderInfo,
       submessageBuilderInfo:
           (fieldInfo.isMessageField && !fieldInfo.isScalarMessage)
@@ -122,6 +125,7 @@ class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
   final String jsonKey;
   final int? index;
   final int depth;
+  final String? parentFieldName;
   final ProtobufJsonEditorProvider? provider;
 
   const ProtobufJsonDefaultFieldEditor({
@@ -130,6 +134,7 @@ class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
     required this.jsonKey,
     this.index,
     this.depth = 0,
+    this.parentFieldName,
     this.provider,
   });
 
@@ -149,6 +154,7 @@ class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
       index: index,
       depth: depth,
       label: label,
+      parentFieldName: parentFieldName,
       parentBuilderInfo: controller.builderInfo,
       submessageBuilderInfo:
           (fieldInfo.isMessageField && !fieldInfo.isScalarMessage)
