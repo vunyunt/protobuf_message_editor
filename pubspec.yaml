@@ -1,6 +1,6 @@
 name: protobuf_message_editor
 description: "An editor widget for protobuf GeneratedMessage instances"
-version: 0.1.0
+version: 0.2.0
 homepage: https://github.com/vunyunt/protobuf_message_editor
 
 environment:

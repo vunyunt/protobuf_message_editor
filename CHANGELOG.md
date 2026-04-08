@@ -1,3 +1,17 @@
+## 0.2.0
+
+- Added **`ProtobufJsonEditor`** using internal JSON state management.
+- Implemented **`ProtobufJsonController`** hierarchy for message state.
+- Added **depth-weighted label colors** and matching **vertical indentation guides**.
+- Added **context-aware tooltips** for fields and add buttons.
+- Introduced **`ProtobufEditorTheme`** for centralized styling.
+- Global support for **limiting numerical precision** (3 significant figures) during serialization.
+- Fixed **`google.protobuf.Any`** serialization for uninitialized fields.
+- Improved custom provider support for nested `Any` fields.
+- Added visual **"Unsaved Changes" indicator**.
+- Standardized Protobuf package naming.
+- **Deprecated legacy editors** (`ProtoMessageEditor`, `ProtoDualPanelMessageEditor`, etc.) and associated types in favor of `ProtobufJsonEditor`.
+
 ## 0.1.0
 
 - Refactored custom message editors to decouple the editor content widget from field expansion or navigation logic.

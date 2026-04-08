@@ -80,7 +80,8 @@ class YamlFieldRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (leading != null) ...[leading!, const SizedBox(width: 4)],
+          SizedBox(width: theme.collapseIconSize, child: leading),
+          const SizedBox(width: 4),
           GestureDetector(onTap: onTapLabel, child: labelWidget),
           const SizedBox(width: 8),
           if (value != null) Expanded(child: value!),

@@ -15,6 +15,7 @@ typedef SubmessageBuilder =
       VoidCallback? onRebuildRequested,
     });
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class ProtoMessageEditor extends StatefulWidget {
   final GeneratedMessage message;
   final GeneratedMessage? parentMessage;

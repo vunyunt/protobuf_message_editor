@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class EnumFieldEditor extends StatefulWidget {
   final FieldInfo fieldInfo;
   final GeneratedMessage message;
   final TextEditingController controller;
   final int? listIndex;
 
-  const EnumFieldEditor(
-      {super.key,
-      required this.fieldInfo,
-      required this.message,
-      required this.controller,
-      this.listIndex});
+  const EnumFieldEditor({
+    super.key,
+    required this.fieldInfo,
+    required this.message,
+    required this.controller,
+    this.listIndex,
+  });
 
   @override
   State<EnumFieldEditor> createState() => _EnumFieldEditorState();
@@ -25,8 +27,9 @@ class _EnumFieldEditorState extends State<EnumFieldEditor> {
     final value = widget.message.getField(widget.fieldInfo.tagNumber);
     final listIndex = widget.listIndex;
 
-    widget.controller.text =
-        listIndex != null ? value[listIndex].toString() : value.toString();
+    widget.controller.text = listIndex != null
+        ? value[listIndex].toString()
+        : value.toString();
   }
 
   @override

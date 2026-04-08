@@ -3,12 +3,14 @@ import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/custom_editor_provider.dart';
 import 'package:protobuf_message_editor/src/utils/proto_message_extensions.dart';
 
+@Deprecated('Use ProtobufJsonEditor instead')
 abstract class CustomFieldEditorBuilder {
   FieldIdentifier get identifier;
 
   Widget build(BuildContext context, {required GeneratedMessage parentMessage});
 }
 
+@Deprecated('Use ProtobufJsonEditor instead')
 abstract class CustomMessageEditorBuilder<T extends GeneratedMessage> {
   String get qualifiedMessageName;
 
@@ -19,6 +21,7 @@ abstract class CustomMessageEditorBuilder<T extends GeneratedMessage> {
   });
 }
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class CustomEditorRegistry implements CustomEditorProvider {
   final Map<FieldIdentifier, CustomFieldEditorBuilder> customFieldBuilders;
   final Map<String, CustomMessageEditorBuilder> customMessageEditors;

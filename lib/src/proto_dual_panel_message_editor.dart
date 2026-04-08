@@ -11,6 +11,7 @@ import 'package:protobuf_message_editor/src/proto_navigation_state.dart';
 ///
 /// If [rootMessage] is provided instead of [navigationState], an internal
 /// [navigationState] will be created and managed
+@Deprecated('Use ProtobufJsonEditor instead')
 class ProtoDualPanelMessageEditor extends StatefulWidget {
   final ProtoNavigationState? navigationState;
   final GeneratedMessage? rootMessage;

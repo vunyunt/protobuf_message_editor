@@ -4,8 +4,10 @@ import 'package:protobuf/well_known_types/google/protobuf/any.pb.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
 
 // For compatibility
+@Deprecated('Use ProtobufJsonEditor instead')
 typedef AnyEditor = AnyEditorBuilder;
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class AnyEditorBuilder extends CustomMessageEditorBuilder {
   final AnyEditorRegistry registry;
 
@@ -23,6 +25,7 @@ class AnyEditorBuilder extends CustomMessageEditorBuilder {
   }) => AnyEditorWidget(registry: registry, data: data as Any);
 }
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class AnyEditorWidget extends StatefulWidget {
   final AnyEditorRegistry registry;
   final Any data;

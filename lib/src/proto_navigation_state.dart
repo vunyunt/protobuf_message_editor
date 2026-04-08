@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class ProtoNavigationNode {
   final int depth;
   final GeneratedMessage? parent;
@@ -16,6 +17,7 @@ class ProtoNavigationNode {
   });
 }
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class ProtoNavigationState extends ChangeNotifier {
   late final ProtoNavigationNode root;
   late final List<ProtoNavigationNode> _stack;

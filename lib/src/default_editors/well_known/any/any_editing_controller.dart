@@ -3,6 +3,7 @@ import 'package:protobuf/protobuf.dart';
 import 'package:protobuf/well_known_types/google/protobuf/any.pb.dart';
 import 'any_editor_registry.dart';
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class AnyEditingController extends ChangeNotifier {
   final Any data;
   final AnyEditorRegistry registry;

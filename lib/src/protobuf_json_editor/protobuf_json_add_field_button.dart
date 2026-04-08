@@ -71,10 +71,15 @@ class ProtobufJsonAddFieldButton extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.add,
-                  size: theme.smallIconSize,
-                  color: Theme.of(context).primaryColor,
+                SizedBox(
+                  width: theme.collapseIconSize,
+                  child: Center(
+                    child: Icon(
+                      Icons.add,
+                      size: theme.smallIconSize,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 4),
                 Text('Add field...', style: theme.actionButtonStyle),

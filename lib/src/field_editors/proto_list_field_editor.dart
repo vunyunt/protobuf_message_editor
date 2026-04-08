@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class ProtoListFieldEditor extends StatefulWidget {
   static dynamic defaultRepeatedFieldAddBuilder({
     required FieldIdentifier identifier,

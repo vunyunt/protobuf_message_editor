@@ -7,6 +7,7 @@ import 'package:protobuf_message_editor/src/proto_message_editor.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 import 'package:protobuf_message_editor/src/utils/proto_message_extensions.dart';
 
+@Deprecated('Use ProtobufJsonEditor instead')
 class ProtoFieldEditor extends StatefulWidget {
   final GeneratedMessage message;
   final FieldInfo fieldInfo;
