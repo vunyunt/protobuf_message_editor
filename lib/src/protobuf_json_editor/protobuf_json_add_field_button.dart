@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_components.dart';
 
 class ProtobufJsonAddFieldButton extends StatelessWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final int depth;
 
   const ProtobufJsonAddFieldButton({
@@ -54,15 +55,15 @@ class ProtobufJsonAddFieldButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.add, size: 14, color: Theme.of(context).primaryColor),
+              Icon(
+                Icons.add,
+                size: ProtobufEditorTheme.of(context).smallIconSize,
+                color: Theme.of(context).primaryColor,
+              ),
               const SizedBox(width: 4),
-              const Text(
+              Text(
                 'Add field...',
-                style: TextStyle(
-                  color: Color(0xFF2196F3),
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: ProtobufEditorTheme.of(context).actionButtonStyle,
               ),
             ],
           ),

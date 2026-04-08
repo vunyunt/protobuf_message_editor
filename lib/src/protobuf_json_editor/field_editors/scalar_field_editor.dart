@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
@@ -7,7 +8,7 @@ import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.da
 
 /// A field editor for scalar values (int, string, double, bytes).
 class ProtobufJsonScalarFieldEditor extends StatefulWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final ProtobufJsonFieldInfo fieldInfo;
 
   const ProtobufJsonScalarFieldEditor({
@@ -59,20 +60,23 @@ class _ProtobufJsonScalarFieldEditorState
 
   @override
   Widget build(BuildContext context) {
+    final theme = ProtobufEditorTheme.of(context);
+
     return YamlIndent(
       depth: widget.fieldInfo.depth,
       child: YamlFieldRow(
         label: widget.fieldInfo.label!,
         value: SizedBox(
-          height: 24,
+          height: theme.fieldValueHeight,
           child: TextField(
             controller: _textController,
-            style: const TextStyle(fontSize: 13, fontFamily: 'monospace'),
-            decoration: const InputDecoration(
+            style: theme.fieldValueStyle,
+            decoration: InputDecoration(
               isDense: true,
               contentPadding: EdgeInsets.zero,
               border: InputBorder.none,
               hintText: 'null',
+              hintStyle: theme.hintTextStyle,
             ),
             onChanged: (newValue) {
               final typedValue = widget.fieldInfo.fieldInfo!.castString(

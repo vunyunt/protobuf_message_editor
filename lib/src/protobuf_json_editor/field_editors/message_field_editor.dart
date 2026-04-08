@@ -8,7 +8,7 @@ import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_com
 
 /// A field editor for message values (nested objects).
 class ProtobufJsonMessageFieldEditor extends StatefulWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final ProtobufJsonFieldInfo fieldInfo;
   final ProtobufJsonEditorProvider? provider;
 
@@ -68,7 +68,7 @@ class _ProtobufJsonMessageFieldEditorState
     final protoFieldInfo = widget.fieldInfo.fieldInfo!;
 
     final subBuilderInfo = protoFieldInfo.subBuilder!().info_;
-    final subController = ProtobufJsonEditingController.submessage(
+    final subController = ProtobufJsonSubmessageController(
       initialValue: value,
       builderInfo: subBuilderInfo,
       typeRegistry: controller.typeRegistry,

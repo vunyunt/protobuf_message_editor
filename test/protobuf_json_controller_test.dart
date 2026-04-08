@@ -83,20 +83,19 @@ void main() {
     });
   });
 
-  group('ProtobufJsonEditingController.submessage', () {
+  group('ProtobufJsonSubmessageController', () {
     test('initialization uses initialValue map', () {
-      final subController = ProtobufJsonEditingController.submessage(
+      final subController = ProtobufJsonSubmessageController(
         initialValue: {'name': 'sub'},
         builderInfo: TestMessage().info_,
       );
 
       expect(subController.jsonMap, {'name': 'sub'});
-      expect(subController.sourceMessage, isNull);
     });
 
     test('onChanged is called when field updates', () {
       Map<String, dynamic>? captured;
-      final subController = ProtobufJsonEditingController.submessage(
+      final subController = ProtobufJsonSubmessageController(
         initialValue: {'name': 'sub'},
         builderInfo: TestMessage().info_,
         onChanged: (map) => captured = map,
@@ -104,11 +103,11 @@ void main() {
 
       subController.updateField('name', 'changed');
       expect(captured, {'name': 'changed'});
-      expect(subController.isDirty, isTrue);
+      expect(subController.jsonMap['name'], 'changed');
     });
 
     test('getSavedMessage creates a fresh submessage', () {
-      final subController = ProtobufJsonEditingController.submessage(
+      final subController = ProtobufJsonSubmessageController(
         initialValue: {'name': 'sub', 'value': 456},
         builderInfo: TestMessage().info_,
       );
@@ -144,7 +143,7 @@ class MockAny extends GeneratedMessage {
 }
 
 void _testAny() {
-  group('ProtobufJsonEditingController Any resolution', () {
+  group('ProtobufJsonController Any resolution', () {
     test('Any message expansion is resolved in submessage controller', () {
       final registry = TypeRegistry([TestMessage()]);
       final json = {
@@ -153,7 +152,7 @@ void _testAny() {
         'value': 456,
       };
 
-      final subController = ProtobufJsonEditingController.submessage(
+      final subController = ProtobufJsonSubmessageController(
         initialValue: json,
         builderInfo: MockAny().info_,
         typeRegistry: registry,
@@ -180,7 +179,7 @@ void _testAny() {
         createEmptyInstance: () => TestMessage(),
       )..aOM<MockAny>(1, 'anyField', subBuilder: () => MockAny());
       final json = <String, dynamic>{};
-      final controller = ProtobufJsonEditingController.submessage(
+      final controller = ProtobufJsonSubmessageController(
         initialValue: json,
         builderInfo: parentInfo,
       );
@@ -193,7 +192,6 @@ void _testAny() {
       expect(controller.jsonMap['anyField'], {
         '@type': 'type.googleapis.com/test.TestMessage',
       });
-      expect(controller.isDirty, isTrue);
     });
 
     test('addField without typeUrl for Any field uses empty map', () {
@@ -202,7 +200,7 @@ void _testAny() {
         createEmptyInstance: () => TestMessage(),
       )..aOM<MockAny>(1, 'anyField', subBuilder: () => MockAny());
       final json = <String, dynamic>{};
-      final controller = ProtobufJsonEditingController.submessage(
+      final controller = ProtobufJsonSubmessageController(
         initialValue: json,
         builderInfo: parentInfo,
       );
@@ -210,7 +208,6 @@ void _testAny() {
       controller.addField('anyField');
 
       expect(controller.jsonMap['anyField'], <String, dynamic>{});
-      expect(controller.isDirty, isTrue);
     });
 
     test('updating repeated Any field with typed elements works', () {
@@ -219,7 +216,7 @@ void _testAny() {
         createEmptyInstance: () => TestMessage(),
       )..pPM<MockAny>(1, 'repeatedAny', subBuilder: () => MockAny());
       final json = <String, dynamic>{'repeatedAny': []};
-      final controller = ProtobufJsonEditingController.submessage(
+      final controller = ProtobufJsonSubmessageController(
         initialValue: json,
         builderInfo: parentInfo,
       );
@@ -233,7 +230,6 @@ void _testAny() {
         controller.jsonMap['repeatedAny'][0]['@type'],
         'type.googleapis.com/test.TestMessage',
       );
-      expect(controller.isDirty, isTrue);
     });
   });
 }

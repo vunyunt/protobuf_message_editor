@@ -10,7 +10,7 @@ import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_f
 /// renders a [ProtobufJsonFieldEditor] for each key. It also appends a
 /// [ProtobufJsonAddFieldButton] at the end.
 class ProtobufJsonMessageEditor extends StatelessWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final int depth;
   final ProtobufJsonEditorProvider? provider;
 

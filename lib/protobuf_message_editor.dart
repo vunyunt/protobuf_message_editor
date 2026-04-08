@@ -17,3 +17,4 @@ export 'src/protobuf_json_editor/field_editors.dart';
 export 'src/protobuf_json_editor/protobuf_json_field_editor.dart';
 export 'src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 export 'src/protobuf_json_editor/protobuf_json_field_info.dart';
+export 'src/protobuf_json_editor/protobuf_editor_theme.dart';

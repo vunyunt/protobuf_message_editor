@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/default_editors/well_known/any/any_editor_registry.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
@@ -14,7 +15,7 @@ import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.da
 /// This editor allows selecting the message type and recursively editing
 /// the resolved submessage.
 class ProtobufJsonAnyFieldEditor extends StatefulWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final ProtobufJsonFieldInfo fieldInfo;
   final ProtobufJsonEditorProvider? provider;
   final TypeRegistry? customTypeRegistry;
@@ -63,6 +64,9 @@ class _ProtobufJsonAnyFieldEditorState
 
     final typeUrl = value['@type'] as String?;
     final registry = widget.customTypeRegistry ?? controller.typeRegistry;
+    // Actually looking at the file view earlier:
+    // final registry = widget.customTypeRegistry ?? controller.typeRegistry;
+    // Let me check any_field_editor.dart again.
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,7 +81,12 @@ class _ProtobufJsonAnyFieldEditorState
                 onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
               ),
               onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
-              value: _buildTypeSelector(context, typeUrl, registry),
+              value: _buildTypeSelector(
+                context,
+                typeUrl,
+                registry,
+                ProtobufEditorTheme.of(context),
+              ),
               trailing: ProtobufJsonRemoveButton(
                 controller: controller,
                 jsonKey: jsonKey,
@@ -86,20 +95,21 @@ class _ProtobufJsonAnyFieldEditorState
             ),
           )
         else
-          _buildTypeSelector(context, typeUrl, registry),
+          _buildTypeSelector(
+            context,
+            typeUrl,
+            registry,
+            ProtobufEditorTheme.of(context),
+          ),
         if (!_isCollapsed) ...[_buildSubmessageContent(value)],
         if (!_isCollapsed && typeUrl == null)
           YamlIndent(
             depth: widget.fieldInfo.depth + 1,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
                 'No type selected. Use the selector above to choose a message type.',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                ),
+                style: ProtobufEditorTheme.of(context).hintTextStyle,
               ),
             ),
           ),
@@ -111,6 +121,7 @@ class _ProtobufJsonAnyFieldEditorState
     BuildContext context,
     String? typeUrl,
     TypeRegistry registry,
+    ProtobufEditorTheme theme,
   ) {
     final currentType = typeUrl?.split('/').last ?? 'Select type...';
 
@@ -124,10 +135,7 @@ class _ProtobufJsonAnyFieldEditorState
             items: typeNames.map((name) {
               return PopupMenuItem(
                 value: name,
-                child: Text(
-                  name,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-                ),
+                child: Text(name, style: theme.fieldValueStyle),
               );
             }).toList(),
           );
@@ -163,27 +171,22 @@ class _ProtobufJsonAnyFieldEditorState
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: Colors.blue.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: Colors.blue.withOpacity(0.3)),
-        ),
+        decoration: theme.typeBadgeDecoration,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
               child: Text(
                 currentType,
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'monospace',
-                ),
+                style: theme.typeBadgeStyle,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.arrow_drop_down, size: 14, color: Colors.blue),
+            Icon(
+              Icons.arrow_drop_down,
+              size: theme.smallIconSize,
+              color: Colors.blue,
+            ),
           ],
         ),
       ),
@@ -198,7 +201,7 @@ class _ProtobufJsonAnyFieldEditorState
 
     final subBuilderInfo = protoFieldInfo.subBuilder?.call().info_;
     if (subBuilderInfo == null) return const SizedBox.shrink();
-    final subController = ProtobufJsonEditingController.submessage(
+    final subController = ProtobufJsonSubmessageController(
       initialValue: value,
       builderInfo: subBuilderInfo,
       typeRegistry: widget.customTypeRegistry ?? controller.typeRegistry,

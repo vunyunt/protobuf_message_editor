@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
@@ -6,7 +7,7 @@ import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_com
 
 /// A field editor for boolean values.
 class ProtobufJsonBooleanFieldEditor extends StatelessWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final ProtobufJsonFieldInfo fieldInfo;
 
   const ProtobufJsonBooleanFieldEditor({
@@ -25,6 +26,8 @@ class ProtobufJsonBooleanFieldEditor extends StatelessWidget {
         ? rawValue[index] as bool? ?? false
         : rawValue as bool? ?? false;
 
+    final theme = ProtobufEditorTheme.of(context);
+
     return YamlIndent(
       depth: fieldInfo.depth,
       child: YamlFieldRow(
@@ -32,7 +35,7 @@ class ProtobufJsonBooleanFieldEditor extends StatelessWidget {
         value: Align(
           alignment: Alignment.centerLeft,
           child: SizedBox(
-            height: 24,
+            height: theme.fieldValueHeight,
             child: Switch(
               value: value,
               onChanged: (newValue) {

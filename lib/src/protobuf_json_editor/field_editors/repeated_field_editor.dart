@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
@@ -9,7 +10,7 @@ import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.da
 
 /// A field editor for repeated fields (lists).
 class ProtobufJsonRepeatedFieldEditor extends StatefulWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final ProtobufJsonFieldInfo fieldInfo;
   final ProtobufJsonEditorProvider? provider;
 
@@ -88,17 +89,13 @@ class _ProtobufJsonRepeatedFieldEditorState
                   children: [
                     Icon(
                       Icons.add,
-                      size: 14,
+                      size: ProtobufEditorTheme.of(context).smallIconSize,
                       color: Theme.of(context).primaryColor,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'Add element',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: ProtobufEditorTheme.of(context).actionButtonStyle,
                     ),
                   ],
                 ),

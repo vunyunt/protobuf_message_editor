@@ -9,7 +9,7 @@ import 'lib/generated/test_message.pb.dart';
 class MockAnyProvider extends ProtobufJsonEditorProvider {
   @override
   Widget? getSubmessageEditor({
-    required ProtobufJsonEditingController controller,
+    required ProtobufJsonController controller,
     required ProtobufJsonFieldInfo fieldInfo,
   }) {
     if (fieldInfo.jsonKey == 'exampleAny') {

@@ -11,7 +11,7 @@ abstract class ProtobufJsonEditorProvider {
   ///
   /// Returns a [Widget] if a custom editor is provided, otherwise `null`.
   Widget? getSubmessageEditor({
-    required ProtobufJsonEditingController controller,
+    required ProtobufJsonController controller,
     required ProtobufJsonFieldInfo fieldInfo,
   }) => null;
 }

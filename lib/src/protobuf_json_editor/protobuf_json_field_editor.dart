@@ -8,7 +8,7 @@ import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_f
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 class ProtobufJsonFieldEditor extends StatefulWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final String jsonKey;
   final int? index;
   final int depth;
@@ -56,7 +56,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
           ? (widget.index! < rawValue.length ? rawValue[widget.index!] : null)
           : rawValue;
 
-      final subController = ProtobufJsonEditingController.submessage(
+      final subController = ProtobufJsonSubmessageController(
         initialValue: (subValue as Map<String, dynamic>?) ?? {},
         builderInfo: subBuilderInfo,
         typeRegistry: widget.controller.typeRegistry,
@@ -118,7 +118,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
 /// custom editor is provided. It avoids infinite recursion by not calling
 /// back into the [ProtobufJsonEditorProvider] for the same field.
 class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final String jsonKey;
   final int? index;
   final int depth;

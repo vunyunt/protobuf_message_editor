@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 
 class ProtobufJsonRemoveButton extends StatelessWidget {
-  final ProtobufJsonEditingController controller;
+  final ProtobufJsonController controller;
   final String jsonKey;
   final int? index;
 
@@ -25,7 +26,11 @@ class ProtobufJsonRemoveButton extends StatelessWidget {
           controller.removeField(jsonKey);
         }
       },
-      child: const Icon(Icons.close, size: 14, color: Colors.grey),
+      child: Icon(
+        Icons.close,
+        size: ProtobufEditorTheme.of(context).smallIconSize,
+        color: ProtobufEditorTheme.of(context).removeButtonColor,
+      ),
     );
   }
 }

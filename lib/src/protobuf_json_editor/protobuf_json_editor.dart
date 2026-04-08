@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
@@ -53,56 +54,61 @@ class _ProtobufJsonEditorState extends State<ProtobufJsonEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Editing: ${widget.message.info_.qualifiedMessageName}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    if (_controller.isDirty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+    final theme = ProtobufEditorTheme.of(context);
+
+    return Theme(
+      data: Theme.of(context).copyWith(extensions: [theme]),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: theme.contentPadding,
+                  child: Row(
+                    children: [
+                      Expanded(
                         child: Text(
-                          'Unsaved Changes',
-                          style: TextStyle(color: Colors.orange, fontSize: 12),
+                          'Editing: ${widget.message.info_.qualifiedMessageName}',
+                          style: theme.fieldLabelStyle,
                         ),
                       ),
-                    ElevatedButton(
-                      onPressed: _controller.isDirty
-                          ? () {
-                              final savedMessage = _controller.save();
-                              widget.onSave?.call(savedMessage);
-                            }
-                          : null,
-                      child: const Text('Save'),
-                    ),
-                  ],
+                      if (_controller.isDirty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            'Unsaved Changes',
+                            style: theme.unsavedChangesStyle,
+                          ),
+                        ),
+                      ElevatedButton(
+                        onPressed: _controller.isDirty
+                            ? () {
+                                final savedMessage = _controller.save();
+                                widget.onSave?.call(savedMessage);
+                              }
+                            : null,
+                        child: const Text('Save'),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Divider(height: 1),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ProtobufJsonMessageEditor(
-                  controller: _controller,
-                  depth: 0,
-                  provider: widget.provider,
+                const Divider(height: 1),
+                Padding(
+                  padding: theme.contentPadding,
+                  child: ProtobufJsonMessageEditor(
+                    controller: _controller,
+                    depth: 0,
+                    provider: widget.provider,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

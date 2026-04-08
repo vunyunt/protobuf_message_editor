@@ -50,12 +50,12 @@ class RootMessage extends GeneratedMessage {
 
 class MockProvider extends ProtobufJsonEditorProvider {
   bool called = false;
-  ProtobufJsonEditingController? lastController;
+  ProtobufJsonController? lastController;
   ProtobufJsonFieldInfo? lastFieldInfo;
 
   @override
   Widget? getSubmessageEditor({
-    required ProtobufJsonEditingController controller,
+    required ProtobufJsonController controller,
     required ProtobufJsonFieldInfo fieldInfo,
   }) {
     called = true;
@@ -71,7 +71,7 @@ class MockProvider extends ProtobufJsonEditorProvider {
 class EmptyProvider extends ProtobufJsonEditorProvider {
   @override
   Widget? getSubmessageEditor({
-    required ProtobufJsonEditingController controller,
+    required ProtobufJsonController controller,
     required ProtobufJsonFieldInfo fieldInfo,
   }) => null;
 }

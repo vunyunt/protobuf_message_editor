@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 
 /// A component that provides consistent indentation for nested message structures.
 class YamlIndent extends StatelessWidget {
   final int depth;
   final Widget child;
-  final double indentWidth;
+  final double? indentWidth;
 
   const YamlIndent({
     super.key,
     required this.depth,
     required this.child,
-    this.indentWidth = 16.0,
+    this.indentWidth,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = ProtobufEditorTheme.of(context);
+    final width = indentWidth ?? theme.indentWidth;
     if (depth <= 0) return child;
 
     return Padding(
-      padding: EdgeInsets.only(left: depth * indentWidth),
+      padding: EdgeInsets.only(left: depth * width),
       child: child,
     );
   }
@@ -43,22 +46,17 @@ class YamlFieldRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ProtobufEditorTheme.of(context);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      padding: theme.fieldRowPadding,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (leading != null) ...[leading!, const SizedBox(width: 4)],
           GestureDetector(
             onTap: onTapLabel,
-            child: Text(
-              '$label:',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontFamily: 'monospace',
-                fontSize: 13,
-              ),
-            ),
+            child: Text('$label:', style: theme.fieldLabelStyle),
           ),
           const SizedBox(width: 8),
           if (value != null) Expanded(child: value!),
@@ -82,12 +80,14 @@ class YamlCollapseToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ProtobufEditorTheme.of(context);
+
     return GestureDetector(
       onTap: onToggle,
       child: Icon(
         isCollapsed ? Icons.chevron_right : Icons.expand_more,
-        size: 16,
-        color: Colors.grey[600],
+        size: theme.collapseIconSize,
+        color: theme.collapseToggleColor,
       ),
     );
   }
