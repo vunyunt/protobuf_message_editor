@@ -3,11 +3,10 @@ import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/default_editors/well_known/any/any_editor_registry.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_components.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A specialized field editor for `google.protobuf.Any` fields.
@@ -85,13 +84,13 @@ class _ProtobufJsonAnyFieldEditorState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (jsonKey.isNotEmpty)
-          YamlIndent(
+          ProtobufJsonIndent(
             depth: widget.fieldInfo.depth,
-            child: YamlFieldRow(
+            child: ProtobufJsonFieldRow(
               label: widget.fieldInfo.label ?? jsonKey,
               labelColor: theme.getLabelColor(widget.fieldInfo.depth),
               tooltip: parentContext.isEmpty ? null : parentContext,
-              leading: YamlCollapseToggle(
+              leading: ProtobufJsonCollapseToggle(
                 isCollapsed: _isCollapsed,
                 onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
               ),
@@ -113,7 +112,7 @@ class _ProtobufJsonAnyFieldEditorState
           ),
         if (!_isCollapsed) ...[_buildSubmessageContent(value)],
         if (!_isCollapsed && typeUrl == null)
-          YamlIndent(
+          ProtobufJsonIndent(
             depth: widget.fieldInfo.depth + 1,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),

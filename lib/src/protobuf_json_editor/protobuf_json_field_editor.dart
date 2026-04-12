@@ -48,6 +48,12 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
 
     final fieldMetadata = _createFieldMetadata(fieldInfo);
 
+    final customFieldEditor = widget.provider?.getFieldEditor(
+      controller: widget.controller,
+      fieldInfo: fieldMetadata,
+    );
+    if (customFieldEditor != null) return customFieldEditor;
+
     if (fieldInfo.isMessageField &&
         !fieldInfo.isScalarMessage &&
         !fieldInfo.isRepeated) {

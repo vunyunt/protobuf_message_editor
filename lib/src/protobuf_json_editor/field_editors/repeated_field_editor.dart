@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_components.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A field editor for repeated fields (lists).
@@ -53,13 +52,13 @@ class _ProtobufJsonRepeatedFieldEditorState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        YamlIndent(
+        ProtobufJsonIndent(
           depth: depth,
-          child: YamlFieldRow(
+          child: ProtobufJsonFieldRow(
             label: fieldInfo.label!,
             labelColor: theme.getLabelColor(depth),
             tooltip: parentContext.isEmpty ? null : parentContext,
-            leading: YamlCollapseToggle(
+            leading: ProtobufJsonCollapseToggle(
               isCollapsed: _isCollapsed,
               onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
             ),
@@ -83,37 +82,20 @@ class _ProtobufJsonRepeatedFieldEditorState
             );
           }),
         if (!_isCollapsed)
-          YamlIndent(
+          ProtobufJsonActionButton(
+            label: 'Add element',
+            icon: Icons.add,
             depth: depth + 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Tooltip(
-                message: 'Add element to ${fieldInfo.label}',
-                child: InkWell(
-                  onTap: () async {
-                    final newList = List.from(value);
-                    dynamic defaultValue = protoFieldInfo.getDefaultValue(
-                      forElement: true,
-                    );
+            tooltip: 'Add element to ${fieldInfo.label}',
+            onTap: () async {
+              final newList = List.from(value);
+              dynamic defaultValue = protoFieldInfo.getDefaultValue(
+                forElement: true,
+              );
 
-                    newList.add(defaultValue);
-                    controller.updateField(jsonKey, newList);
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        size: theme.smallIconSize,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      const SizedBox(width: 4),
-                      Text('Add element', style: theme.actionButtonStyle),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+              newList.add(defaultValue);
+              controller.updateField(jsonKey, newList);
+            },
           ),
       ],
     );

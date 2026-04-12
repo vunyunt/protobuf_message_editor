@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors/remove_button.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
 import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/yaml_layout_components.dart';
+import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A field editor for scalar values (int, string, double, bytes).
@@ -76,9 +75,9 @@ class _ProtobufJsonScalarFieldEditorState
         'Field: ${fieldInfo.parentFieldName}',
     ].join('\n');
 
-    return YamlIndent(
+    return ProtobufJsonIndent(
       depth: fieldInfo.depth,
-      child: YamlFieldRow(
+      child: ProtobufJsonFieldRow(
         label: fieldInfo.label ?? fieldInfo.jsonKey ?? '',
         labelColor: theme.getLabelColor(fieldInfo.depth),
         tooltip: parentContext.isEmpty ? null : parentContext,
