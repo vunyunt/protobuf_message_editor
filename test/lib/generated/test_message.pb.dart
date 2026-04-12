@@ -183,6 +183,7 @@ class TestMessage extends $pb.GeneratedMessage {
     $0.BoolValue? exampleBoolValue,
     $1.Any? exampleAny,
     $core.Iterable<$1.Any>? exampleRepeatedAny,
+    $core.List<$core.int>? exampleBytesField,
   }) {
     final result = create();
     if (exampleStringField != null)
@@ -200,6 +201,7 @@ class TestMessage extends $pb.GeneratedMessage {
     if (exampleAny != null) result.exampleAny = exampleAny;
     if (exampleRepeatedAny != null)
       result.exampleRepeatedAny.addAll(exampleRepeatedAny);
+    if (exampleBytesField != null) result.exampleBytesField = exampleBytesField;
     return result;
   }
 
@@ -233,6 +235,8 @@ class TestMessage extends $pb.GeneratedMessage {
         protoName: 'exampleAny', subBuilder: $1.Any.create)
     ..pPM<$1.Any>(9, _omitFieldNames ? '' : 'exampleRepeatedAny',
         subBuilder: $1.Any.create)
+    ..a<$core.List<$core.int>>(
+        10, _omitFieldNames ? '' : 'exampleBytesField', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -316,6 +320,15 @@ class TestMessage extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(9)
   $pb.PbList<$1.Any> get exampleRepeatedAny => $_getList(8);
+
+  @$pb.TagNumber(10)
+  $core.List<$core.int> get exampleBytesField => $_getN(9);
+  @$pb.TagNumber(10)
+  set exampleBytesField($core.List<$core.int> value) => $_setBytes(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasExampleBytesField() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearExampleBytesField() => $_clearField(10);
 }
 
 const $core.bool _omitFieldNames =

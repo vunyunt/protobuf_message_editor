@@ -80,6 +80,9 @@ extension ProtoFieldTypeExtensions on FieldInfo {
       isMessageField &&
       subBuilder?.call().info_.qualifiedMessageName == 'google.protobuf.Any';
 
+  /// Returns `true` if this is a bytes field.
+  bool get isBytesField => (type & PbFieldType.BYTES_BIT) != 0;
+
   /// Returns `true` if this is a Well-Known Type that serializes to a scalar in JSON.
   bool get isScalarMessage {
     if (!isMessageField) return false;

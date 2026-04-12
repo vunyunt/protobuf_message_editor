@@ -133,6 +133,13 @@ const TestMessage$json = {
       '6': '.google.protobuf.Any',
       '10': 'exampleRepeatedAny'
     },
+    {
+      '1': 'example_bytes_field',
+      '3': 10,
+      '4': 1,
+      '5': 12,
+      '10': 'exampleBytesField'
+    },
   ],
 };
 
@@ -149,4 +156,5 @@ final $typed_data.Uint8List testMessageDescriptor = $convert.base64Decode(
     'RmllbGQSRgoQZXhhbXBsZUJvb2xWYWx1ZRgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5Cb29sVm'
     'FsdWVSEGV4YW1wbGVCb29sVmFsdWUSNAoKZXhhbXBsZUFueRgIIAEoCzIULmdvb2dsZS5wcm90'
     'b2J1Zi5BbnlSCmV4YW1wbGVBbnkSRgoUZXhhbXBsZV9yZXBlYXRlZF9hbnkYCSADKAsyFC5nb2'
-    '9nbGUucHJvdG9idWYuQW55UhJleGFtcGxlUmVwZWF0ZWRBbnk=');
+    '9nbGUucHJvdG9idWYuQW55UhJleGFtcGxlUmVwZWF0ZWRBbnkSLgoTZXhhbXBsZV9ieXRlc19m'
+    'aWVsZBgKIAEoDFIRZXhhbXBsZUJ5dGVzRmllbGQ=');

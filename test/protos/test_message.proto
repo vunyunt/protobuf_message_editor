@@ -33,4 +33,5 @@ message TestMessage {
   google.protobuf.BoolValue exampleBoolValue = 7;
   google.protobuf.Any exampleAny = 8;
   repeated google.protobuf.Any example_repeated_any = 9;
+  bytes example_bytes_field = 10;
 }
