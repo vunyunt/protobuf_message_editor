@@ -134,72 +134,40 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
     ProtoMapEditorTheme theme,
   ) {
     final currentType = typeUrl?.split('/').last ?? 'Select type...';
+    final typeNames = registry is AnyEditorRegistry
+        ? registry.availableMessageNames.toList()
+        : <String>[];
 
-    return InkWell(
-      onTap: () async {
-        if (registry is AnyEditorRegistry) {
-          final typeNames = registry.availableMessageNames.toList();
-          final selected = await showMenu<String>(
-            context: context,
-            position: _getMenuPosition(context),
-            items: typeNames.map((name) {
-              return PopupMenuItem(
-                value: name,
-                child: Text(name, style: theme.fieldValueStyle),
-              );
-            }).toList(),
-          );
+    return ProtoMapBadgeDropdown(
+      label: currentType,
+      items: typeNames,
+      onSelected: (selected) {
+        final newTypeUrl = 'type.googleapis.com/$selected';
+        final newValue = <String, dynamic>{'@type': newTypeUrl};
+        final controller = widget.controller;
+        final jsonKey = widget.fieldInfo.jsonKey!;
 
-          if (selected != null) {
-            final newTypeUrl = 'type.googleapis.com/$selected';
-            final newValue = <String, dynamic>{'@type': newTypeUrl};
-            final controller = widget.controller;
-            final jsonKey = widget.fieldInfo.jsonKey!;
+        final fieldInController = controller.getFieldInfo(jsonKey);
+        final isParentController =
+            fieldInController != null && fieldInController.isAnyField;
 
-            final fieldInController = controller.getFieldInfo(jsonKey);
-            final isParentController =
-                fieldInController != null && fieldInController.isAnyField;
-
-            if (isParentController) {
-              if (widget.fieldInfo.index != null) {
-                final raw = controller.jsonMap[jsonKey];
-                final list = raw is List ? List.from(raw) : <dynamic>[];
-                if (widget.fieldInfo.index! < list.length) {
-                  list[widget.fieldInfo.index!] = newValue;
-                } else {
-                  list.add(newValue);
-                }
-                controller.updateField(jsonKey, list);
-              } else {
-                controller.updateField(jsonKey, newValue);
-              }
+        if (isParentController) {
+          if (widget.fieldInfo.index != null) {
+            final raw = controller.jsonMap[jsonKey];
+            final list = raw is List ? List.from(raw) : <dynamic>[];
+            if (widget.fieldInfo.index! < list.length) {
+              list[widget.fieldInfo.index!] = newValue;
             } else {
-              controller.updateFullJson(newValue);
+              list.add(newValue);
             }
+            controller.updateField(jsonKey, list);
+          } else {
+            controller.updateField(jsonKey, newValue);
           }
+        } else {
+          controller.updateFullJson(newValue);
         }
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: theme.typeBadgeDecoration,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              child: Text(
-                currentType,
-                style: theme.typeBadgeStyle,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Icon(
-              Icons.arrow_drop_down,
-              size: theme.smallIconSize,
-              color: Colors.blue,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -242,22 +210,6 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
       depth: widget.fieldInfo.depth + 1,
       parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,
       provider: widget.provider,
-    );
-  }
-
-  RelativeRect _getMenuPosition(BuildContext context) {
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay =
-        Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
-    return RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(
-          button.size.bottomRight(Offset.zero),
-          ancestor: overlay,
-        ),
-      ),
-      Offset.zero & overlay.size,
     );
   }
 }
