@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
 
 import 'lib/generated/test_message.pb.dart';
 
 void main() {
   testWidgets(
-    'ProtobufJsonAnyFieldEditor passes customTypeRegistry down to sub-controller',
+    'ProtoMapAnyFieldEditor passes customTypeRegistry down to sub-controller',
     (tester) async {
       final message = TestMessage();
 
       // Root registry is EMPTY
-      final rootController = ProtobufJsonEditingController(
+      final rootController = ProtoMapController(
         sourceMessage: message,
         typeRegistry: const TypeRegistry.empty(),
       );
@@ -31,9 +31,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ProtobufJsonAnyFieldEditor(
+            body: ProtoMapAnyFieldEditor(
               controller: rootController,
-              fieldInfo: ProtobufJsonFieldInfo(
+              fieldInfo: ProtoMapFieldInfo(
                 fieldInfo: rootController.getFieldInfo('exampleAny'),
                 jsonKey: 'exampleAny',
                 depth: 0,
@@ -52,9 +52,9 @@ void main() {
 
       // Verify that '@type' is still in the map (it shouldn't have been stripped during resolution)
       // Actually, subController's builderInfo should be TestSubmessage's builderInfo
-      final subEditor = find.byType(ProtobufJsonMessageEditor);
+      final subEditor = find.byType(ProtoMapMessageEditor);
       expect(subEditor, findsOneWidget);
-      final editorWidget = tester.widget<ProtobufJsonMessageEditor>(subEditor);
+      final editorWidget = tester.widget<ProtoMapMessageEditor>(subEditor);
       expect(
         editorWidget.controller.builderInfo.qualifiedMessageName,
         'protobuf_message_editor_test.TestSubmessage',

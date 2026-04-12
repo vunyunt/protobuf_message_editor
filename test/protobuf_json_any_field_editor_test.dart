@@ -12,7 +12,7 @@ void main() {
   ]);
 
   testWidgets(
-    'ProtobufJsonAnyFieldEditor renders type selector and submessage',
+    'ProtoMapAnyFieldEditor renders type selector and submessage',
     (tester) async {
       final submessage = TestSubmessage(someString: 'helloAny');
       final message = TestMessage()..exampleAny = Any.pack(submessage);
@@ -36,7 +36,7 @@ void main() {
     },
   );
 
-  testWidgets('ProtobufJsonAnyFieldEditor can change type', (tester) async {
+  testWidgets('ProtoMapAnyFieldEditor can change type', (tester) async {
     final message = TestMessage();
     // Do NOT set exampleAny to Any() here.
 
@@ -70,11 +70,11 @@ void main() {
     expect(find.text('Add field...'), findsWidgets);
   });
 
-  testWidgets('ProtobufJsonAnyFieldEditor handles null rawValue', (
+  testWidgets('ProtoMapAnyFieldEditor handles null rawValue', (
     tester,
   ) async {
     final message = TestMessage();
-    final controller = ProtobufJsonEditingController(
+    final controller = ProtoMapController(
       sourceMessage: message,
       typeRegistry: registry,
     );
@@ -99,9 +99,9 @@ void main() {
     expect(find.text('Select type...'), findsOneWidget);
   });
 
-  testWidgets('ProtobufJsonAnyFieldEditor handles null label', (tester) async {
+  testWidgets('ProtoMapAnyFieldEditor handles null label', (tester) async {
     final message = TestMessage();
-    final controller = ProtobufJsonEditingController(
+    final controller = ProtoMapController(
       sourceMessage: message,
       typeRegistry: registry,
     );
@@ -112,9 +112,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: ProtobufJsonAnyFieldEditor(
+          body: ProtoMapAnyFieldEditor(
             controller: controller,
-            fieldInfo: ProtobufJsonFieldInfo(
+            fieldInfo: ProtoMapFieldInfo(
               fieldInfo: controller.getFieldInfo('exampleAny'),
               jsonKey: 'exampleAny',
               label: null, // Force null label

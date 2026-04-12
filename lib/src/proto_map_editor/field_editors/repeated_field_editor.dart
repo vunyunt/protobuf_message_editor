@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_editor.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A field editor for repeated fields (lists).
-class ProtobufJsonRepeatedFieldEditor extends StatefulWidget {
-  final ProtobufJsonController controller;
-  final ProtobufJsonFieldInfo fieldInfo;
-  final ProtobufJsonEditorProvider? provider;
+class ProtoMapRepeatedFieldEditor extends StatefulWidget {
+  final ProtoMapControllerBase controller;
+  final ProtoMapFieldInfo fieldInfo;
+  final ProtoMapEditorProvider? provider;
 
-  const ProtobufJsonRepeatedFieldEditor({
+  const ProtoMapRepeatedFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
@@ -21,12 +21,15 @@ class ProtobufJsonRepeatedFieldEditor extends StatefulWidget {
   });
 
   @override
-  State<ProtobufJsonRepeatedFieldEditor> createState() =>
-      _ProtobufJsonRepeatedFieldEditorState();
+  State<ProtoMapRepeatedFieldEditor> createState() =>
+      _ProtoMapRepeatedFieldEditorState();
 }
 
-class _ProtobufJsonRepeatedFieldEditorState
-    extends State<ProtobufJsonRepeatedFieldEditor> {
+@Deprecated('Use ProtoMapRepeatedFieldEditor instead')
+typedef ProtobufJsonRepeatedFieldEditor = ProtoMapRepeatedFieldEditor;
+
+class _ProtoMapRepeatedFieldEditorState
+    extends State<ProtoMapRepeatedFieldEditor> {
   bool _isCollapsed = false;
 
   @override
@@ -39,7 +42,7 @@ class _ProtobufJsonRepeatedFieldEditorState
 
     final value = controller.jsonMap[jsonKey] as List;
 
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
     final parentMessageName = fieldInfo.parentBuilderInfo?.qualifiedMessageName
         .split('.')
         .last;
@@ -52,18 +55,18 @@ class _ProtobufJsonRepeatedFieldEditorState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ProtobufJsonIndent(
+        ProtoMapIndent(
           depth: depth,
-          child: ProtobufJsonFieldRow(
+          child: ProtoMapFieldRow(
             label: fieldInfo.label!,
             labelColor: theme.getLabelColor(depth),
             tooltip: parentContext.isEmpty ? null : parentContext,
-            leading: ProtobufJsonCollapseToggle(
+            leading: ProtoMapCollapseToggle(
               isCollapsed: _isCollapsed,
               onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
             ),
             onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
-            trailing: ProtobufJsonRemoveButton(
+            trailing: ProtoMapRemoveButton(
               controller: controller,
               jsonKey: jsonKey,
             ),
@@ -72,7 +75,7 @@ class _ProtobufJsonRepeatedFieldEditorState
         if (!_isCollapsed)
           ...value.asMap().entries.map((entry) {
             final index = entry.key;
-            return ProtobufJsonFieldEditor(
+            return ProtoMapFieldEditor(
               controller: controller,
               jsonKey: jsonKey,
               index: index,
@@ -82,7 +85,7 @@ class _ProtobufJsonRepeatedFieldEditorState
             );
           }),
         if (!_isCollapsed)
-          ProtobufJsonActionButton(
+          ProtoMapActionButton(
             label: 'Add element',
             icon: Icons.add,
             depth: depth + 1,

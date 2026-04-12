@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
 
-class ProtobufJsonRemoveButton extends StatelessWidget {
-  final ProtobufJsonController controller;
+class ProtoMapRemoveButton extends StatelessWidget {
+  final ProtoMapControllerBase controller;
   final String jsonKey;
   final int? index;
 
-  const ProtobufJsonRemoveButton({
+  const ProtoMapRemoveButton({
     super.key,
     required this.controller,
     required this.jsonKey,
@@ -28,9 +28,12 @@ class ProtobufJsonRemoveButton extends StatelessWidget {
       },
       child: Icon(
         Icons.close,
-        size: ProtobufEditorTheme.of(context).smallIconSize,
-        color: ProtobufEditorTheme.of(context).removeButtonColor,
+        size: ProtoMapEditorTheme.of(context).smallIconSize,
+        color: ProtoMapEditorTheme.of(context).removeButtonColor,
       ),
     );
   }
 }
+
+@Deprecated('Use ProtoMapRemoveButton instead')
+typedef ProtobufJsonRemoveButton = ProtoMapRemoveButton;

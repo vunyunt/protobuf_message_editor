@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 
-class ProtobufJsonAddFieldButton extends StatelessWidget {
-  final ProtobufJsonController controller;
+class ProtoMapAddFieldButton extends StatelessWidget {
+  final ProtoMapControllerBase controller;
   final int depth;
   final String? parentFieldName;
 
-  const ProtobufJsonAddFieldButton({
+  const ProtoMapAddFieldButton({
     super.key,
     required this.controller,
     required this.depth,
@@ -32,7 +32,7 @@ class ProtobufJsonAddFieldButton extends StatelessWidget {
       if (parentFieldName != null) 'Field: $parentFieldName',
     ].join('\n');
 
-    return ProtobufJsonActionButton(
+    return ProtoMapActionButton(
       label: 'Add field...',
       icon: Icons.add,
       depth: depth,
@@ -77,3 +77,6 @@ class ProtobufJsonAddFieldButton extends StatelessWidget {
     );
   }
 }
+
+@Deprecated('Use ProtoMapAddFieldButton instead')
+typedef ProtobufJsonAddFieldButton = ProtoMapAddFieldButton;

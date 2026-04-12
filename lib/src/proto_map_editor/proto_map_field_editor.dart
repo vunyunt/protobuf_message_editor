@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/field_editors.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/field_editors.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
-class ProtobufJsonFieldEditor extends StatefulWidget {
-  final ProtobufJsonController controller;
+class ProtoMapFieldEditor extends StatefulWidget {
+  final ProtoMapControllerBase controller;
   final String jsonKey;
   final int? index;
   final int depth;
   final String? parentFieldName;
-  final ProtobufJsonEditorProvider? provider;
+  final ProtoMapEditorProvider? provider;
 
-  const ProtobufJsonFieldEditor({
+  const ProtoMapFieldEditor({
     super.key,
     required this.controller,
     required this.jsonKey,
@@ -25,22 +25,24 @@ class ProtobufJsonFieldEditor extends StatefulWidget {
   });
 
   @override
-  State<ProtobufJsonFieldEditor> createState() =>
-      _ProtobufJsonFieldEditorState();
+  State<ProtoMapFieldEditor> createState() => _ProtoMapFieldEditorState();
 }
 
-class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
+@Deprecated('Use ProtoMapFieldEditor instead')
+typedef ProtobufJsonFieldEditor = ProtoMapFieldEditor;
+
+class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
   @override
   Widget build(BuildContext context) {
     final fieldInfo = widget.controller.getFieldInfo(widget.jsonKey);
 
     if (fieldInfo == null) {
-      final fieldMetadata = ProtobufJsonFieldInfo(
+      final fieldMetadata = ProtoMapFieldInfo(
         jsonKey: widget.jsonKey,
         depth: widget.depth,
       );
       // Fallback for keys that don't match FieldInfo (e.g., @type in Any)
-      return ProtobufJsonFallbackFieldEditor(
+      return ProtoMapFallbackFieldEditor(
         controller: widget.controller,
         fieldInfo: fieldMetadata,
       );
@@ -63,7 +65,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
           ? (widget.index! < rawValue.length ? rawValue[widget.index!] : null)
           : rawValue;
 
-      final subController = ProtobufJsonSubmessageController(
+      final subController = ProtoMapSubmessageController(
         initialValue: (subValue as Map<String, dynamic>?) ?? {},
         builderInfo: subBuilderInfo,
         typeRegistry: widget.controller.typeRegistry,
@@ -87,7 +89,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
       if (customEditor != null) return customEditor;
     }
 
-    return ProtobufJsonDefaultFieldEditor(
+    return ProtoMapDefaultFieldEditor(
       controller: widget.controller,
       jsonKey: widget.jsonKey,
       index: widget.index,
@@ -97,7 +99,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
     );
   }
 
-  ProtobufJsonFieldInfo _createFieldMetadata(FieldInfo fieldInfo) {
+  ProtoMapFieldInfo _createFieldMetadata(FieldInfo fieldInfo) {
     final oneofIndex =
         widget.controller.builderInfo.oneofs[fieldInfo.tagNumber];
 
@@ -105,7 +107,7 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
         ? '[${widget.index}]'
         : (oneofIndex != null ? '${widget.jsonKey} (oneof)' : widget.jsonKey);
 
-    return ProtobufJsonFieldInfo(
+    return ProtoMapFieldInfo(
       fieldInfo: fieldInfo,
       jsonKey: widget.jsonKey,
       index: widget.index,
@@ -125,16 +127,16 @@ class _ProtobufJsonFieldEditorState extends State<ProtobufJsonFieldEditor> {
 ///
 /// This widget is called by [ProtobufJsonFieldEditor] as a fallback when no
 /// custom editor is provided. It avoids infinite recursion by not calling
-/// back into the [ProtobufJsonEditorProvider] for the same field.
-class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
-  final ProtobufJsonController controller;
+/// back into the [ProtoMapEditorProvider] for the same field.
+class ProtoMapDefaultFieldEditor extends StatelessWidget {
+  final ProtoMapControllerBase controller;
   final String jsonKey;
   final int? index;
   final int depth;
   final String? parentFieldName;
-  final ProtobufJsonEditorProvider? provider;
+  final ProtoMapEditorProvider? provider;
 
-  const ProtobufJsonDefaultFieldEditor({
+  const ProtoMapDefaultFieldEditor({
     super.key,
     required this.controller,
     required this.jsonKey,
@@ -154,7 +156,7 @@ class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
         ? '[$index]'
         : (oneofIndex != null ? '$jsonKey (oneof)' : jsonKey);
 
-    final fieldMetadata = ProtobufJsonFieldInfo(
+    final fieldMetadata = ProtoMapFieldInfo(
       fieldInfo: fieldInfo,
       jsonKey: jsonKey,
       index: index,
@@ -171,7 +173,7 @@ class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
     // If index != null, we are editing an element of a repeated field.
     // We should skip the isRepeated check and go straight to the type's editor.
     if (fieldInfo.isRepeated && index == null) {
-      return ProtobufJsonRepeatedFieldEditor(
+      return ProtoMapRepeatedFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
         provider: provider,
@@ -179,7 +181,7 @@ class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
     }
 
     if (fieldInfo.isBoolField) {
-      return ProtobufJsonBooleanFieldEditor(
+      return ProtoMapBooleanFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
       );
@@ -187,14 +189,14 @@ class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
 
     if (fieldInfo.isMessageField && !fieldInfo.isScalarMessage) {
       if (fieldInfo.isAnyField) {
-        return ProtobufJsonAnyFieldEditor(
+        return ProtoMapAnyFieldEditor(
           controller: controller,
           fieldInfo: fieldMetadata,
           provider: provider,
         );
       }
 
-      return ProtobufJsonMessageFieldEditor(
+      return ProtoMapMessageFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
         provider: provider,
@@ -202,15 +204,18 @@ class ProtobufJsonDefaultFieldEditor extends StatelessWidget {
     }
 
     if (fieldInfo.isEnumField) {
-      return ProtobufJsonEnumFieldEditor(
+      return ProtoMapEnumFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
       );
     }
 
-    return ProtobufJsonScalarFieldEditor(
+    return ProtoMapScalarFieldEditor(
       controller: controller,
       fieldInfo: fieldMetadata,
     );
   }
 }
+
+@Deprecated('Use ProtoMapDefaultFieldEditor instead')
+typedef ProtobufJsonDefaultFieldEditor = ProtoMapDefaultFieldEditor;

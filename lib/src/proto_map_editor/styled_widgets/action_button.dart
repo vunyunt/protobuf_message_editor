@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets/protobuf_json_indent.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets/proto_map_indent.dart';
 
 /// A stylized action button used for "Add field" and "Add element" actions.
-class ProtobufJsonActionButton extends StatelessWidget {
+class ProtoMapActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
   final String? tooltip;
   final int? depth;
 
-  const ProtobufJsonActionButton({
+  const ProtoMapActionButton({
     super.key,
     required this.label,
     required this.icon,
@@ -21,7 +21,7 @@ class ProtobufJsonActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
 
     Widget button = Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -52,9 +52,12 @@ class ProtobufJsonActionButton extends StatelessWidget {
     }
 
     if (depth != null) {
-      button = ProtobufJsonIndent(depth: depth!, child: button);
+      button = ProtoMapIndent(depth: depth!, child: button);
     }
 
     return button;
   }
 }
+
+@Deprecated('Use ProtoMapActionButton instead')
+typedef ProtobufJsonActionButton = ProtoMapActionButton;

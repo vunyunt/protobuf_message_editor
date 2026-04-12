@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 
 // Mock messages for testing
 class SubMessage extends GeneratedMessage {
@@ -48,15 +48,15 @@ class RootMessage extends GeneratedMessage {
   set sub(SubMessage v) => setField(1, v);
 }
 
-class MockProvider extends ProtobufJsonEditorProvider {
+class MockProvider extends ProtoMapEditorProvider {
   bool called = false;
   ProtobufJsonController? lastController;
-  ProtobufJsonFieldInfo? lastFieldInfo;
+  ProtoMapFieldInfo? lastFieldInfo;
 
   @override
   Widget? getSubmessageEditor({
     required ProtobufJsonController controller,
-    required ProtobufJsonFieldInfo fieldInfo,
+    required ProtoMapFieldInfo fieldInfo,
   }) {
     called = true;
     lastController = controller;
@@ -68,11 +68,11 @@ class MockProvider extends ProtobufJsonEditorProvider {
   }
 }
 
-class EmptyProvider extends ProtobufJsonEditorProvider {
+class EmptyProvider extends ProtoMapEditorProvider {
   @override
   Widget? getSubmessageEditor({
     required ProtobufJsonController controller,
-    required ProtobufJsonFieldInfo fieldInfo,
+    required ProtoMapFieldInfo fieldInfo,
   }) => null;
 }
 

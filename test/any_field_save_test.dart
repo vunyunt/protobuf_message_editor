@@ -16,7 +16,7 @@ void main() {
     test('saves successfully when singular Any field is empty map', () {
       final message = TestMessage()..exampleStringField = 'hello';
 
-      final controller = ProtobufJsonEditingController(
+      final controller = ProtoMapController(
         sourceMessage: message,
         typeRegistry: registry,
       );
@@ -38,7 +38,7 @@ void main() {
     test('saves successfully when singular Any field has valid type', () {
       final message = TestMessage();
 
-      final controller = ProtobufJsonEditingController(
+      final controller = ProtoMapController(
         sourceMessage: message,
         typeRegistry: registry,
       );
@@ -61,7 +61,7 @@ void main() {
       () {
         final message = TestMessage();
 
-        final controller = ProtobufJsonEditingController(
+        final controller = ProtoMapController(
           sourceMessage: message,
           typeRegistry: registry,
         );
@@ -92,7 +92,7 @@ void main() {
     test('saves successfully when repeated Any is all empty entries', () {
       final message = TestMessage();
 
-      final controller = ProtobufJsonEditingController(
+      final controller = ProtoMapController(
         sourceMessage: message,
         typeRegistry: registry,
       );
@@ -115,7 +115,7 @@ void main() {
         ..exampleStringField = 'keep me'
         ..exampleIntField = Int64(42);
 
-      final controller = ProtobufJsonEditingController(
+      final controller = ProtoMapController(
         sourceMessage: message,
         typeRegistry: registry,
       );

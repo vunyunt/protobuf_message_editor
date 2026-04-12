@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A field editor for scalar values (int, string, double, bytes).
-class ProtobufJsonScalarFieldEditor extends StatefulWidget {
-  final ProtobufJsonController controller;
-  final ProtobufJsonFieldInfo fieldInfo;
+class ProtoMapScalarFieldEditor extends StatefulWidget {
+  final ProtoMapControllerBase controller;
+  final ProtoMapFieldInfo fieldInfo;
 
-  const ProtobufJsonScalarFieldEditor({
+  const ProtoMapScalarFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
   });
 
   @override
-  State<ProtobufJsonScalarFieldEditor> createState() =>
-      _ProtobufJsonScalarFieldEditorState();
+  State<ProtoMapScalarFieldEditor> createState() =>
+      _ProtoMapScalarFieldEditorState();
 }
 
-class _ProtobufJsonScalarFieldEditorState
-    extends State<ProtobufJsonScalarFieldEditor> {
+@Deprecated('Use ProtoMapScalarFieldEditor instead')
+typedef ProtobufJsonScalarFieldEditor = ProtoMapScalarFieldEditor;
+
+class _ProtoMapScalarFieldEditorState extends State<ProtoMapScalarFieldEditor> {
   late final TextEditingController _textController;
 
   dynamic _getValue() {
@@ -44,7 +46,7 @@ class _ProtobufJsonScalarFieldEditorState
   }
 
   @override
-  void didUpdateWidget(ProtobufJsonScalarFieldEditor oldWidget) {
+  void didUpdateWidget(ProtoMapScalarFieldEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
     final value = _getValue();
     final text = value?.toString() ?? '';
@@ -64,7 +66,7 @@ class _ProtobufJsonScalarFieldEditorState
   Widget build(BuildContext context) {
     final controller = widget.controller;
     final fieldInfo = widget.fieldInfo;
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
 
     final parentMessageName = fieldInfo.parentBuilderInfo?.qualifiedMessageName
         .split('.')
@@ -75,9 +77,9 @@ class _ProtobufJsonScalarFieldEditorState
         'Field: ${fieldInfo.parentFieldName}',
     ].join('\n');
 
-    return ProtobufJsonIndent(
+    return ProtoMapIndent(
       depth: fieldInfo.depth,
-      child: ProtobufJsonFieldRow(
+      child: ProtoMapFieldRow(
         label: fieldInfo.label ?? fieldInfo.jsonKey ?? '',
         labelColor: theme.getLabelColor(fieldInfo.depth),
         tooltip: parentContext.isEmpty ? null : parentContext,
@@ -112,7 +114,7 @@ class _ProtobufJsonScalarFieldEditorState
             },
           ),
         ),
-        trailing: ProtobufJsonRemoveButton(
+        trailing: ProtoMapRemoveButton(
           controller: controller,
           jsonKey: fieldInfo.jsonKey!,
           index: fieldInfo.index,

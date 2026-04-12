@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
 
 /// A new approach to editing protobuf messages.
 ///
 /// This editor converts the passed in message internally to a JSON object
-/// and uses a [ProtobufJsonEditingController] to manage state.
-class ProtobufJsonEditor extends StatefulWidget {
+/// and uses a [ProtoMapController] to manage state.
+class ProtoMapEditor extends StatefulWidget {
   final GeneratedMessage message;
   final TypeRegistry? typeRegistry;
-  final ProtobufJsonEditingController? controller;
+  final ProtoMapController? controller;
   final void Function(GeneratedMessage message)? onSave;
-  final ProtobufJsonEditorProvider? provider;
+  final ProtoMapEditorProvider? provider;
 
-  const ProtobufJsonEditor({
+  const ProtoMapEditor({
     super.key,
     required this.message,
     this.typeRegistry,
@@ -26,20 +26,23 @@ class ProtobufJsonEditor extends StatefulWidget {
   });
 
   @override
-  State<ProtobufJsonEditor> createState() => _ProtobufJsonEditorState();
+  State<ProtoMapEditor> createState() => _ProtoMapEditorState();
 }
 
-class _ProtobufJsonEditorState extends State<ProtobufJsonEditor> {
-  ProtobufJsonEditingController? _internalController;
+@Deprecated('Use ProtoMapEditor instead')
+typedef ProtobufJsonEditor = ProtoMapEditor;
 
-  ProtobufJsonEditingController get _controller =>
+class _ProtoMapEditorState extends State<ProtoMapEditor> {
+  ProtoMapController? _internalController;
+
+  ProtoMapController get _controller =>
       widget.controller ?? _internalController!;
 
   @override
   void initState() {
     super.initState();
     if (widget.controller == null) {
-      _internalController = ProtobufJsonEditingController(
+      _internalController = ProtoMapController(
         sourceMessage: widget.message,
         typeRegistry: widget.typeRegistry ?? const TypeRegistry.empty(),
       );
@@ -54,7 +57,7 @@ class _ProtobufJsonEditorState extends State<ProtobufJsonEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
 
     return Theme(
       data: Theme.of(context).copyWith(extensions: [theme]),
@@ -98,7 +101,7 @@ class _ProtobufJsonEditorState extends State<ProtobufJsonEditor> {
                 const Divider(height: 1),
                 Padding(
                   padding: theme.contentPadding,
-                  child: ProtobufJsonMessageEditor(
+                  child: ProtoMapMessageEditor(
                     controller: _controller,
                     depth: 0,
                     provider: widget.provider,

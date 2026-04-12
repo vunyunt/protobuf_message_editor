@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:protobuf/protobuf.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_editor.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor.dart';
 
 // A mock message for testing
 class TestMessage extends GeneratedMessage {
@@ -37,7 +37,7 @@ void main() {
     tester,
   ) async {
     final message = TestMessage()..name = 'Original';
-    final controller = ProtobufJsonEditingController(sourceMessage: message);
+    final controller = ProtoMapController(sourceMessage: message);
 
     GeneratedMessage? savedMessage;
 

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A field editor for enum values.
-class ProtobufJsonEnumFieldEditor extends StatelessWidget {
-  final ProtobufJsonController controller;
-  final ProtobufJsonFieldInfo fieldInfo;
+class ProtoMapEnumFieldEditor extends StatelessWidget {
+  final ProtoMapControllerBase controller;
+  final ProtoMapFieldInfo fieldInfo;
 
-  const ProtobufJsonEnumFieldEditor({
+  const ProtoMapEnumFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
@@ -28,7 +28,7 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
         : rawValue;
     final currentName = protoFieldInfo.getEnumName(value);
 
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
 
     final parentMessageName = fieldInfo.parentBuilderInfo?.qualifiedMessageName
         .split('.')
@@ -39,9 +39,9 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
         'Field: ${fieldInfo.parentFieldName}',
     ].join('\n');
 
-    return ProtobufJsonIndent(
+    return ProtoMapIndent(
       depth: fieldInfo.depth,
-      child: ProtobufJsonFieldRow(
+      child: ProtoMapFieldRow(
         label: fieldInfo.label ?? fieldInfo.jsonKey ?? '',
         labelColor: theme.getLabelColor(fieldInfo.depth),
         tooltip: parentContext.isEmpty ? null : parentContext,
@@ -71,7 +71,7 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
             ),
           ),
         ),
-        trailing: ProtobufJsonRemoveButton(
+        trailing: ProtoMapRemoveButton(
           controller: controller,
           jsonKey: jsonKey,
           index: index,
@@ -80,3 +80,6 @@ class ProtobufJsonEnumFieldEditor extends StatelessWidget {
     );
   }
 }
+
+@Deprecated('Use ProtoMapEnumFieldEditor instead')
+typedef ProtobufJsonEnumFieldEditor = ProtoMapEnumFieldEditor;

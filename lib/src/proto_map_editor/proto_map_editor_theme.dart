@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// A [ThemeExtension] that defines the styling tokens for the Protobuf JSON editor.
 @immutable
-class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
+class ProtoMapEditorTheme extends ThemeExtension<ProtoMapEditorTheme> {
   /// The style for field labels (e.g., "fieldName:").
   final TextStyle fieldLabelStyle;
 
@@ -56,7 +56,7 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
   /// The size for collapse/expand toggle icons.
   final double collapseIconSize;
 
-  const ProtobufEditorTheme({
+  const ProtoMapEditorTheme({
     required this.fieldLabelStyle,
     required this.fieldValueStyle,
     required this.hintTextStyle,
@@ -76,12 +76,12 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
     required this.depthColors,
   });
 
-  /// Creates a [ProtobufEditorTheme] with default values that match the current hardcoded look.
-  factory ProtobufEditorTheme.defaults(BuildContext context) {
+  /// Creates a [ProtoMapEditorTheme] with default values that match the current hardcoded look.
+  factory ProtoMapEditorTheme.defaults(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
 
-    return ProtobufEditorTheme(
+    return ProtoMapEditorTheme(
       fieldLabelStyle: const TextStyle(
         fontWeight: FontWeight.bold,
         fontFamily: 'monospace',
@@ -140,16 +140,16 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
     return depthColors[depth % depthColors.length];
   }
 
-  /// Returns the [ProtobufEditorTheme] from the current [Theme].
+  /// Returns the [ProtoMapEditorTheme] from the current [Theme].
   ///
-  /// Falls back to [ProtobufEditorTheme.defaults] if no extension is found.
-  static ProtobufEditorTheme of(BuildContext context) {
-    return Theme.of(context).extension<ProtobufEditorTheme>() ??
-        ProtobufEditorTheme.defaults(context);
+  /// Falls back to [ProtoMapEditorTheme.defaults] if no extension is found.
+  static ProtoMapEditorTheme of(BuildContext context) {
+    return Theme.of(context).extension<ProtoMapEditorTheme>() ??
+        ProtoMapEditorTheme.defaults(context);
   }
 
   @override
-  ProtobufEditorTheme copyWith({
+  ProtoMapEditorTheme copyWith({
     TextStyle? fieldLabelStyle,
     TextStyle? fieldValueStyle,
     TextStyle? hintTextStyle,
@@ -168,7 +168,7 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
     double? collapseIconSize,
     List<Color>? depthColors,
   }) {
-    return ProtobufEditorTheme(
+    return ProtoMapEditorTheme(
       fieldLabelStyle: fieldLabelStyle ?? this.fieldLabelStyle,
       fieldValueStyle: fieldValueStyle ?? this.fieldValueStyle,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
@@ -190,13 +190,13 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
   }
 
   @override
-  ProtobufEditorTheme lerp(
-    ThemeExtension<ProtobufEditorTheme>? other,
+  ProtoMapEditorTheme lerp(
+    ThemeExtension<ProtoMapEditorTheme>? other,
     double t,
   ) {
-    if (other is! ProtobufEditorTheme) return this;
+    if (other is! ProtoMapEditorTheme) return this;
 
-    return ProtobufEditorTheme(
+    return ProtoMapEditorTheme(
       fieldLabelStyle: TextStyle.lerp(
         fieldLabelStyle,
         other.fieldLabelStyle,
@@ -263,3 +263,6 @@ class ProtobufEditorTheme extends ThemeExtension<ProtobufEditorTheme> {
     return (a ?? 0) + ((b ?? 0) - (a ?? 0)) * t;
   }
 }
+
+@Deprecated('Use ProtoMapEditorTheme instead')
+typedef ProtobufEditorTheme = ProtoMapEditorTheme;

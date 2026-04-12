@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_add_field_button.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_add_field_button.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_editor.dart';
 
 /// A widget that renders the fields of a protobuf message.
 ///
 /// This widget iterates over the keys in the [controller]'s JSON map and
-/// renders a [ProtobufJsonFieldEditor] for each key. It also appends a
-/// [ProtobufJsonAddFieldButton] at the end.
-class ProtobufJsonMessageEditor extends StatelessWidget {
-  final ProtobufJsonController controller;
+/// renders a [ProtoMapFieldEditor] for each key. It also appends a
+/// [ProtoMapAddFieldButton] at the end.
+class ProtoMapMessageEditor extends StatelessWidget {
+  final ProtoMapControllerBase controller;
   final int depth;
   final String? parentFieldName;
-  final ProtobufJsonEditorProvider? provider;
+  final ProtoMapEditorProvider? provider;
 
-  const ProtobufJsonMessageEditor({
+  const ProtoMapMessageEditor({
     super.key,
     required this.controller,
     this.depth = 0,
@@ -31,7 +31,7 @@ class ProtobufJsonMessageEditor extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ...jsonMap.keys.map(
-          (key) => ProtobufJsonFieldEditor(
+          (key) => ProtoMapFieldEditor(
             controller: controller,
             jsonKey: key,
             depth: depth,
@@ -39,7 +39,7 @@ class ProtobufJsonMessageEditor extends StatelessWidget {
             provider: provider,
           ),
         ),
-        ProtobufJsonAddFieldButton(
+        ProtoMapAddFieldButton(
           controller: controller,
           depth: depth,
           parentFieldName: parentFieldName,
@@ -48,3 +48,6 @@ class ProtobufJsonMessageEditor extends StatelessWidget {
     );
   }
 }
+
+@Deprecated('Use ProtoMapMessageEditor instead')
+typedef ProtobufJsonMessageEditor = ProtoMapMessageEditor;

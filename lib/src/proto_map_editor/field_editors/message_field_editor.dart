@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 
 /// A field editor for message values (nested objects).
-class ProtobufJsonMessageFieldEditor extends StatefulWidget {
-  final ProtobufJsonController controller;
-  final ProtobufJsonFieldInfo fieldInfo;
-  final ProtobufJsonEditorProvider? provider;
+class ProtoMapMessageFieldEditor extends StatefulWidget {
+  final ProtoMapControllerBase controller;
+  final ProtoMapFieldInfo fieldInfo;
+  final ProtoMapEditorProvider? provider;
 
-  const ProtobufJsonMessageFieldEditor({
+  const ProtoMapMessageFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
@@ -20,12 +20,15 @@ class ProtobufJsonMessageFieldEditor extends StatefulWidget {
   });
 
   @override
-  State<ProtobufJsonMessageFieldEditor> createState() =>
-      _ProtobufJsonMessageFieldEditorState();
+  State<ProtoMapMessageFieldEditor> createState() =>
+      _ProtoMapMessageFieldEditorState();
 }
 
-class _ProtobufJsonMessageFieldEditorState
-    extends State<ProtobufJsonMessageFieldEditor> {
+@Deprecated('Use ProtoMapMessageFieldEditor instead')
+typedef ProtobufJsonMessageFieldEditor = ProtoMapMessageFieldEditor;
+
+class _ProtoMapMessageFieldEditorState
+    extends State<ProtoMapMessageFieldEditor> {
   bool _isCollapsed = false;
 
   @override
@@ -40,7 +43,7 @@ class _ProtobufJsonMessageFieldEditorState
               <String, dynamic>{}
         : rawValue as Map<String, dynamic>? ?? <String, dynamic>{};
 
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
 
     final parentMessageName = widget
         .fieldInfo
@@ -57,13 +60,13 @@ class _ProtobufJsonMessageFieldEditorState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ProtobufJsonIndent(
+        ProtoMapIndent(
           depth: widget.fieldInfo.depth,
-          child: ProtobufJsonFieldRow(
+          child: ProtoMapFieldRow(
             label: widget.fieldInfo.label ?? jsonKey,
             labelColor: theme.getLabelColor(widget.fieldInfo.depth),
             tooltip: parentContext.isEmpty ? null : parentContext,
-            leading: ProtobufJsonCollapseToggle(
+            leading: ProtoMapCollapseToggle(
               isCollapsed: _isCollapsed,
               onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
             ),
@@ -78,7 +81,7 @@ class _ProtobufJsonMessageFieldEditorState
                 fontWeight: FontWeight.bold,
               ),
             ),
-            trailing: ProtobufJsonRemoveButton(
+            trailing: ProtoMapRemoveButton(
               controller: widget.controller,
               jsonKey: jsonKey,
               index: index,
@@ -97,7 +100,7 @@ class _ProtobufJsonMessageFieldEditorState
 
     if (subBuilderInfo == null) return const SizedBox.shrink();
 
-    final subController = ProtobufJsonSubmessageController(
+    final subController = ProtoMapSubmessageController(
       initialValue: value,
       builderInfo: subBuilderInfo,
       typeRegistry: controller.typeRegistry,
@@ -117,7 +120,7 @@ class _ProtobufJsonMessageFieldEditorState
       },
     );
 
-    return ProtobufJsonMessageEditor(
+    return ProtoMapMessageEditor(
       controller: subController,
       depth: widget.fieldInfo.depth + 1,
       parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,

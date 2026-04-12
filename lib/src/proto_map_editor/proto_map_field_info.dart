@@ -1,7 +1,7 @@
 import 'package:protobuf/protobuf.dart';
 
 /// Metadata for a protobuf-json field being edited.
-class ProtobufJsonFieldInfo {
+class ProtoMapFieldInfo {
   /// The [FieldInfo] for the field (from package:protobuf).
   final FieldInfo? fieldInfo;
 
@@ -26,7 +26,7 @@ class ProtobufJsonFieldInfo {
   /// The metadata of the submessage if this is a message field.
   final BuilderInfo? submessageBuilderInfo;
 
-  const ProtobufJsonFieldInfo({
+  const ProtoMapFieldInfo({
     this.fieldInfo,
     this.jsonKey,
     this.index,
@@ -37,8 +37,8 @@ class ProtobufJsonFieldInfo {
     this.submessageBuilderInfo,
   });
 
-  /// Creates a copy of this [ProtobufJsonFieldInfo] with some fields replaced.
-  ProtobufJsonFieldInfo copyWith({
+  /// Creates a copy of this [ProtoMapFieldInfo] with some fields replaced.
+  ProtoMapFieldInfo copyWith({
     FieldInfo? fieldInfo,
     String? jsonKey,
     int? index,
@@ -48,7 +48,7 @@ class ProtobufJsonFieldInfo {
     BuilderInfo? parentBuilderInfo,
     BuilderInfo? submessageBuilderInfo,
   }) {
-    return ProtobufJsonFieldInfo(
+    return ProtoMapFieldInfo(
       fieldInfo: fieldInfo ?? this.fieldInfo,
       jsonKey: jsonKey ?? this.jsonKey,
       index: index ?? this.index,
@@ -61,3 +61,6 @@ class ProtobufJsonFieldInfo {
     );
   }
 }
+
+@Deprecated('Use ProtoMapFieldInfo instead')
+typedef ProtobufJsonFieldInfo = ProtoMapFieldInfo;

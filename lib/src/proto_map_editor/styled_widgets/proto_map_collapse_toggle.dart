@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
 
 /// A minimalist toggle for expanding/collapsing sections.
 ///
 /// NOTE: This component is intended to provide a YAML-like visual layout,
 /// but it does not strictly follow YAML formatting rules.
-class ProtobufJsonCollapseToggle extends StatelessWidget {
+class ProtoMapCollapseToggle extends StatelessWidget {
   final bool isCollapsed;
   final VoidCallback onToggle;
 
-  const ProtobufJsonCollapseToggle({
+  const ProtoMapCollapseToggle({
     super.key,
     required this.isCollapsed,
     required this.onToggle,
@@ -17,7 +17,7 @@ class ProtobufJsonCollapseToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
 
     return GestureDetector(
       onTap: onToggle,
@@ -29,3 +29,6 @@ class ProtobufJsonCollapseToggle extends StatelessWidget {
     );
   }
 }
+
+@Deprecated('Use ProtoMapCollapseToggle instead')
+typedef ProtobufJsonCollapseToggle = ProtoMapCollapseToggle;

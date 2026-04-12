@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
 import 'package:protobuf_message_editor/src/default_editors/well_known/any/any_editor_registry.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/custom_editors/protobuf_json_editor_provider.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_message_editor.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A specialized field editor for `google.protobuf.Any` fields.
 ///
 /// This editor allows selecting the message type and recursively editing
 /// the resolved submessage.
-class ProtobufJsonAnyFieldEditor extends StatefulWidget {
-  final ProtobufJsonController controller;
-  final ProtobufJsonFieldInfo fieldInfo;
-  final ProtobufJsonEditorProvider? provider;
+class ProtoMapAnyFieldEditor extends StatefulWidget {
+  final ProtoMapControllerBase controller;
+  final ProtoMapFieldInfo fieldInfo;
+  final ProtoMapEditorProvider? provider;
   final TypeRegistry? customTypeRegistry;
 
-  const ProtobufJsonAnyFieldEditor({
+  const ProtoMapAnyFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
@@ -28,12 +28,13 @@ class ProtobufJsonAnyFieldEditor extends StatefulWidget {
   });
 
   @override
-  State<ProtobufJsonAnyFieldEditor> createState() =>
-      _ProtobufJsonAnyFieldEditorState();
+  State<ProtoMapAnyFieldEditor> createState() => _ProtoMapAnyFieldEditorState();
 }
 
-class _ProtobufJsonAnyFieldEditorState
-    extends State<ProtobufJsonAnyFieldEditor> {
+@Deprecated('Use ProtoMapAnyFieldEditor instead')
+typedef ProtobufJsonAnyFieldEditor = ProtoMapAnyFieldEditor;
+
+class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
   bool _isCollapsed = false;
 
   @override
@@ -67,7 +68,7 @@ class _ProtobufJsonAnyFieldEditorState
     // final registry = widget.customTypeRegistry ?? controller.typeRegistry;
     // Let me check any_field_editor.dart again.
 
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
     final parentMessageName = widget
         .fieldInfo
         .parentBuilderInfo
@@ -84,19 +85,19 @@ class _ProtobufJsonAnyFieldEditorState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (jsonKey.isNotEmpty)
-          ProtobufJsonIndent(
+          ProtoMapIndent(
             depth: widget.fieldInfo.depth,
-            child: ProtobufJsonFieldRow(
+            child: ProtoMapFieldRow(
               label: widget.fieldInfo.label ?? jsonKey,
               labelColor: theme.getLabelColor(widget.fieldInfo.depth),
               tooltip: parentContext.isEmpty ? null : parentContext,
-              leading: ProtobufJsonCollapseToggle(
+              leading: ProtoMapCollapseToggle(
                 isCollapsed: _isCollapsed,
                 onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
               ),
               onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
               value: _buildTypeSelector(context, typeUrl, registry, theme),
-              trailing: ProtobufJsonRemoveButton(
+              trailing: ProtoMapRemoveButton(
                 controller: controller,
                 jsonKey: jsonKey,
                 index: index,
@@ -108,17 +109,17 @@ class _ProtobufJsonAnyFieldEditorState
             context,
             typeUrl,
             registry,
-            ProtobufEditorTheme.of(context),
+            ProtoMapEditorTheme.of(context),
           ),
         if (!_isCollapsed) ...[_buildSubmessageContent(value)],
         if (!_isCollapsed && typeUrl == null)
-          ProtobufJsonIndent(
+          ProtoMapIndent(
             depth: widget.fieldInfo.depth + 1,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
                 'No type selected. Use the selector above to choose a message type.',
-                style: ProtobufEditorTheme.of(context).hintTextStyle,
+                style: ProtoMapEditorTheme.of(context).hintTextStyle,
               ),
             ),
           ),
@@ -130,7 +131,7 @@ class _ProtobufJsonAnyFieldEditorState
     BuildContext context,
     String? typeUrl,
     TypeRegistry registry,
-    ProtobufEditorTheme theme,
+    ProtoMapEditorTheme theme,
   ) {
     final currentType = typeUrl?.split('/').last ?? 'Select type...';
 
@@ -210,7 +211,7 @@ class _ProtobufJsonAnyFieldEditorState
 
     final subBuilderInfo = protoFieldInfo.subBuilder?.call().info_;
     if (subBuilderInfo == null) return const SizedBox.shrink();
-    final subController = ProtobufJsonSubmessageController(
+    final subController = ProtoMapSubmessageController(
       initialValue: value,
       builderInfo: subBuilderInfo,
       typeRegistry: widget.customTypeRegistry ?? controller.typeRegistry,
@@ -236,7 +237,7 @@ class _ProtobufJsonAnyFieldEditorState
       },
     );
 
-    return ProtobufJsonMessageEditor(
+    return ProtoMapMessageEditor(
       controller: subController,
       depth: widget.fieldInfo.depth + 1,
       parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,

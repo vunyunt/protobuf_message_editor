@@ -3,7 +3,7 @@ import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 /// A base controller that manages the JSON representation of a [GeneratedMessage] fragment.
-abstract class ProtobufJsonController {
+abstract class ProtoMapControllerBase {
   final BuilderInfo builderInfo;
   final TypeRegistry typeRegistry;
   final void Function(Map<String, dynamic>)? onChanged;
@@ -11,7 +11,7 @@ abstract class ProtobufJsonController {
   late Map<String, dynamic> _jsonMap;
   late final Map<String, FieldInfo> _jsonKeyToFieldInfo;
 
-  ProtobufJsonController({
+  ProtoMapControllerBase({
     required Map<String, dynamic> initialValue,
     required this.builderInfo,
     this.typeRegistry = const TypeRegistry.empty(),
@@ -173,25 +173,27 @@ abstract class ProtobufJsonController {
   }
 }
 
+@Deprecated('Use ProtoMapControllerBase instead')
+typedef ProtobufJsonController = ProtoMapControllerBase;
+
 /// A root controller that manages the JSON representation of a [GeneratedMessage].
 ///
 /// This controller leverages [toProto3Json] and [mergeFromProto3Json] to provide
 /// a simplified editing model where the message is represented as a
 /// [Map<String, dynamic>].
-class ProtobufJsonEditingController extends ProtobufJsonController
-    with ChangeNotifier {
+class ProtoMapController extends ProtoMapControllerBase with ChangeNotifier {
   final GeneratedMessage sourceMessage;
   bool _isDirty = false;
 
   /// Creates a root controller for a [GeneratedMessage].
-  ProtobufJsonEditingController({
+  ProtoMapController({
     required this.sourceMessage,
     TypeRegistry typeRegistry = const TypeRegistry.empty(),
   }) : super(
          initialValue:
              sourceMessage.toProto3Json(typeRegistry: typeRegistry)
                  as Map<String, dynamic>,
-         builderInfo: ProtobufJsonSubmessageController.resolveBuilderInfo(
+         builderInfo: ProtoMapSubmessageController.resolveBuilderInfo(
            sourceMessage.info_,
            sourceMessage.toProto3Json(typeRegistry: typeRegistry)
                as Map<String, dynamic>,
@@ -232,13 +234,16 @@ class ProtobufJsonEditingController extends ProtobufJsonController
   }
 }
 
+@Deprecated('Use ProtoMapController instead')
+typedef ProtobufJsonEditingController = ProtoMapController;
+
 /// A lightweight sub-controller for a nested message fragment.
 ///
-/// Unlike [ProtobufJsonEditingController], this class is not a [Listenable]
+/// Unlike [ProtoMapController], this class is not a [Listenable]
 /// and does not need to be disposed. It propagates changes back to its parent
 /// via the [onChanged] callback.
-class ProtobufJsonSubmessageController extends ProtobufJsonController {
-  ProtobufJsonSubmessageController({
+class ProtoMapSubmessageController extends ProtoMapControllerBase {
+  ProtoMapSubmessageController({
     required Map<String, dynamic> initialValue,
     required BuilderInfo builderInfo,
     TypeRegistry typeRegistry = const TypeRegistry.empty(),
@@ -276,3 +281,6 @@ class ProtobufJsonSubmessageController extends ProtobufJsonController {
     return info;
   }
 }
+
+@Deprecated('Use ProtoMapSubmessageController instead')
+typedef ProtobufJsonSubmessageController = ProtoMapSubmessageController;

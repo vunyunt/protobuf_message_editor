@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_controller.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_info.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/styled_widgets.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 
 /// A field editor for boolean values.
-class ProtobufJsonBooleanFieldEditor extends StatelessWidget {
-  final ProtobufJsonController controller;
-  final ProtobufJsonFieldInfo fieldInfo;
+class ProtoMapBooleanFieldEditor extends StatelessWidget {
+  final ProtoMapControllerBase controller;
+  final ProtoMapFieldInfo fieldInfo;
 
-  const ProtobufJsonBooleanFieldEditor({
+  const ProtoMapBooleanFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
@@ -25,7 +25,7 @@ class ProtobufJsonBooleanFieldEditor extends StatelessWidget {
         ? rawValue[index] as bool? ?? false
         : rawValue as bool? ?? false;
 
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
 
     final parentMessageName = fieldInfo.parentBuilderInfo?.qualifiedMessageName
         .split('.')
@@ -36,9 +36,9 @@ class ProtobufJsonBooleanFieldEditor extends StatelessWidget {
         'Field: ${fieldInfo.parentFieldName}',
     ].join('\n');
 
-    return ProtobufJsonIndent(
+    return ProtoMapIndent(
       depth: fieldInfo.depth,
-      child: ProtobufJsonFieldRow(
+      child: ProtoMapFieldRow(
         label: fieldInfo.label ?? fieldInfo.jsonKey ?? '',
         labelColor: theme.getLabelColor(fieldInfo.depth),
         tooltip: parentContext.isEmpty ? null : parentContext,
@@ -62,7 +62,7 @@ class ProtobufJsonBooleanFieldEditor extends StatelessWidget {
             ),
           ),
         ),
-        trailing: ProtobufJsonRemoveButton(
+        trailing: ProtoMapRemoveButton(
           controller: controller,
           jsonKey: jsonKey,
           index: index,
@@ -71,3 +71,6 @@ class ProtobufJsonBooleanFieldEditor extends StatelessWidget {
     );
   }
 }
+
+@Deprecated('Use ProtoMapBooleanFieldEditor instead')
+typedef ProtobufJsonBooleanFieldEditor = ProtoMapBooleanFieldEditor;

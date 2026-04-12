@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_json_field_editor.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_editor.dart';
 
 import 'lib/generated/test_message.pb.dart';
 
-class MockAnyProvider extends ProtobufJsonEditorProvider {
+class MockAnyProvider extends ProtoMapEditorProvider {
   @override
   Widget? getSubmessageEditor({
     required ProtobufJsonController controller,
-    required ProtobufJsonFieldInfo fieldInfo,
+    required ProtoMapFieldInfo fieldInfo,
   }) {
     if (fieldInfo.jsonKey == 'exampleAny') {
-      return ProtobufJsonAnyFieldEditor(
+      return ProtoMapAnyFieldEditor(
         controller: controller,
         fieldInfo: fieldInfo,
         provider: this,
@@ -25,11 +25,11 @@ class MockAnyProvider extends ProtobufJsonEditorProvider {
 
 void main() {
   testWidgets(
-    'ProtobufJsonAnyFieldEditor does not double-nest when used via provider',
+    'ProtoMapAnyFieldEditor does not double-nest when used via provider',
     (tester) async {
       final message = TestMessage();
       final registry = TypeRegistry([TestSubmessage()]);
-      final rootController = ProtobufJsonEditingController(
+      final rootController = ProtoMapController(
         sourceMessage: message,
         typeRegistry: registry,
       );
@@ -69,7 +69,7 @@ void main() {
 
       // Now try updating a field inside the Any
       // We need to find the nested editor.
-      // ProtobufJsonAnyFieldEditor builds a ProtobufJsonMessageEditor for the submessage.
+      // ProtoMapAnyFieldEditor builds a ProtoMapMessageEditor for the submessage.
       // The fields of TestSubmessage should now be rendered.
       // YamlFieldRow appends a colon to the label.
       final subFieldFinder = find.textContaining('someString');
@@ -95,6 +95,6 @@ void main() {
 }
 
 // Access private state for testing purposes if needed, OR just use public APIs.
-// To use find.byType(ProtobufJsonAnyFieldEditor), I need to import it.
-// To access _ProtobufJsonAnyFieldEditorState, I'd need to put the test in the same package or use a trick.
+// To use find.byType(ProtoMapAnyFieldEditor), I need to import it.
+// To access _ProtoMapAnyFieldEditorState, I'd need to put the test in the same package or use a trick.
 // But I can just check the rootController.jsonMap after pumping.

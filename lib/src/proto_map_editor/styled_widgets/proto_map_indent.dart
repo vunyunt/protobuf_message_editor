@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:protobuf_message_editor/src/protobuf_json_editor/protobuf_editor_theme.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
 
 /// A component that provides consistent indentation for nested message structures.
 ///
 /// NOTE: This component is intended to provide a YAML-like visual layout with
 /// vertical indentation guides, but it does not strictly follow YAML formatting
 /// rules.
-class ProtobufJsonIndent extends StatelessWidget {
+class ProtoMapIndent extends StatelessWidget {
   final int depth;
   final Widget child;
   final double? indentWidth;
 
-  const ProtobufJsonIndent({
+  const ProtoMapIndent({
     super.key,
     required this.depth,
     required this.child,
@@ -20,7 +20,7 @@ class ProtobufJsonIndent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ProtobufEditorTheme.of(context);
+    final theme = ProtoMapEditorTheme.of(context);
     final width = indentWidth ?? theme.indentWidth;
     if (depth <= 0) return child;
 
@@ -44,3 +44,6 @@ class ProtobufJsonIndent extends StatelessWidget {
     );
   }
 }
+
+@Deprecated('Use ProtoMapIndent instead')
+typedef ProtobufJsonIndent = ProtoMapIndent;
