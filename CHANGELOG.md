@@ -1,3 +1,9 @@
+## 0.2.1
+
+- Extracted reusable UI components into `styled_widgets` to support custom decorators.
+- Migrated internal naming from `ProtobufJson` to `ProtoMap` for consistency.
+- Provided deprecated aliases for all renamed classes to maintain backward compatibility.
+
 ## 0.2.0
 
 - Added **`ProtobufJsonEditor`** using internal JSON state management.
