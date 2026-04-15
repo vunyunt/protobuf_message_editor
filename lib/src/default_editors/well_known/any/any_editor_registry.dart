@@ -3,7 +3,6 @@ import 'package:protobuf/protobuf.dart';
 /// A custom implementation for [TypeRegistry] that is used by [AnyEditor].
 ///
 /// This provides a way to access an iterable of all available message types
-@Deprecated('Use ProtobufJsonEditor instead')
 class AnyEditorRegistry implements TypeRegistry {
   final Map<String, BuilderInfo> _mapping;
   final Map<String, GeneratedMessage> _messages;

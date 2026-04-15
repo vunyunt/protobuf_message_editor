@@ -58,7 +58,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
 
     if (fieldInfo.isMessageField &&
         !fieldInfo.isScalarMessage &&
-        !fieldInfo.isRepeated) {
+        (!fieldInfo.isRepeated || widget.index != null)) {
       final subBuilderInfo = fieldInfo.subBuilder!().info_;
       final rawValue = widget.controller.jsonMap[widget.jsonKey];
       final subValue = (widget.index != null && rawValue is List)
