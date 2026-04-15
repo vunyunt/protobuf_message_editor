@@ -41,11 +41,28 @@ class _ProtoMapEditorState extends State<ProtoMapEditor> {
   @override
   void initState() {
     super.initState();
+    _initController();
+  }
+
+  void _initController() {
     if (widget.controller == null) {
       _internalController = ProtoMapController(
         sourceMessage: widget.message,
         typeRegistry: widget.typeRegistry ?? const TypeRegistry.empty(),
       );
+    } else {
+      _internalController = null;
+    }
+  }
+
+  @override
+  void didUpdateWidget(ProtoMapEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller ||
+        widget.message != oldWidget.message ||
+        widget.typeRegistry != oldWidget.typeRegistry) {
+      _internalController?.dispose();
+      _initController();
     }
   }
 
