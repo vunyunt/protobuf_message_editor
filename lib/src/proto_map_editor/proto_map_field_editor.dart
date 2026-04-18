@@ -14,6 +14,8 @@ class ProtoMapFieldEditor extends StatefulWidget {
   final String? parentFieldName;
   final ProtoMapEditorProvider? provider;
 
+  final bool enabled;
+
   const ProtoMapFieldEditor({
     super.key,
     required this.controller,
@@ -22,6 +24,7 @@ class ProtoMapFieldEditor extends StatefulWidget {
     this.depth = 0,
     this.parentFieldName,
     this.provider,
+    this.enabled = true,
   });
 
   @override
@@ -45,6 +48,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
       return ProtoMapFallbackFieldEditor(
         controller: widget.controller,
         fieldInfo: fieldMetadata,
+        enabled: widget.enabled,
       );
     }
 
@@ -97,6 +101,14 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
       if (customEditor != null) return customEditor;
     }
 
+    final enabled =
+        widget.enabled &&
+        !(widget.provider?.isFieldUneditable(
+              controller: widget.controller,
+              fieldInfo: fieldMetadata,
+            ) ??
+            false);
+
     return ProtoMapDefaultFieldEditor(
       controller: widget.controller,
       jsonKey: widget.jsonKey,
@@ -104,6 +116,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
       depth: widget.depth,
       parentFieldName: widget.parentFieldName,
       provider: widget.provider,
+      enabled: enabled,
     );
   }
 
@@ -143,6 +156,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
   final int depth;
   final String? parentFieldName;
   final ProtoMapEditorProvider? provider;
+  final bool enabled;
 
   const ProtoMapDefaultFieldEditor({
     super.key,
@@ -152,6 +166,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
     this.depth = 0,
     this.parentFieldName,
     this.provider,
+    this.enabled = true,
   });
 
   @override
@@ -185,6 +200,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
         controller: controller,
         fieldInfo: fieldMetadata,
         provider: provider,
+        enabled: enabled,
       );
     }
 
@@ -192,6 +208,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
       return ProtoMapBooleanFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
+        enabled: enabled,
       );
     }
 
@@ -201,6 +218,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
           controller: controller,
           fieldInfo: fieldMetadata,
           provider: provider,
+          enabled: enabled,
         );
       }
 
@@ -208,6 +226,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
         controller: controller,
         fieldInfo: fieldMetadata,
         provider: provider,
+        enabled: enabled,
       );
     }
 
@@ -215,12 +234,14 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
       return ProtoMapEnumFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
+        enabled: enabled,
       );
     }
 
     return ProtoMapScalarFieldEditor(
       controller: controller,
       fieldInfo: fieldMetadata,
+      enabled: enabled,
     );
   }
 }

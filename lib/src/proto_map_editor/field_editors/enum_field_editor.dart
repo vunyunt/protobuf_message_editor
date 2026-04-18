@@ -10,10 +10,13 @@ class ProtoMapEnumFieldEditor extends StatelessWidget {
   final ProtoMapControllerBase controller;
   final ProtoMapFieldInfo fieldInfo;
 
+  final bool enabled;
+
   const ProtoMapEnumFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
+    this.enabled = true,
   });
 
   @override
@@ -57,17 +60,21 @@ class ProtoMapEnumFieldEditor extends StatelessWidget {
                     (e) => DropdownMenuItem(value: e.name, child: Text(e.name)),
                   )
                   .toList(),
-              onChanged: (newName) {
-                if (newName != null) {
-                  if (index != null) {
-                    final list = List.from(controller.jsonMap[jsonKey] as List);
-                    list[index] = newName;
-                    controller.updateField(jsonKey, list);
-                  } else {
-                    controller.updateField(jsonKey, newName);
-                  }
-                }
-              },
+              onChanged: enabled
+                  ? (newName) {
+                      if (newName != null) {
+                        if (index != null) {
+                          final list = List.from(
+                            controller.jsonMap[jsonKey] as List,
+                          );
+                          list[index] = newName;
+                          controller.updateField(jsonKey, list);
+                        } else {
+                          controller.updateField(jsonKey, newName);
+                        }
+                      }
+                    }
+                  : null,
             ),
           ),
         ),
@@ -75,6 +82,7 @@ class ProtoMapEnumFieldEditor extends StatelessWidget {
           controller: controller,
           jsonKey: jsonKey,
           index: index,
+          enabled: enabled,
         ),
       ),
     );

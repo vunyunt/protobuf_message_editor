@@ -9,10 +9,13 @@ class ProtoMapBooleanFieldEditor extends StatelessWidget {
   final ProtoMapControllerBase controller;
   final ProtoMapFieldInfo fieldInfo;
 
+  final bool enabled;
+
   const ProtoMapBooleanFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
+    this.enabled = true,
   });
 
   @override
@@ -48,15 +51,19 @@ class ProtoMapBooleanFieldEditor extends StatelessWidget {
             height: theme.fieldValueHeight,
             child: Switch(
               value: value,
-              onChanged: (newValue) {
-                if (index != null) {
-                  final list = List.from(controller.jsonMap[jsonKey] as List);
-                  list[index] = newValue;
-                  controller.updateField(jsonKey, list);
-                } else {
-                  controller.updateField(jsonKey, newValue);
-                }
-              },
+              onChanged: enabled
+                  ? (newValue) {
+                      if (index != null) {
+                        final list = List.from(
+                          controller.jsonMap[jsonKey] as List,
+                        );
+                        list[index] = newValue;
+                        controller.updateField(jsonKey, list);
+                      } else {
+                        controller.updateField(jsonKey, newValue);
+                      }
+                    }
+                  : null,
               activeThumbColor: Theme.of(context).primaryColor,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -66,6 +73,7 @@ class ProtoMapBooleanFieldEditor extends StatelessWidget {
           controller: controller,
           jsonKey: jsonKey,
           index: index,
+          enabled: enabled,
         ),
       ),
     );

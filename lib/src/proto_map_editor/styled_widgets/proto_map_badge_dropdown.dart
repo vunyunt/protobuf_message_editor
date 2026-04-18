@@ -7,33 +7,38 @@ class ProtoMapBadgeDropdown extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String> onSelected;
 
+  final bool enabled;
+
   const ProtoMapBadgeDropdown({
     super.key,
     required this.label,
     required this.items,
     required this.onSelected,
+    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = ProtoMapEditorTheme.of(context);
     return InkWell(
-      onTap: () async {
-        final selected = await showMenu<String>(
-          context: context,
-          position: _getMenuPosition(context),
-          items: items.map((name) {
-            return PopupMenuItem(
-              value: name,
-              child: Text(name, style: theme.fieldValueStyle),
-            );
-          }).toList(),
-        );
+      onTap: enabled
+          ? () async {
+              final selected = await showMenu<String>(
+                context: context,
+                position: _getMenuPosition(context),
+                items: items.map((name) {
+                  return PopupMenuItem(
+                    value: name,
+                    child: Text(name, style: theme.fieldValueStyle),
+                  );
+                }).toList(),
+              );
 
-        if (selected != null) {
-          onSelected(selected);
-        }
-      },
+              if (selected != null) {
+                onSelected(selected);
+              }
+            }
+          : null,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: theme.typeBadgeDecoration,

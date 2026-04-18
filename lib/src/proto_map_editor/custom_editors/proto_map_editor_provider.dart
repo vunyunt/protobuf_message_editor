@@ -35,6 +35,15 @@ abstract class ProtoMapEditorProvider {
     required ProtoMapFieldInfo fieldInfo,
   }) => false;
 
+  /// Returns `true` if the field should be uneditable.
+  ///
+  /// [controller] is the [ProtoMapControllerBase] managing the field.
+  /// [fieldInfo] contains metadata about the field.
+  bool isFieldUneditable({
+    required ProtoMapControllerBase controller,
+    required ProtoMapFieldInfo fieldInfo,
+  }) => false;
+
   /// Merges multiple providers into one.
   ///
   /// The resulting provider will check each provider in order and return
@@ -89,6 +98,22 @@ class _MergedProtoMapEditorProvider extends ProtoMapEditorProvider {
   }) {
     for (final provider in providers) {
       if (provider.shouldExcludeField(
+        controller: controller,
+        fieldInfo: fieldInfo,
+      )) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  bool isFieldUneditable({
+    required ProtoMapControllerBase controller,
+    required ProtoMapFieldInfo fieldInfo,
+  }) {
+    for (final provider in providers) {
+      if (provider.isFieldUneditable(
         controller: controller,
         fieldInfo: fieldInfo,
       )) {

@@ -13,11 +13,14 @@ class ProtoMapRepeatedFieldEditor extends StatefulWidget {
   final ProtoMapFieldInfo fieldInfo;
   final ProtoMapEditorProvider? provider;
 
+  final bool enabled;
+
   const ProtoMapRepeatedFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
     this.provider,
+    this.enabled = true,
   });
 
   @override
@@ -69,6 +72,7 @@ class _ProtoMapRepeatedFieldEditorState
             trailing: ProtoMapRemoveButton(
               controller: controller,
               jsonKey: jsonKey,
+              enabled: widget.enabled,
             ),
           ),
         ),
@@ -84,7 +88,7 @@ class _ProtoMapRepeatedFieldEditorState
               provider: widget.provider,
             );
           }),
-        if (!_isCollapsed)
+        if (!_isCollapsed && widget.enabled)
           ProtoMapActionButton(
             label: 'Add element',
             icon: Icons.add,

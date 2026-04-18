@@ -11,10 +11,13 @@ class ProtoMapScalarFieldEditor extends StatefulWidget {
   final ProtoMapControllerBase controller;
   final ProtoMapFieldInfo fieldInfo;
 
+  final bool enabled;
+
   const ProtoMapScalarFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
+    this.enabled = true,
   });
 
   @override
@@ -106,6 +109,7 @@ class _ProtoMapScalarFieldEditorState extends State<ProtoMapScalarFieldEditor> {
                 )
               : TextField(
                   controller: _textController,
+                  enabled: widget.enabled,
                   style: theme.fieldValueStyle,
                   decoration: InputDecoration(
                     isDense: true,
@@ -156,6 +160,7 @@ class _ProtoMapScalarFieldEditorState extends State<ProtoMapScalarFieldEditor> {
               controller: controller,
               jsonKey: fieldInfo.jsonKey!,
               index: fieldInfo.index,
+              enabled: widget.enabled,
             ),
           ],
         ),

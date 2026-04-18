@@ -12,11 +12,14 @@ class ProtoMapMessageFieldEditor extends StatefulWidget {
   final ProtoMapFieldInfo fieldInfo;
   final ProtoMapEditorProvider? provider;
 
+  final bool enabled;
+
   const ProtoMapMessageFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
     this.provider,
+    this.enabled = true,
   });
 
   @override
@@ -85,6 +88,7 @@ class _ProtoMapMessageFieldEditorState
               controller: widget.controller,
               jsonKey: jsonKey,
               index: index,
+              enabled: widget.enabled,
             ),
           ),
         ),
@@ -125,6 +129,7 @@ class _ProtoMapMessageFieldEditorState
       depth: widget.fieldInfo.depth + 1,
       parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,
       provider: widget.provider,
+      enabled: widget.enabled,
     );
   }
 }

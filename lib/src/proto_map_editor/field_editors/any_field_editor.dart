@@ -19,12 +19,15 @@ class ProtoMapAnyFieldEditor extends StatefulWidget {
   final ProtoMapEditorProvider? provider;
   final TypeRegistry? customTypeRegistry;
 
+  final bool enabled;
+
   const ProtoMapAnyFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
     this.provider,
     this.customTypeRegistry,
+    this.enabled = true,
   });
 
   @override
@@ -96,11 +99,18 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
                 onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
               ),
               onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
-              value: _buildTypeSelector(context, typeUrl, registry, theme),
+              value: _buildTypeSelector(
+                context,
+                typeUrl,
+                registry,
+                theme,
+                widget.enabled,
+              ),
               trailing: ProtoMapRemoveButton(
                 controller: controller,
                 jsonKey: jsonKey,
                 index: index,
+                enabled: widget.enabled,
               ),
             ),
           )
@@ -110,6 +120,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
             typeUrl,
             registry,
             ProtoMapEditorTheme.of(context),
+            widget.enabled,
           ),
         if (!_isCollapsed) ...[_buildSubmessageContent(value)],
         if (!_isCollapsed && typeUrl == null)
@@ -132,6 +143,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
     String? typeUrl,
     TypeRegistry registry,
     ProtoMapEditorTheme theme,
+    bool enabled,
   ) {
     final currentType = typeUrl?.split('/').last ?? 'Select type...';
     final typeNames = registry is AnyEditorRegistry
@@ -141,6 +153,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
     return ProtoMapBadgeDropdown(
       label: currentType,
       items: typeNames,
+      enabled: enabled,
       onSelected: (selected) {
         final newTypeUrl = 'type.googleapis.com/$selected';
         final newValue = <String, dynamic>{'@type': newTypeUrl};
@@ -210,6 +223,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
       depth: widget.fieldInfo.depth + 1,
       parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,
       provider: widget.provider,
+      enabled: widget.enabled,
     );
   }
 }

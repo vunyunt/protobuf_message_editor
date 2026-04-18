@@ -15,12 +15,15 @@ class ProtoMapMessageEditor extends StatelessWidget {
   final String? parentFieldName;
   final ProtoMapEditorProvider? provider;
 
+  final bool enabled;
+
   const ProtoMapMessageEditor({
     super.key,
     required this.controller,
     this.depth = 0,
     this.parentFieldName,
     this.provider,
+    this.enabled = true,
   });
 
   @override
@@ -39,11 +42,12 @@ class ProtoMapMessageEditor extends StatelessWidget {
             provider: provider,
           ),
         ),
-        ProtoMapAddFieldButton(
-          controller: controller,
-          depth: depth,
-          parentFieldName: parentFieldName,
-        ),
+        if (enabled)
+          ProtoMapAddFieldButton(
+            controller: controller,
+            depth: depth,
+            parentFieldName: parentFieldName,
+          ),
       ],
     );
   }

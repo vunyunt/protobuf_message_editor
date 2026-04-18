@@ -9,10 +9,13 @@ class ProtoMapFallbackFieldEditor extends StatelessWidget {
   final ProtoMapControllerBase controller;
   final ProtoMapFieldInfo fieldInfo;
 
+  final bool enabled;
+
   const ProtoMapFallbackFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
+    this.enabled = true,
   });
 
   @override
@@ -31,6 +34,7 @@ class ProtoMapFallbackFieldEditor extends StatelessWidget {
         trailing: ProtoMapRemoveButton(
           controller: controller,
           jsonKey: jsonKey,
+          enabled: enabled,
         ),
       ),
     );
