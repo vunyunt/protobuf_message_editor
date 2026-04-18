@@ -29,7 +29,7 @@ typedef ProtobufJsonMessageFieldEditor = ProtoMapMessageFieldEditor;
 
 class _ProtoMapMessageFieldEditorState
     extends State<ProtoMapMessageFieldEditor> {
-  bool _isCollapsed = false;
+  bool _isCollapsed = true;
 
   @override
   Widget build(BuildContext context) {

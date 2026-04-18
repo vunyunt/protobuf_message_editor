@@ -30,7 +30,7 @@ typedef ProtobufJsonRepeatedFieldEditor = ProtoMapRepeatedFieldEditor;
 
 class _ProtoMapRepeatedFieldEditorState
     extends State<ProtoMapRepeatedFieldEditor> {
-  bool _isCollapsed = false;
+  bool _isCollapsed = true;
 
   @override
   Widget build(BuildContext context) {

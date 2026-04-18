@@ -35,7 +35,7 @@ class ProtoMapAnyFieldEditor extends StatefulWidget {
 typedef ProtobufJsonAnyFieldEditor = ProtoMapAnyFieldEditor;
 
 class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
-  bool _isCollapsed = false;
+  bool _isCollapsed = true;
 
   @override
   Widget build(BuildContext context) {
