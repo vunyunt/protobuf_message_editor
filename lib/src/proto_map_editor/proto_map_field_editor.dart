@@ -50,6 +50,14 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
 
     final fieldMetadata = _createFieldMetadata(fieldInfo);
 
+    if (widget.provider?.shouldExcludeField(
+          controller: widget.controller,
+          fieldInfo: fieldMetadata,
+        ) ??
+        false) {
+      return const SizedBox.shrink();
+    }
+
     final customFieldEditor = widget.provider?.getFieldEditor(
       controller: widget.controller,
       fieldInfo: fieldMetadata,

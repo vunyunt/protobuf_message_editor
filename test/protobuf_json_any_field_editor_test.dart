@@ -11,30 +11,33 @@ void main() {
     AnotherTestSubmessage.getDefault(),
   ]);
 
-  testWidgets(
-    'ProtoMapAnyFieldEditor renders type selector and submessage',
-    (tester) async {
-      final submessage = TestSubmessage(someString: 'helloAny');
-      final message = TestMessage()..exampleAny = Any.pack(submessage);
+  testWidgets('ProtoMapAnyFieldEditor renders type selector and submessage', (
+    tester,
+  ) async {
+    final submessage = TestSubmessage(someString: 'helloAny');
+    final message = TestMessage()..exampleAny = Any.pack(submessage);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ProtobufJsonEditor(message: message, typeRegistry: registry),
-          ),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ProtobufJsonEditor(message: message, typeRegistry: registry),
         ),
-      );
+      ),
+    );
 
-      // Should show the type name
-      expect(
-        find.text('protobuf_message_editor_test.TestSubmessage'),
-        findsWidgets,
-      );
+    // Should show the type name
+    expect(
+      find.text('protobuf_message_editor_test.TestSubmessage'),
+      findsWidgets,
+    );
 
-      // Should show the value of the sub-field
-      expect(find.text('helloAny'), findsOneWidget);
-    },
-  );
+    // Expand the Any field to see the submessage content
+    await tester.tap(find.textContaining('exampleAny'));
+    await tester.pumpAndSettle();
+
+    // Should show the value of the sub-field
+    expect(find.text('helloAny'), findsOneWidget);
+  });
 
   testWidgets('ProtoMapAnyFieldEditor can change type', (tester) async {
     final message = TestMessage();
@@ -66,13 +69,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Expand to see submessage content
+    await tester.tap(find.textContaining('exampleAny'));
+    await tester.pumpAndSettle();
+
     // Now it should show "Add field..." for the submessage
     expect(find.text('Add field...'), findsWidgets);
   });
 
-  testWidgets('ProtoMapAnyFieldEditor handles null rawValue', (
-    tester,
-  ) async {
+  testWidgets('ProtoMapAnyFieldEditor handles null rawValue', (tester) async {
     final message = TestMessage();
     final controller = ProtoMapController(
       sourceMessage: message,

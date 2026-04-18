@@ -69,8 +69,11 @@ void main() {
 
       // Now try updating a field inside the Any
       // We need to find the nested editor.
-      // ProtoMapAnyFieldEditor builds a ProtoMapMessageEditor for the submessage.
       // The fields of TestSubmessage should now be rendered.
+      // But we need to expand the Any field first because it's collapsed by default.
+      await tester.tap(find.textContaining('exampleAny'));
+      await tester.pumpAndSettle();
+
       // YamlFieldRow appends a colon to the label.
       final subFieldFinder = find.textContaining('someString');
 

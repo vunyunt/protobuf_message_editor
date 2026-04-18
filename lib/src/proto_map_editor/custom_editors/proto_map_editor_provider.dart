@@ -26,6 +26,15 @@ abstract class ProtoMapEditorProvider {
     required ProtoMapFieldInfo fieldInfo,
   }) => null;
 
+  /// Returns `true` if the field should be excluded from rendering.
+  ///
+  /// [controller] is the [ProtoMapControllerBase] managing the field.
+  /// [fieldInfo] contains metadata about the field.
+  bool shouldExcludeField({
+    required ProtoMapControllerBase controller,
+    required ProtoMapFieldInfo fieldInfo,
+  }) => false;
+
   /// Merges multiple providers into one.
   ///
   /// The resulting provider will check each provider in order and return
@@ -71,5 +80,21 @@ class _MergedProtoMapEditorProvider extends ProtoMapEditorProvider {
       if (editor != null) return editor;
     }
     return null;
+  }
+
+  @override
+  bool shouldExcludeField({
+    required ProtoMapControllerBase controller,
+    required ProtoMapFieldInfo fieldInfo,
+  }) {
+    for (final provider in providers) {
+      if (provider.shouldExcludeField(
+        controller: controller,
+        fieldInfo: fieldInfo,
+      )) {
+        return true;
+      }
+    }
+    return false;
   }
 }

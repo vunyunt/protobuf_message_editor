@@ -47,6 +47,10 @@ void main() {
       // Before the fix, the submessage would have been unresolved because it used the empty root registry.
       // This would result in rendering fields of Any (type_url, value) instead of TestSubmessage.
 
+      // Expand the Any field to see its content
+      await tester.tap(find.textContaining('exampleAny'));
+      await tester.pumpAndSettle();
+
       // Check if sub-fields editor can be interacted with
       expect(find.text('Add field...'), findsWidgets);
 

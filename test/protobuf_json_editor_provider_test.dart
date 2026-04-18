@@ -122,7 +122,12 @@ void main() {
         ),
       );
 
-      // Verify the default editor is rendered (it should have 'foo' key)
+      // Verify the default editor is rendered
+      // First, expand the 'sub' field
+      await tester.tap(find.textContaining('sub'));
+      await tester.pumpAndSettle();
+
+      // Now it should have 'foo' key
       expect(find.textContaining('foo'), findsOneWidget);
       expect(find.text('CUSTOM_EDITOR_ACTIVE'), findsNothing);
     },
