@@ -7,6 +7,7 @@ abstract class ProtoMapControllerBase {
   final BuilderInfo builderInfo;
   final TypeRegistry typeRegistry;
   final void Function(Map<String, dynamic>)? onChanged;
+  bool isInitialLoad;
 
   late Map<String, dynamic> _jsonMap;
   late final Map<String, FieldInfo> _jsonKeyToFieldInfo;
@@ -16,6 +17,7 @@ abstract class ProtoMapControllerBase {
     required this.builderInfo,
     this.typeRegistry = const TypeRegistry.empty(),
     this.onChanged,
+    this.isInitialLoad = true,
   }) : _jsonMap = Map<String, dynamic>.from(initialValue) {
     _initializeFieldLookup();
   }
@@ -230,7 +232,13 @@ class ProtoMapController extends ProtoMapControllerBase with ChangeNotifier {
           as Map<String, dynamic>,
     );
     _isDirty = false;
+    isInitialLoad = true;
     notifyListeners();
+  }
+
+  /// Marks the initial load as complete.
+  void markInitialLoadComplete() {
+    isInitialLoad = false;
   }
 }
 
@@ -248,6 +256,7 @@ class ProtoMapSubmessageController extends ProtoMapControllerBase {
     required BuilderInfo builderInfo,
     TypeRegistry typeRegistry = const TypeRegistry.empty(),
     void Function(Map<String, dynamic>)? onChanged,
+    bool isInitialLoad = true,
   }) : super(
          initialValue: initialValue,
          builderInfo: resolveBuilderInfo(
@@ -257,6 +266,7 @@ class ProtoMapSubmessageController extends ProtoMapControllerBase {
          ),
          typeRegistry: typeRegistry,
          onChanged: onChanged,
+         isInitialLoad: isInitialLoad,
        );
 
   @override

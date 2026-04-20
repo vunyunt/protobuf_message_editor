@@ -32,7 +32,13 @@ typedef ProtobufJsonMessageFieldEditor = ProtoMapMessageFieldEditor;
 
 class _ProtoMapMessageFieldEditorState
     extends State<ProtoMapMessageFieldEditor> {
-  bool _isCollapsed = true;
+  late bool _isCollapsed;
+
+  @override
+  void initState() {
+    super.initState();
+    _isCollapsed = widget.controller.isInitialLoad;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +114,7 @@ class _ProtoMapMessageFieldEditorState
       initialValue: value,
       builderInfo: subBuilderInfo,
       typeRegistry: controller.typeRegistry,
+      isInitialLoad: controller.isInitialLoad,
       onChanged: (newMap) {
         if (widget.fieldInfo.index != null) {
           final raw = controller.jsonMap[jsonKey];

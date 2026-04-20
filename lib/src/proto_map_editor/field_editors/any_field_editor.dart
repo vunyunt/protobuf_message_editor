@@ -38,7 +38,13 @@ class ProtoMapAnyFieldEditor extends StatefulWidget {
 typedef ProtobufJsonAnyFieldEditor = ProtoMapAnyFieldEditor;
 
 class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
-  bool _isCollapsed = true;
+  late bool _isCollapsed;
+
+  @override
+  void initState() {
+    super.initState();
+    _isCollapsed = widget.controller.isInitialLoad;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -196,6 +202,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
       initialValue: value,
       builderInfo: subBuilderInfo,
       typeRegistry: widget.customTypeRegistry ?? controller.typeRegistry,
+      isInitialLoad: controller.isInitialLoad,
       onChanged: (newMap) {
         final fieldInController = controller.getFieldInfo(jsonKey);
         final isParentController =

@@ -68,4 +68,55 @@ void main() {
       reason: 'Repeated field elements should be hidden when collapsed',
     );
   });
+
+  testWidgets('Newly added fields and elements should be expanded', (
+    WidgetTester tester,
+  ) async {
+    final message = TestMessage();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: ProtoMapEditor(message: message)),
+      ),
+    );
+
+    // Initial state: nothing is there yet
+    expect(find.byType(ProtoMapCollapseToggle), findsNothing);
+
+    // 1. Add a nested message field
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    // Select 'nested' from the menu
+    await tester.tap(find.text('nested'));
+    await tester.pumpAndSettle();
+
+    // The field should now exist and be EXPANDED (pointing to 'TestMessage' type label)
+    expect(find.byType(ProtoMapCollapseToggle), findsOneWidget);
+    expect(find.text('TestMessage'), findsOneWidget);
+
+    // Its children should be visible (Add field... button inside the nested message)
+    // There should be two "Add field..." buttons now: one for root, one for nested
+    expect(find.text('Add field...'), findsNWidgets(2));
+
+    // 2. Add a repeated field
+    await tester.tap(find.text('Add field...').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('repeatedStrings'));
+    await tester.pumpAndSettle();
+
+    // Now there should be 3 collapse toggles? Wait, 1 for 'nested', 1 for 'repeatedStrings'
+    expect(find.byType(ProtoMapCollapseToggle), findsNWidgets(2));
+
+    // 'repeatedStrings' should be expanded, so it should show the "Add element" button
+    expect(find.text('Add element'), findsOneWidget);
+
+    // 3. Add an element to the repeated field
+    await tester.tap(find.text('Add element'));
+    await tester.pumpAndSettle();
+
+    // The element should be visible (it's a scalar, so no toggle, just the field editor)
+    // Input for the string element
+    expect(find.byType(TextField), findsOneWidget);
+  });
 }

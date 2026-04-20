@@ -42,6 +42,9 @@ class _ProtoMapEditorState extends State<ProtoMapEditor> {
   void initState() {
     super.initState();
     _initController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.markInitialLoadComplete();
+    });
   }
 
   void _initController() {

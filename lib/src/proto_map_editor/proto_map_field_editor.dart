@@ -81,6 +81,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
         initialValue: (subValue as Map<String, dynamic>?) ?? {},
         builderInfo: subBuilderInfo,
         typeRegistry: widget.controller.typeRegistry,
+        isInitialLoad: widget.controller.isInitialLoad,
         onChanged: (newMap) {
           if (widget.index != null) {
             final list = List.from(
