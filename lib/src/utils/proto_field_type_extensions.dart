@@ -196,4 +196,44 @@ extension ProtoFieldTypeExtensions on FieldInfo {
     if (isStringField()) return "";
     return null;
   }
+
+  /// Returns a compact string representation of the field's type.
+  String get typeNameBadge {
+    final suffix = isRepeated ? '[]' : '';
+    if (isMapField) {
+      return 'map';
+    }
+    if (isEnumField) return 'enum$suffix';
+    if (isMessageField) {
+      final messageName = subBuilder?.call().info_.qualifiedMessageName;
+      if (messageName != null) {
+        return '${messageName.split('.').last}$suffix';
+      }
+      return 'message$suffix';
+    }
+    if (isBoolField) return 'bool$suffix';
+    if (isStringField()) return 'string$suffix';
+    if (isBytesField) return 'bytes$suffix';
+
+    const numericMap = {
+      PbFieldType.OD: 'double',
+      PbFieldType.OF: 'float',
+      PbFieldType.O3: 'int32',
+      PbFieldType.O6: 'int64',
+      PbFieldType.OS3: 'sint32',
+      PbFieldType.OS6: 'sint64',
+      PbFieldType.OU3: 'uint32',
+      PbFieldType.OU6: 'uint64',
+      PbFieldType.OF3: 'fixed32',
+      PbFieldType.OF6: 'fixed64',
+      PbFieldType.OSF3: 'sfixed32',
+      PbFieldType.OSF6: 'sfixed64',
+    };
+
+    final baseType = type & ~PbFieldType.REPEATED_BIT;
+    final typeName = numericMap[baseType];
+    if (typeName != null) return '$typeName$suffix';
+
+    return 'unknown$suffix';
+  }
 }

@@ -64,9 +64,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Select AnotherExampleSubmessage
-    await tester.tap(
-      find.text('protobuf_message_editor_test.AnotherTestSubmessage').last,
-    );
+    await tester.tap(find.text('AnotherTestSubmessage').last);
     await tester.pumpAndSettle();
 
     // Expand to see submessage content

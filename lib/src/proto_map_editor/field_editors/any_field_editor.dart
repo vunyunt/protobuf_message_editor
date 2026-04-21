@@ -8,6 +8,7 @@ import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_inf
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/widgets/proto_map_type_selector.dart';
 
 /// A specialized field editor for `google.protobuf.Any` fields.
 ///
@@ -39,11 +40,74 @@ typedef ProtobufJsonAnyFieldEditor = ProtoMapAnyFieldEditor;
 
 class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
   late bool _isCollapsed;
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
     super.initState();
     _isCollapsed = widget.controller.isInitialLoad;
+  }
+
+  @override
+  void dispose() {
+    _hideTypeSelector();
+    super.dispose();
+  }
+
+  void _showTypeSelector(
+    BuildContext context,
+    List<String> availableTypes,
+    ProtoMapEditorTheme theme,
+  ) {
+    _hideTypeSelector();
+    _overlayEntry = ProtoMapTypeSelector.show(
+      context: context,
+      layerLink: _layerLink,
+      availableTypes: availableTypes,
+      onSelected: (selected) {
+        _hideTypeSelector();
+        _onTypeSelected(selected);
+      },
+      onCancel: _hideTypeSelector,
+    );
+  }
+
+  void _hideTypeSelector() {
+    if (_overlayEntry != null) {
+      if (_overlayEntry!.mounted) {
+        _overlayEntry!.remove();
+      }
+      _overlayEntry = null;
+    }
+  }
+
+  void _onTypeSelected(String selected) {
+    final newTypeUrl = 'type.googleapis.com/$selected';
+    final newValue = <String, dynamic>{'@type': newTypeUrl};
+    final controller = widget.controller;
+    final jsonKey = widget.fieldInfo.jsonKey!;
+
+    final fieldInController = controller.getFieldInfo(jsonKey);
+    final isParentController =
+        fieldInController != null && fieldInController.isAnyField;
+
+    if (isParentController) {
+      if (widget.fieldInfo.index != null) {
+        final raw = controller.jsonMap[jsonKey];
+        final list = raw is List ? List.from(raw) : <dynamic>[];
+        if (widget.fieldInfo.index! < list.length) {
+          list[widget.fieldInfo.index!] = newValue;
+        } else {
+          list.add(newValue);
+        }
+        controller.updateField(jsonKey, list);
+      } else {
+        controller.updateField(jsonKey, newValue);
+      }
+    } else {
+      controller.updateFullJson(newValue);
+    }
   }
 
   @override
@@ -156,37 +220,19 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
         ? registry.availableMessageNames.toList()
         : <String>[];
 
-    return ProtoMapBadgeDropdown(
-      label: currentType,
-      items: typeNames,
-      enabled: enabled,
-      onSelected: (selected) {
-        final newTypeUrl = 'type.googleapis.com/$selected';
-        final newValue = <String, dynamic>{'@type': newTypeUrl};
-        final controller = widget.controller;
-        final jsonKey = widget.fieldInfo.jsonKey!;
-
-        final fieldInController = controller.getFieldInfo(jsonKey);
-        final isParentController =
-            fieldInController != null && fieldInController.isAnyField;
-
-        if (isParentController) {
-          if (widget.fieldInfo.index != null) {
-            final raw = controller.jsonMap[jsonKey];
-            final list = raw is List ? List.from(raw) : <dynamic>[];
-            if (widget.fieldInfo.index! < list.length) {
-              list[widget.fieldInfo.index!] = newValue;
-            } else {
-              list.add(newValue);
-            }
-            controller.updateField(jsonKey, list);
-          } else {
-            controller.updateField(jsonKey, newValue);
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: ProtoMapBadgeDropdown(
+        label: currentType,
+        items: const [], // We handle items in our custom selector
+        enabled: enabled,
+        onSelected: (_) {}, // Handled by our own trigger
+        onTap: () {
+          if (enabled) {
+            _showTypeSelector(context, typeNames, theme);
           }
-        } else {
-          controller.updateFullJson(newValue);
-        }
-      },
+        },
+      ),
     );
   }
 
