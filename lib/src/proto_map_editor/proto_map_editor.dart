@@ -84,51 +84,53 @@ class _ProtoMapEditorState extends State<ProtoMapEditor> {
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: theme.contentPadding,
-                  child: Row(
-                    children: [
-                      Expanded(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: theme.contentPadding,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Editing: ${widget.message.info_.qualifiedMessageName}',
+                        style: theme.fieldLabelStyle,
+                      ),
+                    ),
+                    if (_controller.isDirty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
-                          'Editing: ${widget.message.info_.qualifiedMessageName}',
-                          style: theme.fieldLabelStyle,
+                          'Unsaved Changes',
+                          style: theme.unsavedChangesStyle,
                         ),
                       ),
-                      if (_controller.isDirty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            'Unsaved Changes',
-                            style: theme.unsavedChangesStyle,
-                          ),
-                        ),
-                      ElevatedButton(
-                        onPressed: _controller.isDirty
-                            ? () {
-                                final savedMessage = _controller.save();
-                                widget.onSave?.call(savedMessage);
-                              }
-                            : null,
-                        child: const Text('Save'),
-                      ),
-                    ],
+                    ElevatedButton(
+                      onPressed: _controller.isDirty
+                          ? () {
+                              final savedMessage = _controller.save();
+                              widget.onSave?.call(savedMessage);
+                            }
+                          : null,
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: theme.contentPadding,
+                    child: ProtoMapMessageEditor(
+                      controller: _controller,
+                      depth: 0,
+                      provider: widget.provider,
+                    ),
                   ),
                 ),
-                const Divider(height: 1),
-                Padding(
-                  padding: theme.contentPadding,
-                  child: ProtoMapMessageEditor(
-                    controller: _controller,
-                    depth: 0,
-                    provider: widget.provider,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
