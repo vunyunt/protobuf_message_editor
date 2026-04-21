@@ -46,7 +46,7 @@ abstract class ProtoMapControllerBase {
   }
 
   /// Adds a previously unset field with a default value.
-  void addField(String key, {String? typeUrl}) {
+  void addField(String key, {String? typeUrl, dynamic initialValue}) {
     if (_jsonMap.containsKey(key)) return;
 
     final fieldInfo = _jsonKeyToFieldInfo[key];
@@ -54,7 +54,9 @@ abstract class ProtoMapControllerBase {
 
     _onBeforeFieldUpdate(key);
 
-    if (fieldInfo.isAnyField && typeUrl != null) {
+    if (initialValue != null) {
+      _jsonMap[key] = initialValue;
+    } else if (fieldInfo.isAnyField && typeUrl != null) {
       _jsonMap[key] = <String, dynamic>{'@type': typeUrl};
     } else {
       _jsonMap[key] = fieldInfo.getDefaultValue();

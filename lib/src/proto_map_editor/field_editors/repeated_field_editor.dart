@@ -102,9 +102,29 @@ class _ProtoMapRepeatedFieldEditorState
             tooltip: 'Add element to ${fieldInfo.label}',
             onTap: () async {
               final newList = List.from(value);
-              dynamic defaultValue = protoFieldInfo.getDefaultValue(
-                forElement: true,
-              );
+
+              dynamic defaultValue;
+              final subBuilderInfo = protoFieldInfo.isMessageField
+                  ? protoFieldInfo.subBuilder?.call().info_
+                  : null;
+
+              if (subBuilderInfo != null) {
+                final customMessage = widget.provider?.getSubmessageBuilder(
+                  submessageBuilderInfo: subBuilderInfo,
+                  fieldInfo: protoFieldInfo,
+                );
+                if (customMessage != null) {
+                  defaultValue = customMessage.toProto3Json(
+                    typeRegistry: controller.typeRegistry,
+                  );
+                } else {
+                  defaultValue = protoFieldInfo.getDefaultValue(
+                    forElement: true,
+                  );
+                }
+              } else {
+                defaultValue = protoFieldInfo.getDefaultValue(forElement: true);
+              }
 
               newList.add(defaultValue);
               controller.updateField(jsonKey, newList);

@@ -1,12 +1,24 @@
 import 'package:flutter/widgets.dart';
+import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 
 /// A provider for custom editors in the [ProtoMapEditor].
 abstract class ProtoMapEditorProvider {
+  /// Provides a custom builder for a new submessage.
+  ///
+  /// [submessageBuilderInfo] is the [BuilderInfo] of the message being created.
+  /// [fieldInfo] is the [FieldInfo] of the field being added (if available).
+  ///
+  /// Returns a [GeneratedMessage] if a custom builder is provided, otherwise `null`.
+  GeneratedMessage? getSubmessageBuilder({
+    required BuilderInfo submessageBuilderInfo,
+    FieldInfo? fieldInfo,
+  }) => null;
+
   /// Provides a custom editor for a submessage.
   ///
-  /// [controller] is the [ProtoMapController] for the submessage.
+  /// [controller] is the [ProtoMapControllerBase] for the submessage.
   /// [fieldInfo] contains metadata about the field.
   ///
   /// Returns a [Widget] if a custom editor is provided, otherwise `null`.
@@ -24,6 +36,17 @@ abstract class ProtoMapEditorProvider {
   Widget? getFieldEditor({
     required ProtoMapControllerBase controller,
     required ProtoMapFieldInfo fieldInfo,
+  }) => null;
+
+  /// Provides a custom initial value for a field when it is added.
+  ///
+  /// [controller] is the [ProtoMapControllerBase] managing the field.
+  /// [fieldInfo] is the [FieldInfo] of the field being added.
+  ///
+  /// Returns a value if a custom initial value is provided, otherwise `null`.
+  dynamic getFieldInitialValue({
+    required ProtoMapControllerBase controller,
+    required FieldInfo fieldInfo,
   }) => null;
 
   /// Returns `true` if the field should be excluded from rendering.
@@ -62,6 +85,21 @@ class _MergedProtoMapEditorProvider extends ProtoMapEditorProvider {
   _MergedProtoMapEditorProvider(this.providers);
 
   @override
+  GeneratedMessage? getSubmessageBuilder({
+    required BuilderInfo submessageBuilderInfo,
+    FieldInfo? fieldInfo,
+  }) {
+    for (final provider in providers) {
+      final builder = provider.getSubmessageBuilder(
+        submessageBuilderInfo: submessageBuilderInfo,
+        fieldInfo: fieldInfo,
+      );
+      if (builder != null) return builder;
+    }
+    return null;
+  }
+
+  @override
   Widget? getSubmessageEditor({
     required ProtoMapControllerBase controller,
     required ProtoMapFieldInfo fieldInfo,
@@ -87,6 +125,21 @@ class _MergedProtoMapEditorProvider extends ProtoMapEditorProvider {
         fieldInfo: fieldInfo,
       );
       if (editor != null) return editor;
+    }
+    return null;
+  }
+
+  @override
+  dynamic getFieldInitialValue({
+    required ProtoMapControllerBase controller,
+    required FieldInfo fieldInfo,
+  }) {
+    for (final provider in providers) {
+      final value = provider.getFieldInitialValue(
+        controller: controller,
+        fieldInfo: fieldInfo,
+      );
+      if (value != null) return value;
     }
     return null;
   }

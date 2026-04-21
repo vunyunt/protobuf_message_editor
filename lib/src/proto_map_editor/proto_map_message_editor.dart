@@ -47,6 +47,7 @@ class ProtoMapMessageEditor extends StatelessWidget {
             controller: controller,
             depth: depth,
             parentFieldName: parentFieldName,
+            provider: provider,
           ),
       ],
     );

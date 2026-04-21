@@ -84,9 +84,27 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
 
   void _onTypeSelected(String selected) {
     final newTypeUrl = 'type.googleapis.com/$selected';
-    final newValue = <String, dynamic>{'@type': newTypeUrl};
     final controller = widget.controller;
     final jsonKey = widget.fieldInfo.jsonKey!;
+    final registry = widget.customTypeRegistry ?? controller.typeRegistry;
+
+    Map<String, dynamic> newValue;
+    final resolved = registry.lookup(selected);
+    final customMessage = resolved != null
+        ? widget.provider?.getSubmessageBuilder(
+            submessageBuilderInfo: resolved,
+            fieldInfo: widget.fieldInfo.fieldInfo,
+          )
+        : null;
+
+    if (customMessage != null) {
+      newValue =
+          customMessage.toProto3Json(typeRegistry: registry)
+              as Map<String, dynamic>;
+      newValue['@type'] = newTypeUrl;
+    } else {
+      newValue = <String, dynamic>{'@type': newTypeUrl};
+    }
 
     final fieldInController = controller.getFieldInfo(jsonKey);
     final isParentController =

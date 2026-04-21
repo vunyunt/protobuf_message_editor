@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/widgets/proto_map_field_selector.dart';
+import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 
 class ProtoMapAddFieldButton extends StatefulWidget {
   final ProtoMapControllerBase controller;
   final int depth;
   final String? parentFieldName;
+  final ProtoMapEditorProvider? provider;
 
   const ProtoMapAddFieldButton({
     super.key,
     required this.controller,
     required this.depth,
     this.parentFieldName,
+    this.provider,
   });
 
   @override
@@ -55,7 +59,40 @@ class _ProtoMapAddFieldButtonState extends State<ProtoMapAddFieldButton> {
       availableFields: unsetFields,
       onSelected: (field) {
         _hideSelector();
-        widget.controller.addField(field.name);
+
+        Map<String, dynamic>? initialValue;
+        if (field.isMessageField && !field.isScalarMessage) {
+          final subBuilderInfo = field.subBuilder?.call().info_;
+          if (subBuilderInfo != null) {
+            final customMessage = widget.provider?.getSubmessageBuilder(
+              submessageBuilderInfo: subBuilderInfo,
+              fieldInfo: field,
+            );
+            if (customMessage != null) {
+              initialValue =
+                  customMessage.toProto3Json(
+                        typeRegistry: widget.controller.typeRegistry,
+                      )
+                      as Map<String, dynamic>;
+            }
+          }
+        }
+
+        if (initialValue == null) {
+          final customInitialValue = widget.provider?.getFieldInitialValue(
+            controller: widget.controller,
+            fieldInfo: field,
+          );
+          if (customInitialValue != null) {
+            widget.controller.addField(
+              field.name,
+              initialValue: customInitialValue,
+            );
+            return;
+          }
+        }
+
+        widget.controller.addField(field.name, initialValue: initialValue);
       },
       onCancel: _hideSelector,
     );
