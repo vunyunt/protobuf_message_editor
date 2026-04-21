@@ -61,7 +61,9 @@ class _ProtoMapAddFieldButtonState extends State<ProtoMapAddFieldButton> {
         _hideSelector();
 
         Map<String, dynamic>? initialValue;
-        if (field.isMessageField && !field.isScalarMessage) {
+        if (field.isMessageField &&
+            !field.isScalarMessage &&
+            !field.isRepeated) {
           final subBuilderInfo = field.subBuilder?.call().info_;
           if (subBuilderInfo != null) {
             final customMessage = widget.provider?.getSubmessageBuilder(
