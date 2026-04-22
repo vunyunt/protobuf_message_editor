@@ -93,7 +93,9 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
     final customMessage = resolved != null
         ? widget.provider?.getSubmessageBuilder(
             submessageBuilderInfo: resolved,
-            fieldInfo: widget.fieldInfo.fieldInfo,
+            fieldInfo: widget.fieldInfo.copyWith(
+              submessageBuilderInfo: resolved,
+            ),
           )
         : null;
 
@@ -145,12 +147,10 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
     if (jsonKey.isEmpty || !isAtParentLevel) {
       value = controller.jsonMap;
     } else if (index != null && rawValue is List) {
-      value =
-          (index < rawValue.length ? rawValue[index] : null)
-              as Map<String, dynamic>? ??
-          <String, dynamic>{};
+      final item = (index < rawValue.length ? rawValue[index] : null);
+      value = item is Map<String, dynamic> ? item : <String, dynamic>{};
     } else {
-      value = rawValue as Map<String, dynamic>? ?? <String, dynamic>{};
+      value = rawValue is Map<String, dynamic> ? rawValue : <String, dynamic>{};
     }
 
     final typeUrl = value['@type'] as String?;

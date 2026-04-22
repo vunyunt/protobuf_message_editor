@@ -35,13 +35,34 @@ abstract class ProtoMapControllerBase {
   /// Retrieves the [FieldInfo] for a given JSON key.
   FieldInfo? getFieldInfo(String jsonKey) => _jsonKeyToFieldInfo[jsonKey];
 
+  /// Normalizes a value, converting [GeneratedMessage] to its JSON representation.
+  static dynamic normalizeValue(dynamic value, TypeRegistry typeRegistry) {
+    if (value is GeneratedMessage) {
+      return value.toProto3Json(typeRegistry: typeRegistry);
+    } else if (value is Map) {
+      return Map<String, dynamic>.fromEntries(
+        value.entries.map(
+          (e) =>
+              MapEntry(e.key.toString(), normalizeValue(e.value, typeRegistry)),
+        ),
+      );
+    } else if (value is List) {
+      return value.map((e) => normalizeValue(e, typeRegistry)).toList();
+    }
+    return value;
+  }
+
   /// Updates a field in the JSON map.
   void updateField(String key, dynamic value) {
-    if (_jsonMap[key] == value) return;
+    final normalizedValue = ProtoMapControllerBase.normalizeValue(
+      value,
+      typeRegistry,
+    );
+    if (_jsonMap[key] == normalizedValue) return;
 
     _onBeforeFieldUpdate(key);
 
-    _jsonMap[key] = value;
+    _jsonMap[key] = normalizedValue;
     _notifyChange();
   }
 
@@ -55,7 +76,10 @@ abstract class ProtoMapControllerBase {
     _onBeforeFieldUpdate(key);
 
     if (initialValue != null) {
-      _jsonMap[key] = initialValue;
+      _jsonMap[key] = ProtoMapControllerBase.normalizeValue(
+        initialValue,
+        typeRegistry,
+      );
     } else if (fieldInfo.isAnyField && typeUrl != null) {
       _jsonMap[key] = <String, dynamic>{'@type': typeUrl};
     } else {
@@ -92,7 +116,7 @@ abstract class ProtoMapControllerBase {
 
   /// Replaces the entire JSON map.
   void updateFullJson(Map<String, dynamic> newJson) {
-    _jsonMap = Map.from(newJson);
+    _jsonMap = Map<String, dynamic>.from(newJson);
     _notifyChange();
   }
 
@@ -229,7 +253,7 @@ class ProtoMapController extends ProtoMapControllerBase with ChangeNotifier {
 
   /// Resets the JSON map to the current state of [sourceMessage].
   void reset() {
-    _jsonMap = Map.from(
+    _jsonMap = Map<String, dynamic>.from(
       sourceMessage.toProto3Json(typeRegistry: typeRegistry)
           as Map<String, dynamic>,
     );
@@ -254,16 +278,19 @@ typedef ProtobufJsonEditingController = ProtoMapController;
 /// via the [onChanged] callback.
 class ProtoMapSubmessageController extends ProtoMapControllerBase {
   ProtoMapSubmessageController({
-    required Map<String, dynamic> initialValue,
+    required dynamic initialValue,
     required BuilderInfo builderInfo,
     TypeRegistry typeRegistry = const TypeRegistry.empty(),
     void Function(Map<String, dynamic>)? onChanged,
     bool isInitialLoad = true,
   }) : super(
-         initialValue: initialValue,
+         initialValue:
+             ProtoMapControllerBase.normalizeValue(initialValue, typeRegistry)
+                 as Map<String, dynamic>,
          builderInfo: resolveBuilderInfo(
            builderInfo,
-           initialValue,
+           ProtoMapControllerBase.normalizeValue(initialValue, typeRegistry)
+               as Map<String, dynamic>,
            typeRegistry,
          ),
          typeRegistry: typeRegistry,

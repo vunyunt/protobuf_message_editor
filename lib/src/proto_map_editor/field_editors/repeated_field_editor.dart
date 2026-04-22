@@ -111,7 +111,9 @@ class _ProtoMapRepeatedFieldEditorState
               if (subBuilderInfo != null) {
                 final customMessage = widget.provider?.getSubmessageBuilder(
                   submessageBuilderInfo: subBuilderInfo,
-                  fieldInfo: protoFieldInfo,
+                  fieldInfo: fieldInfo.copyWith(
+                    submessageBuilderInfo: subBuilderInfo,
+                  ),
                 );
                 if (customMessage != null) {
                   defaultValue = customMessage.toProto3Json(
@@ -126,7 +128,12 @@ class _ProtoMapRepeatedFieldEditorState
                 defaultValue = protoFieldInfo.getDefaultValue(forElement: true);
               }
 
-              newList.add(defaultValue);
+              newList.add(
+                ProtoMapControllerBase.normalizeValue(
+                  defaultValue,
+                  controller.typeRegistry,
+                ),
+              );
               controller.updateField(jsonKey, newList);
             },
           ),

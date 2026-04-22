@@ -48,9 +48,10 @@ class _ProtoMapMessageFieldEditorState
     final rawValue = widget.controller.jsonMap[jsonKey];
     final value = (index != null && rawValue is List)
         ? (index < rawValue.length ? rawValue[index] : null)
-                  as Map<String, dynamic>? ??
-              <String, dynamic>{}
-        : rawValue as Map<String, dynamic>? ?? <String, dynamic>{};
+        : rawValue;
+    final mapValue = value is Map<String, dynamic>
+        ? value
+        : <String, dynamic>{};
 
     final theme = ProtoMapEditorTheme.of(context);
 
@@ -98,12 +99,12 @@ class _ProtoMapMessageFieldEditorState
             ),
           ),
         ),
-        if (!_isCollapsed) ...[_buildSubmessageContent(value)],
+        if (!_isCollapsed) ...[_buildSubmessageContent(mapValue)],
       ],
     );
   }
 
-  Widget _buildSubmessageContent(Map<String, dynamic> value) {
+  Widget _buildSubmessageContent(Map<String, dynamic> mapValue) {
     final jsonKey = widget.fieldInfo.jsonKey!;
     final controller = widget.controller;
     final subBuilderInfo = widget.fieldInfo.submessageBuilderInfo;
@@ -111,7 +112,7 @@ class _ProtoMapMessageFieldEditorState
     if (subBuilderInfo == null) return const SizedBox.shrink();
 
     final subController = ProtoMapSubmessageController(
-      initialValue: value,
+      initialValue: mapValue,
       builderInfo: subBuilderInfo,
       typeRegistry: controller.typeRegistry,
       isInitialLoad: controller.isInitialLoad,

@@ -13,7 +13,7 @@ abstract class ProtoMapEditorProvider {
   /// Returns a [GeneratedMessage] if a custom builder is provided, otherwise `null`.
   GeneratedMessage? getSubmessageBuilder({
     required BuilderInfo submessageBuilderInfo,
-    FieldInfo? fieldInfo,
+    required ProtoMapFieldInfo fieldInfo,
   }) => null;
 
   /// Provides a custom editor for a submessage.
@@ -46,7 +46,7 @@ abstract class ProtoMapEditorProvider {
   /// Returns a value if a custom initial value is provided, otherwise `null`.
   dynamic getFieldInitialValue({
     required ProtoMapControllerBase controller,
-    required FieldInfo fieldInfo,
+    required ProtoMapFieldInfo fieldInfo,
   }) => null;
 
   /// Returns `true` if the field should be excluded from rendering.
@@ -87,7 +87,7 @@ class _MergedProtoMapEditorProvider extends ProtoMapEditorProvider {
   @override
   GeneratedMessage? getSubmessageBuilder({
     required BuilderInfo submessageBuilderInfo,
-    FieldInfo? fieldInfo,
+    required ProtoMapFieldInfo fieldInfo,
   }) {
     for (final provider in providers) {
       final builder = provider.getSubmessageBuilder(
@@ -132,7 +132,7 @@ class _MergedProtoMapEditorProvider extends ProtoMapEditorProvider {
   @override
   dynamic getFieldInitialValue({
     required ProtoMapControllerBase controller,
-    required FieldInfo fieldInfo,
+    required ProtoMapFieldInfo fieldInfo,
   }) {
     for (final provider in providers) {
       final value = provider.getFieldInitialValue(

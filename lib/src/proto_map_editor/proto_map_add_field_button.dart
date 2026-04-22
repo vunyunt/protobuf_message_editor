@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/widgets/proto_map_field_selector.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
@@ -61,6 +62,18 @@ class _ProtoMapAddFieldButtonState extends State<ProtoMapAddFieldButton> {
         _hideSelector();
 
         Map<String, dynamic>? initialValue;
+        final protoFieldInfo = ProtoMapFieldInfo(
+          fieldInfo: field,
+          jsonKey: field.name,
+          depth: widget.depth,
+          parentFieldName: widget.parentFieldName,
+          parentBuilderInfo: widget.controller.builderInfo,
+          submessageBuilderInfo: field.isMessageField
+              ? field.subBuilder?.call().info_
+              : null,
+          label: field.name,
+        );
+
         if (field.isMessageField &&
             !field.isScalarMessage &&
             !field.isRepeated) {
@@ -68,12 +81,13 @@ class _ProtoMapAddFieldButtonState extends State<ProtoMapAddFieldButton> {
           if (subBuilderInfo != null) {
             final customMessage = widget.provider?.getSubmessageBuilder(
               submessageBuilderInfo: subBuilderInfo,
-              fieldInfo: field,
+              fieldInfo: protoFieldInfo,
             );
             if (customMessage != null) {
               initialValue =
-                  customMessage.toProto3Json(
-                        typeRegistry: widget.controller.typeRegistry,
+                  ProtoMapControllerBase.normalizeValue(
+                        customMessage,
+                        widget.controller.typeRegistry,
                       )
                       as Map<String, dynamic>;
             }
@@ -83,7 +97,7 @@ class _ProtoMapAddFieldButtonState extends State<ProtoMapAddFieldButton> {
         if (initialValue == null) {
           final customInitialValue = widget.provider?.getFieldInitialValue(
             controller: widget.controller,
-            fieldInfo: field,
+            fieldInfo: protoFieldInfo,
           );
           if (customInitialValue != null) {
             widget.controller.addField(

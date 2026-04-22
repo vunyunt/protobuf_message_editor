@@ -58,7 +58,7 @@ class CustomBuilderProvider extends ProtoMapEditorProvider {
   @override
   GeneratedMessage? getSubmessageBuilder({
     required BuilderInfo submessageBuilderInfo,
-    FieldInfo? fieldInfo,
+    required ProtoMapFieldInfo fieldInfo,
   }) {
     if (submessageBuilderInfo.qualifiedMessageName == 'test.SubMessage') {
       return SubMessage()..foo = 'INITIAL_VALUE';

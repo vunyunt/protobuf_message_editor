@@ -78,7 +78,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
           : rawValue;
 
       final subController = ProtoMapSubmessageController(
-        initialValue: (subValue as Map<String, dynamic>?) ?? {},
+        initialValue: (subValue is Map<String, dynamic>) ? subValue : {},
         builderInfo: subBuilderInfo,
         typeRegistry: widget.controller.typeRegistry,
         isInitialLoad: widget.controller.isInitialLoad,
