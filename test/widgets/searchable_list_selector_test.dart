@@ -16,7 +16,7 @@ void main() {
             onSelected: (val) => selected = val,
             onCancel: () {},
             searchText: (item) => item,
-            itemBuilder: (context, item, isSelected) {
+            itemBuilder: (context, item, isHighlighted, isSelected) {
               return Text(item);
             },
           ),
@@ -45,7 +45,7 @@ void main() {
             onSelected: (val) => selected = val,
             onCancel: () {},
             searchText: (item) => item,
-            itemBuilder: (context, item, isSelected) {
+            itemBuilder: (context, item, isHighlighted, isSelected) {
               return Text(item);
             },
           ),
@@ -76,7 +76,7 @@ void main() {
             onSelected: (_) {},
             onCancel: () {},
             searchText: (item) => item,
-            itemBuilder: (context, item, isSelected) {
+            itemBuilder: (context, item, isHighlighted, isSelected) {
               return Text(item);
             },
           ),

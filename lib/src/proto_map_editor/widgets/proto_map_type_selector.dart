@@ -7,12 +7,14 @@ class ProtoMapTypeSelector extends StatelessWidget {
   final List<String> availableTypes;
   final ValueChanged<String> onSelected;
   final VoidCallback onCancel;
+  final String? selectedType;
 
   const ProtoMapTypeSelector({
     super.key,
     required this.availableTypes,
     required this.onSelected,
     required this.onCancel,
+    this.selectedType,
   });
 
   /// Shows the type selector in an overlay with robust positioning.
@@ -22,6 +24,7 @@ class ProtoMapTypeSelector extends StatelessWidget {
     required List<String> availableTypes,
     required ValueChanged<String> onSelected,
     required VoidCallback onCancel,
+    String? selectedType,
   }) {
     final theme = ProtoMapEditorTheme.of(context);
     return SearchableListSelector.show<String>(
@@ -33,8 +36,14 @@ class ProtoMapTypeSelector extends StatelessWidget {
       searchText: (type) => type,
       maxWidth: 400,
       searchHint: 'Search message type...',
-      itemBuilder: (context, type, isSelected) {
-        return _TypeItem(type: type, isSelected: isSelected, theme: theme);
+      isSelected: (type) => type == selectedType,
+      itemBuilder: (context, type, isHighlighted, isSelected) {
+        return _TypeItem(
+          type: type,
+          isHighlighted: isHighlighted,
+          isSelected: isSelected,
+          theme: theme,
+        );
       },
     );
   }
@@ -50,8 +59,14 @@ class ProtoMapTypeSelector extends StatelessWidget {
       searchText: (type) => type,
       maxWidth: 400,
       searchHint: 'Search message type...',
-      itemBuilder: (context, type, isSelected) {
-        return _TypeItem(type: type, isSelected: isSelected, theme: theme);
+      isSelected: (type) => type == selectedType,
+      itemBuilder: (context, type, isHighlighted, isSelected) {
+        return _TypeItem(
+          type: type,
+          isHighlighted: isHighlighted,
+          isSelected: isSelected,
+          theme: theme,
+        );
       },
     );
   }
@@ -59,11 +74,13 @@ class ProtoMapTypeSelector extends StatelessWidget {
 
 class _TypeItem extends StatelessWidget {
   final String type;
+  final bool isHighlighted;
   final bool isSelected;
   final ProtoMapEditorTheme theme;
 
   const _TypeItem({
     required this.type,
+    required this.isHighlighted,
     required this.isSelected,
     required this.theme,
   });
@@ -74,25 +91,34 @@ class _TypeItem extends StatelessWidget {
     final messageName = parts.last;
     final prefix = parts.take(parts.length - 1).join('.');
 
+    final active = isHighlighted || isSelected;
+
     return Container(
-      color: isSelected ? Colors.blue.withOpacity(0.1) : null,
+      color: active ? Colors.blue.withOpacity(0.1) : null,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            messageName,
-            style: theme.fieldValueStyle.copyWith(
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.blue : null,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  messageName,
+                  style: theme.fieldValueStyle.copyWith(
+                    fontWeight: active ? FontWeight.bold : FontWeight.normal,
+                    color: active ? Colors.blue : null,
+                  ),
+                ),
+                if (prefix.isNotEmpty)
+                  _ScrollingPrefix(
+                    prefix: prefix,
+                    theme: theme,
+                    isSelected: active,
+                  ),
+              ],
             ),
           ),
-          if (prefix.isNotEmpty)
-            _ScrollingPrefix(
-              prefix: prefix,
-              theme: theme,
-              isSelected: isSelected,
-            ),
+          if (isSelected) const Icon(Icons.check, size: 16, color: Colors.blue),
         ],
       ),
     );

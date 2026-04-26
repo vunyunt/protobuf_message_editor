@@ -35,8 +35,13 @@ class ProtoMapFieldSelector extends StatelessWidget {
       searchText: (field) => field.name,
       maxWidth: 300,
       searchHint: 'Search field...',
-      itemBuilder: (context, field, isSelected) {
-        return _FieldItem(field: field, isSelected: isSelected, theme: theme);
+      itemBuilder: (context, field, isHighlighted, isSelected) {
+        return _FieldItem(
+          field: field,
+          isHighlighted: isHighlighted,
+          isSelected: isSelected,
+          theme: theme,
+        );
       },
     );
   }
@@ -52,8 +57,13 @@ class ProtoMapFieldSelector extends StatelessWidget {
       searchText: (field) => field.name,
       maxWidth: 300,
       searchHint: 'Search field...',
-      itemBuilder: (context, field, isSelected) {
-        return _FieldItem(field: field, isSelected: isSelected, theme: theme);
+      itemBuilder: (context, field, isHighlighted, isSelected) {
+        return _FieldItem(
+          field: field,
+          isHighlighted: isHighlighted,
+          isSelected: isSelected,
+          theme: theme,
+        );
       },
     );
   }
@@ -61,11 +71,13 @@ class ProtoMapFieldSelector extends StatelessWidget {
 
 class _FieldItem extends StatefulWidget {
   final FieldInfo field;
+  final bool isHighlighted;
   final bool isSelected;
   final ProtoMapEditorTheme theme;
 
   const _FieldItem({
     required this.field,
+    required this.isHighlighted,
     required this.isSelected,
     required this.theme,
   });
@@ -79,20 +91,23 @@ class _FieldItemState extends State<_FieldItem> {
 
   @override
   Widget build(BuildContext context) {
-    final showExpanded = widget.isSelected || _isHovered;
+    final active = widget.isHighlighted || widget.isSelected;
+    final showExpanded = active || _isHovered;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: Container(
-        color: widget.isSelected ? Colors.blue.withOpacity(0.1) : null,
+        color: active ? Colors.blue.withOpacity(0.1) : null,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: showExpanded ? _buildExpandedView() : _buildCompactView(),
+        child: showExpanded
+            ? _buildExpandedView(active)
+            : _buildCompactView(active),
       ),
     );
   }
 
-  Widget _buildCompactView() {
+  Widget _buildCompactView(bool active) {
     return Row(
       children: [
         Expanded(
@@ -101,10 +116,8 @@ class _FieldItemState extends State<_FieldItem> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: widget.theme.fieldValueStyle.copyWith(
-              fontWeight: widget.isSelected
-                  ? FontWeight.bold
-                  : FontWeight.normal,
-              color: widget.isSelected ? Colors.blue : null,
+              fontWeight: active ? FontWeight.bold : FontWeight.normal,
+              color: active ? Colors.blue : null,
             ),
           ),
         ),
@@ -114,29 +127,29 @@ class _FieldItemState extends State<_FieldItem> {
           child: _TypeBadge(
             type: widget.field.typeNameBadge,
             theme: widget.theme,
-            isSelected: widget.isSelected,
+            isSelected: active,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildExpandedView() {
+  Widget _buildExpandedView(bool active) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           widget.field.name,
           style: widget.theme.fieldValueStyle.copyWith(
-            fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
-            color: widget.isSelected ? Colors.blue : null,
+            fontWeight: active ? FontWeight.bold : FontWeight.normal,
+            color: active ? Colors.blue : null,
           ),
         ),
         const SizedBox(height: 4),
         _TypeBadge(
           type: widget.field.typeNameBadge,
           theme: widget.theme,
-          isSelected: widget.isSelected,
+          isSelected: active,
           isFull: true,
         ),
       ],

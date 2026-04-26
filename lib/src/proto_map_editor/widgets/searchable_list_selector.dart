@@ -12,8 +12,16 @@ class SearchableListSelector<T> extends StatefulWidget {
   final String Function(T item) searchText;
 
   /// Builds the item widget for the list.
-  final Widget Function(BuildContext context, T item, bool isSelected)
+  final Widget Function(
+    BuildContext context,
+    T item,
+    bool isHighlighted,
+    bool isSelected,
+  )
   itemBuilder;
+
+  /// Optional callback to determine if an item is selected.
+  final bool Function(T item)? isSelected;
 
   /// Maximum width of the selector popup.
   final double maxWidth;
@@ -37,6 +45,7 @@ class SearchableListSelector<T> extends StatefulWidget {
     required this.onCancel,
     required this.searchText,
     required this.itemBuilder,
+    this.isSelected,
     this.maxWidth = 400,
     this.maxHeight = 400,
     this.searchHint = 'Search...',
@@ -52,8 +61,14 @@ class SearchableListSelector<T> extends StatefulWidget {
     required ValueChanged<T> onSelected,
     required VoidCallback onCancel,
     required String Function(T item) searchText,
-    required Widget Function(BuildContext context, T item, bool isSelected)
+    required Widget Function(
+      BuildContext context,
+      T item,
+      bool isHighlighted,
+      bool isSelected,
+    )
     itemBuilder,
+    bool Function(T item)? isSelected,
     double maxWidth = 400,
     double maxHeight = 400,
     String searchHint = 'Search...',
@@ -101,6 +116,7 @@ class SearchableListSelector<T> extends StatefulWidget {
                   onCancel: onCancel,
                   searchText: searchText,
                   itemBuilder: itemBuilder,
+                  isSelected: isSelected,
                   maxWidth: maxWidth,
                   maxHeight: effectiveMaxHeight < maxHeight
                       ? effectiveMaxHeight
@@ -238,6 +254,7 @@ class _SearchableListSelectorState<T> extends State<SearchableListSelector<T>> {
                     context,
                     item,
                     index == _selectedIndex,
+                    widget.isSelected?.call(item) ?? false,
                   ),
                 );
               },
