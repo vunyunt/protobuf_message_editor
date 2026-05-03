@@ -1,4 +1,16 @@
+## 0.2.2
+
+- Refactored `ProtoMapController` to simplify initialization and improve message serialization.
+- Standardized field editor interfaces using `ProtoMapFieldInfo` and unified value normalization.
+- Added support for **disabling and excluding fields** via `ProtoMapEditorProvider`.
+- Enhanced **`google.protobuf.Any`** editing with a new searchable type selector.
+- Added **custom builder support** for initializing new submessage fields and elements.
+- Improved UX with **auto-expansion** of newly added fields and **collapsed-by-default** expandable fields.
+- Pinned the save header in `ProtoMapEditor` and updated bytes fields to hide the text input by default.
+- Fixed initialization issues for repeated message fields in the map editor.
+
 ## 0.2.1
+
 
 - Extracted reusable UI components into `styled_widgets` to support custom decorators.
 - Migrated internal naming from `ProtobufJson` to `ProtoMap` for consistency.
