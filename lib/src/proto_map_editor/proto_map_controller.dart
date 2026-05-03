@@ -214,21 +214,18 @@ class ProtoMapController extends ProtoMapControllerBase with ChangeNotifier {
   bool _isDirty = false;
 
   /// Creates a root controller for a [GeneratedMessage].
-  ProtoMapController({
-    required this.sourceMessage,
-    TypeRegistry typeRegistry = const TypeRegistry.empty(),
-  }) : super(
-         initialValue:
-             sourceMessage.toProto3Json(typeRegistry: typeRegistry)
-                 as Map<String, dynamic>,
-         builderInfo: ProtoMapSubmessageController.resolveBuilderInfo(
-           sourceMessage.info_,
-           sourceMessage.toProto3Json(typeRegistry: typeRegistry)
-               as Map<String, dynamic>,
-           typeRegistry,
-         ),
-         typeRegistry: typeRegistry,
-       );
+  ProtoMapController({required this.sourceMessage, super.typeRegistry})
+    : super(
+        initialValue:
+            sourceMessage.toProto3Json(typeRegistry: typeRegistry)
+                as Map<String, dynamic>,
+        builderInfo: ProtoMapSubmessageController.resolveBuilderInfo(
+          sourceMessage.info_,
+          sourceMessage.toProto3Json(typeRegistry: typeRegistry)
+              as Map<String, dynamic>,
+          typeRegistry,
+        ),
+      );
 
   /// Whether the JSON representation has been modified since initialization or the last save.
   bool get isDirty => _isDirty;
@@ -238,6 +235,21 @@ class ProtoMapController extends ProtoMapControllerBase with ChangeNotifier {
     _isDirty = true;
     onChanged?.call(_jsonMap);
     notifyListeners();
+  }
+
+  @override
+  GeneratedMessage getSavedMessage() {
+    final sanitized = ProtoMapControllerBase._sanitizeForSave(
+      _jsonMap,
+      builderInfo,
+    );
+    if (sourceMessage.info_ != builderInfo) {
+      // It was resolved (e.g. from Any)
+      final wrapper = sourceMessage.info_.createEmptyInstance!();
+      wrapper.mergeFromProto3Json(sanitized, typeRegistry: typeRegistry);
+      return wrapper;
+    }
+    return super.getSavedMessage();
   }
 
   /// Saves the current JSON state.
