@@ -40,6 +40,9 @@ class _ProtoMapScalarFieldEditorState extends State<ProtoMapScalarFieldEditor> {
       }
       return null;
     }
+    if (widget.fieldInfo.mapKey != null && rawValue is Map) {
+      return rawValue[widget.fieldInfo.mapKey!];
+    }
     return rawValue;
   }
 
@@ -97,7 +100,7 @@ class _ProtoMapScalarFieldEditorState extends State<ProtoMapScalarFieldEditor> {
     return ProtoMapIndent(
       depth: fieldInfo.depth,
       child: ProtoMapFieldRow(
-        label: '${fieldInfo.label ?? fieldInfo.jsonKey ?? ''}$labelSuffix',
+        label: '${fieldInfo.label ?? fieldInfo.mapKey ?? fieldInfo.jsonKey ?? ''}$labelSuffix',
         labelColor: theme.getLabelColor(fieldInfo.depth),
         tooltip: parentContext.isEmpty ? null : parentContext,
         value: SizedBox(
@@ -133,6 +136,12 @@ class _ProtoMapScalarFieldEditorState extends State<ProtoMapScalarFieldEditor> {
                         list.add(typedValue);
                       }
                       controller.updateField(jsonKey, list);
+                    } else if (fieldInfo.mapKey != null) {
+                      controller.updateMapValue(
+                        jsonKey,
+                        fieldInfo.mapKey!,
+                        typedValue,
+                      );
                     } else {
                       controller.updateField(jsonKey, typedValue);
                     }
@@ -160,6 +169,7 @@ class _ProtoMapScalarFieldEditorState extends State<ProtoMapScalarFieldEditor> {
               controller: controller,
               jsonKey: fieldInfo.jsonKey!,
               index: fieldInfo.index,
+              mapKey: fieldInfo.mapKey,
               enabled: widget.enabled,
             ),
           ],

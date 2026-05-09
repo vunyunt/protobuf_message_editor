@@ -140,7 +140,55 @@ const TestMessage$json = {
       '5': 12,
       '10': 'exampleBytesField'
     },
+    {
+      '1': 'example_map_field',
+      '3': 11,
+      '4': 3,
+      '5': 11,
+      '6': '.protobuf_message_editor_test.TestMessage.ExampleMapFieldEntry',
+      '10': 'exampleMapField'
+    },
+    {
+      '1': 'example_message_map_field',
+      '3': 12,
+      '4': 3,
+      '5': 11,
+      '6':
+          '.protobuf_message_editor_test.TestMessage.ExampleMessageMapFieldEntry',
+      '10': 'exampleMessageMapField'
+    },
   ],
+  '3': [
+    TestMessage_ExampleMapFieldEntry$json,
+    TestMessage_ExampleMessageMapFieldEntry$json
+  ],
+};
+
+@$core.Deprecated('Use testMessageDescriptor instead')
+const TestMessage_ExampleMapFieldEntry$json = {
+  '1': 'ExampleMapFieldEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+  '7': {'7': true},
+};
+
+@$core.Deprecated('Use testMessageDescriptor instead')
+const TestMessage_ExampleMessageMapFieldEntry$json = {
+  '1': 'ExampleMessageMapFieldEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 3, '10': 'key'},
+    {
+      '1': 'value',
+      '3': 2,
+      '4': 1,
+      '5': 11,
+      '6': '.protobuf_message_editor_test.TestSubmessage',
+      '10': 'value'
+    },
+  ],
+  '7': {'7': true},
 };
 
 /// Descriptor for `TestMessage`. Decode as a `google.protobuf.DescriptorProto`.
@@ -157,4 +205,12 @@ final $typed_data.Uint8List testMessageDescriptor = $convert.base64Decode(
     'FsdWVSEGV4YW1wbGVCb29sVmFsdWUSNAoKZXhhbXBsZUFueRgIIAEoCzIULmdvb2dsZS5wcm90'
     'b2J1Zi5BbnlSCmV4YW1wbGVBbnkSRgoUZXhhbXBsZV9yZXBlYXRlZF9hbnkYCSADKAsyFC5nb2'
     '9nbGUucHJvdG9idWYuQW55UhJleGFtcGxlUmVwZWF0ZWRBbnkSLgoTZXhhbXBsZV9ieXRlc19m'
-    'aWVsZBgKIAEoDFIRZXhhbXBsZUJ5dGVzRmllbGQ=');
+    'aWVsZBgKIAEoDFIRZXhhbXBsZUJ5dGVzRmllbGQSagoRZXhhbXBsZV9tYXBfZmllbGQYCyADKA'
+    'syPi5wcm90b2J1Zl9tZXNzYWdlX2VkaXRvcl90ZXN0LlRlc3RNZXNzYWdlLkV4YW1wbGVNYXBG'
+    'aWVsZEVudHJ5Ug9leGFtcGxlTWFwRmllbGQSgAEKGWV4YW1wbGVfbWVzc2FnZV9tYXBfZmllbG'
+    'QYDCADKAsyRS5wcm90b2J1Zl9tZXNzYWdlX2VkaXRvcl90ZXN0LlRlc3RNZXNzYWdlLkV4YW1w'
+    'bGVNZXNzYWdlTWFwRmllbGRFbnRyeVIWZXhhbXBsZU1lc3NhZ2VNYXBGaWVsZBpCChRFeGFtcG'
+    'xlTWFwRmllbGRFbnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoCVIFdmFsdWU6'
+    'AjgBGncKG0V4YW1wbGVNZXNzYWdlTWFwRmllbGRFbnRyeRIQCgNrZXkYASABKANSA2tleRJCCg'
+    'V2YWx1ZRgCIAEoCzIsLnByb3RvYnVmX21lc3NhZ2VfZWRpdG9yX3Rlc3QuVGVzdFN1Ym1lc3Nh'
+    'Z2VSBXZhbHVlOgI4AQ==');

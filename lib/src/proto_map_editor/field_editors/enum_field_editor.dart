@@ -22,13 +22,15 @@ class ProtoMapEnumFieldEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final jsonKey = fieldInfo.jsonKey!;
-    final index = fieldInfo.index;
+    final mapKey = fieldInfo.mapKey;
     final protoFieldInfo = fieldInfo.fieldInfo!;
 
     final rawValue = controller.jsonMap[jsonKey];
-    final value = (index != null && rawValue is List)
-        ? rawValue[index]
-        : rawValue;
+    final value = (fieldInfo.index != null && rawValue is List)
+        ? rawValue[fieldInfo.index!]
+        : (mapKey != null && rawValue is Map)
+            ? rawValue[mapKey]
+            : rawValue;
     final currentName = protoFieldInfo.getEnumName(value);
 
     final theme = ProtoMapEditorTheme.of(context);
@@ -45,7 +47,7 @@ class ProtoMapEnumFieldEditor extends StatelessWidget {
     return ProtoMapIndent(
       depth: fieldInfo.depth,
       child: ProtoMapFieldRow(
-        label: fieldInfo.label ?? fieldInfo.jsonKey ?? '',
+        label: fieldInfo.label ?? mapKey ?? jsonKey,
         labelColor: theme.getLabelColor(fieldInfo.depth),
         tooltip: parentContext.isEmpty ? null : parentContext,
         value: SizedBox(
@@ -63,12 +65,14 @@ class ProtoMapEnumFieldEditor extends StatelessWidget {
               onChanged: enabled
                   ? (newName) {
                       if (newName != null) {
-                        if (index != null) {
+                        if (fieldInfo.index != null) {
                           final list = List.from(
                             controller.jsonMap[jsonKey] as List,
                           );
-                          list[index] = newName;
+                          list[fieldInfo.index!] = newName;
                           controller.updateField(jsonKey, list);
+                        } else if (mapKey != null) {
+                          controller.updateMapValue(jsonKey, mapKey, newName);
                         } else {
                           controller.updateField(jsonKey, newName);
                         }
@@ -81,7 +85,8 @@ class ProtoMapEnumFieldEditor extends StatelessWidget {
         trailing: ProtoMapRemoveButton(
           controller: controller,
           jsonKey: jsonKey,
-          index: index,
+          index: fieldInfo.index,
+          mapKey: mapKey,
           enabled: enabled,
         ),
       ),

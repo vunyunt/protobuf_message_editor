@@ -49,7 +49,8 @@ class _ProtoMapRepeatedFieldEditorState
     final depth = fieldInfo.depth;
     final protoFieldInfo = fieldInfo.fieldInfo!;
 
-    final value = controller.jsonMap[jsonKey] as List;
+    final rawValue = controller.jsonMap[jsonKey];
+    final value = rawValue is List ? rawValue : [];
 
     final theme = ProtoMapEditorTheme.of(context);
     final parentMessageName = fieldInfo.parentBuilderInfo?.qualifiedMessageName

@@ -197,6 +197,14 @@ extension ProtoFieldTypeExtensions on FieldInfo {
     return null;
   }
 
+  /// The [PbFieldType] of the keys in this map field.
+  int? get mapKeyFieldType =>
+      this is MapFieldInfo ? (this as MapFieldInfo).keyFieldType : null;
+
+  /// The [PbFieldType] of the values in this map field.
+  int? get mapValueFieldType =>
+      this is MapFieldInfo ? (this as MapFieldInfo).valueFieldType : null;
+
   /// Returns a compact string representation of the field's type.
   String get typeNameBadge {
     final suffix = isRepeated ? '[]' : '';

@@ -10,6 +10,7 @@ class ProtoMapFieldEditor extends StatefulWidget {
   final ProtoMapControllerBase controller;
   final String jsonKey;
   final int? index;
+  final String? mapKey;
   final int depth;
   final String? parentFieldName;
   final ProtoMapEditorProvider? provider;
@@ -21,6 +22,7 @@ class ProtoMapFieldEditor extends StatefulWidget {
     required this.controller,
     required this.jsonKey,
     this.index,
+    this.mapKey,
     this.depth = 0,
     this.parentFieldName,
     this.provider,
@@ -68,38 +70,65 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
     );
     if (customFieldEditor != null) return customFieldEditor;
 
-    if (fieldInfo.isMessageField &&
+    // 1. It's a map entry value and that value is a message type.
+    final isEntryMessage = widget.mapKey != null &&
+        fieldInfo.isMapField &&
+        fieldInfo.mapValueFieldType != null &&
+        (fieldInfo.mapValueFieldType! & PbFieldType.M) != 0;
+
+
+    // 2. It's a regular message field (singular or an element of a list).
+    // Note: We exclude Map fields here because they are handled by ProtoMapMapFieldEditor
+    // unless we are specifically editing an entry value (handled by isEntryMessage above).
+    final isRegularMessage = !fieldInfo.isMapField &&
+        fieldInfo.isMessageField &&
         !fieldInfo.isScalarMessage &&
-        (!fieldInfo.isRepeated || widget.index != null)) {
-      final subBuilderInfo = fieldInfo.subBuilder!().info_;
-      final rawValue = widget.controller.jsonMap[widget.jsonKey];
-      final subValue = (widget.index != null && rawValue is List)
-          ? (widget.index! < rawValue.length ? rawValue[widget.index!] : null)
-          : rawValue;
+        (!fieldInfo.isRepeated || widget.index != null);
 
-      final subController = ProtoMapSubmessageController(
-        initialValue: (subValue is Map<String, dynamic>) ? subValue : {},
-        builderInfo: subBuilderInfo,
-        typeRegistry: widget.controller.typeRegistry,
-        isInitialLoad: widget.controller.isInitialLoad,
-        onChanged: (newMap) {
-          if (widget.index != null) {
-            final list = List.from(
-              widget.controller.jsonMap[widget.jsonKey] as List,
-            );
-            list[widget.index!] = newMap;
-            widget.controller.updateField(widget.jsonKey, list);
-          } else {
-            widget.controller.updateField(widget.jsonKey, newMap);
-          }
-        },
-      );
+    if (isEntryMessage || isRegularMessage) {
+      final subBuilderInfo = widget.mapKey != null
+          ? (fieldInfo as dynamic).valueCreator?.call().info_
+          : fieldInfo.subBuilder?.call().info_;
+      
+      if (subBuilderInfo != null) {
+        final rawValue = widget.controller.jsonMap[widget.jsonKey];
+        final subValue = (widget.index != null && rawValue is List)
+            ? (widget.index! < rawValue.length ? rawValue[widget.index!] : null)
+            : (widget.mapKey != null && rawValue is Map)
+            ? rawValue[widget.mapKey!]
+            : rawValue;
+        
 
-      final customEditor = widget.provider?.getSubmessageEditor(
-        controller: subController,
-        fieldInfo: fieldMetadata,
-      );
-      if (customEditor != null) return customEditor;
+        final subController = ProtoMapSubmessageController(
+          initialValue: (subValue is Map<String, dynamic>) ? subValue : {},
+          builderInfo: subBuilderInfo,
+          typeRegistry: widget.controller.typeRegistry,
+          isInitialLoad: widget.controller.isInitialLoad,
+          onChanged: (newMap) {
+            if (widget.index != null) {
+              final list = List.from(
+                widget.controller.jsonMap[widget.jsonKey] as List,
+              );
+              list[widget.index!] = newMap;
+              widget.controller.updateField(widget.jsonKey, list);
+            } else if (widget.mapKey != null) {
+              widget.controller.updateMapValue(
+                widget.jsonKey,
+                widget.mapKey!,
+                newMap,
+              );
+            } else {
+              widget.controller.updateField(widget.jsonKey, newMap);
+            }
+          },
+        );
+
+        final customEditor = widget.provider?.getSubmessageEditor(
+          controller: subController,
+          fieldInfo: fieldMetadata,
+        );
+        if (customEditor != null) return customEditor;
+      }
     }
 
     final enabled =
@@ -114,6 +143,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
       controller: widget.controller,
       jsonKey: widget.jsonKey,
       index: widget.index,
+      mapKey: widget.mapKey,
       depth: widget.depth,
       parentFieldName: widget.parentFieldName,
       provider: widget.provider,
@@ -127,20 +157,27 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
 
     final label = widget.index != null
         ? '[${widget.index}]'
-        : (oneofIndex != null ? '${widget.jsonKey} (oneof)' : widget.jsonKey);
+        : (widget.mapKey != null
+            ? widget.mapKey!
+            : (oneofIndex != null ? '${widget.jsonKey} (oneof)' : widget.jsonKey));
 
     return ProtoMapFieldInfo(
       fieldInfo: fieldInfo,
       jsonKey: widget.jsonKey,
       index: widget.index,
+      mapKey: widget.mapKey,
       depth: widget.depth,
       label: label,
       parentFieldName: widget.parentFieldName,
       parentBuilderInfo: widget.controller.builderInfo,
-      submessageBuilderInfo:
-          (fieldInfo.isMessageField && !fieldInfo.isScalarMessage)
-          ? fieldInfo.subBuilder?.call().info_
-          : null,
+      submessageBuilderInfo: (widget.mapKey != null)
+          ? (fieldInfo as dynamic).valueCreator?.call().info_
+          : (fieldInfo.isMessageField && !fieldInfo.isScalarMessage)
+              ? fieldInfo.subBuilder?.call().info_
+              : null,
+      isMapField: fieldInfo.isMapField,
+      mapKeyFieldType: fieldInfo.mapKeyFieldType,
+      mapValueFieldType: fieldInfo.mapValueFieldType,
     );
   }
 }
@@ -154,6 +191,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
   final ProtoMapControllerBase controller;
   final String jsonKey;
   final int? index;
+  final String? mapKey;
   final int depth;
   final String? parentFieldName;
   final ProtoMapEditorProvider? provider;
@@ -164,6 +202,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
     required this.controller,
     required this.jsonKey,
     this.index,
+    this.mapKey,
     this.depth = 0,
     this.parentFieldName,
     this.provider,
@@ -178,24 +217,40 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
     final oneofIndex = controller.builderInfo.oneofs[fieldInfo.tagNumber];
     final label = index != null
         ? '[$index]'
-        : (oneofIndex != null ? '$jsonKey (oneof)' : jsonKey);
+        : (mapKey != null
+            ? mapKey!
+            : (oneofIndex != null ? '$jsonKey (oneof)' : jsonKey));
 
     final fieldMetadata = ProtoMapFieldInfo(
       fieldInfo: fieldInfo,
       jsonKey: jsonKey,
       index: index,
+      mapKey: mapKey,
       depth: depth,
       label: label,
       parentFieldName: parentFieldName,
       parentBuilderInfo: controller.builderInfo,
-      submessageBuilderInfo:
-          (fieldInfo.isMessageField && !fieldInfo.isScalarMessage)
-          ? fieldInfo.subBuilder?.call().info_
-          : null,
+      submessageBuilderInfo: (mapKey != null)
+          ? (fieldInfo as dynamic).valueCreator?.call().info_
+          : (fieldInfo.isMessageField && !fieldInfo.isScalarMessage)
+              ? fieldInfo.subBuilder?.call().info_
+              : null,
+      isMapField: fieldInfo.isMapField,
+      mapKeyFieldType: fieldInfo.mapKeyFieldType,
+      mapValueFieldType: fieldInfo.mapValueFieldType,
     );
 
     // If index != null, we are editing an element of a repeated field.
     // We should skip the isRepeated check and go straight to the type's editor.
+    if (fieldInfo.isMapField && mapKey == null) {
+      return ProtoMapMapFieldEditor(
+        controller: controller,
+        fieldInfo: fieldMetadata,
+        provider: provider,
+        enabled: enabled,
+      );
+    }
+
     if (fieldInfo.isRepeated && index == null) {
       return ProtoMapRepeatedFieldEditor(
         controller: controller,

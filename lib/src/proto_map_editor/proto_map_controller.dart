@@ -114,6 +114,59 @@ abstract class ProtoMapControllerBase {
     }
   }
 
+  /// Renames a key in a map field.
+  void renameMapKey(String fieldKey, String oldKey, String newKey) {
+    if (oldKey == newKey) return;
+    final map = _jsonMap[fieldKey];
+    if (map is! Map<String, dynamic>) return;
+    if (map.containsKey(newKey)) return; // Don't overwrite existing keys
+
+    _onBeforeFieldUpdate(fieldKey);
+
+    final value = map.remove(oldKey);
+    map[newKey] = value;
+
+    _notifyChange();
+  }
+
+  /// Updates a value in a map field.
+  void updateMapValue(String fieldKey, String mapKey, dynamic value) {
+    final rawMap = _jsonMap[fieldKey];
+    if (rawMap is! Map) return;
+
+    final map = rawMap is Map<String, dynamic>
+        ? rawMap
+        : Map<String, dynamic>.from(rawMap);
+    _jsonMap[fieldKey] = map;
+
+    final normalizedValue = ProtoMapControllerBase.normalizeValue(
+      value,
+      typeRegistry,
+    );
+    if (map[mapKey] == normalizedValue) return;
+
+    _onBeforeFieldUpdate(fieldKey);
+
+    map[mapKey] = normalizedValue;
+    _notifyChange();
+  }
+
+  /// Removes a value from a map field.
+  void removeMapValue(String fieldKey, String mapKey) {
+    final rawMap = _jsonMap[fieldKey];
+    if (rawMap is! Map) return;
+
+    final map = rawMap is Map<String, dynamic>
+        ? rawMap
+        : Map<String, dynamic>.from(rawMap);
+    _jsonMap[fieldKey] = map;
+
+    _onBeforeFieldUpdate(fieldKey);
+
+    map.remove(mapKey);
+    _notifyChange();
+  }
+
   /// Replaces the entire JSON map.
   void updateFullJson(Map<String, dynamic> newJson) {
     _jsonMap = Map<String, dynamic>.from(newJson);
@@ -189,6 +242,29 @@ abstract class ProtoMapControllerBase {
             }
             return e;
           }).toList();
+        } else {
+          sanitized[entry.key] = entry.value;
+        }
+      } else if (fieldInfo.isMapField && entry.value is Map<String, dynamic>) {
+        final valueType = fieldInfo.mapValueFieldType;
+        final isMessageValue = (valueType != null &&
+            (valueType & PbFieldType.MESSAGE_BIT) != 0);
+
+        if (isMessageValue) {
+          final subBuilderInfo = fieldInfo.subBuilder?.call().info_;
+          if (subBuilderInfo != null) {
+            final map = entry.value as Map<String, dynamic>;
+            sanitized[entry.key] = map.map(
+              (k, v) => MapEntry(
+                k,
+                (v is Map<String, dynamic>)
+                    ? _sanitizeForSave(v, subBuilderInfo)
+                    : v,
+              ),
+            );
+          } else {
+            sanitized[entry.key] = entry.value;
+          }
         } else {
           sanitized[entry.key] = entry.value;
         }

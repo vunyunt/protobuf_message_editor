@@ -184,6 +184,9 @@ class TestMessage extends $pb.GeneratedMessage {
     $1.Any? exampleAny,
     $core.Iterable<$1.Any>? exampleRepeatedAny,
     $core.List<$core.int>? exampleBytesField,
+    $core.Iterable<$core.MapEntry<$core.String, $core.String>>? exampleMapField,
+    $core.Iterable<$core.MapEntry<$fixnum.Int64, TestSubmessage>>?
+        exampleMessageMapField,
   }) {
     final result = create();
     if (exampleStringField != null)
@@ -202,6 +205,10 @@ class TestMessage extends $pb.GeneratedMessage {
     if (exampleRepeatedAny != null)
       result.exampleRepeatedAny.addAll(exampleRepeatedAny);
     if (exampleBytesField != null) result.exampleBytesField = exampleBytesField;
+    if (exampleMapField != null)
+      result.exampleMapField.addEntries(exampleMapField);
+    if (exampleMessageMapField != null)
+      result.exampleMessageMapField.addEntries(exampleMessageMapField);
     return result;
   }
 
@@ -237,6 +244,20 @@ class TestMessage extends $pb.GeneratedMessage {
         subBuilder: $1.Any.create)
     ..a<$core.List<$core.int>>(
         10, _omitFieldNames ? '' : 'exampleBytesField', $pb.PbFieldType.OY)
+    ..m<$core.String, $core.String>(
+        11, _omitFieldNames ? '' : 'exampleMapField',
+        entryClassName: 'TestMessage.ExampleMapFieldEntry',
+        keyFieldType: $pb.PbFieldType.OS,
+        valueFieldType: $pb.PbFieldType.OS,
+        packageName: const $pb.PackageName('protobuf_message_editor_test'))
+    ..m<$fixnum.Int64, TestSubmessage>(
+        12, _omitFieldNames ? '' : 'exampleMessageMapField',
+        entryClassName: 'TestMessage.ExampleMessageMapFieldEntry',
+        keyFieldType: $pb.PbFieldType.O6,
+        valueFieldType: $pb.PbFieldType.OM,
+        valueCreator: TestSubmessage.create,
+        valueDefaultOrMaker: TestSubmessage.getDefault,
+        packageName: const $pb.PackageName('protobuf_message_editor_test'))
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -329,6 +350,13 @@ class TestMessage extends $pb.GeneratedMessage {
   $core.bool hasExampleBytesField() => $_has(9);
   @$pb.TagNumber(10)
   void clearExampleBytesField() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $pb.PbMap<$core.String, $core.String> get exampleMapField => $_getMap(10);
+
+  @$pb.TagNumber(12)
+  $pb.PbMap<$fixnum.Int64, TestSubmessage> get exampleMessageMapField =>
+      $_getMap(11);
 }
 
 const $core.bool _omitFieldNames =

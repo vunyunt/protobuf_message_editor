@@ -7,6 +7,8 @@ class ProtoMapRemoveButton extends StatelessWidget {
   final String jsonKey;
   final int? index;
 
+  final String? mapKey;
+
   final bool enabled;
 
   const ProtoMapRemoveButton({
@@ -14,6 +16,7 @@ class ProtoMapRemoveButton extends StatelessWidget {
     required this.controller,
     required this.jsonKey,
     this.index,
+    this.mapKey,
     this.enabled = true,
   });
 
@@ -26,6 +29,8 @@ class ProtoMapRemoveButton extends StatelessWidget {
                 final list = List.from(controller.jsonMap[jsonKey] as List);
                 list.removeAt(index!);
                 controller.updateField(jsonKey, list);
+              } else if (mapKey != null) {
+                controller.removeMapValue(jsonKey, mapKey!);
               } else {
                 controller.removeField(jsonKey);
               }

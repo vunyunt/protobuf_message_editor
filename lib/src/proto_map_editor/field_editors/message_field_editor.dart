@@ -44,14 +44,15 @@ class _ProtoMapMessageFieldEditorState
   Widget build(BuildContext context) {
     final jsonKey = widget.fieldInfo.jsonKey!;
     final index = widget.fieldInfo.index;
+    final mapKey = widget.fieldInfo.mapKey;
 
     final rawValue = widget.controller.jsonMap[jsonKey];
     final value = (index != null && rawValue is List)
         ? (index < rawValue.length ? rawValue[index] : null)
-        : rawValue;
-    final mapValue = value is Map<String, dynamic>
-        ? value
-        : <String, dynamic>{};
+        : (mapKey != null && rawValue is Map)
+            ? rawValue[mapKey]
+            : rawValue;
+    final mapValue = value is Map ? Map<String, dynamic>.from(value) : <String, dynamic>{};
 
     final theme = ProtoMapEditorTheme.of(context);
 
@@ -126,6 +127,12 @@ class _ProtoMapMessageFieldEditorState
             list.add(newMap);
           }
           controller.updateField(jsonKey, list);
+        } else if (widget.fieldInfo.mapKey != null) {
+          controller.updateMapValue(
+            jsonKey,
+            widget.fieldInfo.mapKey!,
+            newMap,
+          );
         } else {
           controller.updateField(jsonKey, newMap);
         }

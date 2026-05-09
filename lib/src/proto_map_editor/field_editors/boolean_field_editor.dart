@@ -21,12 +21,13 @@ class ProtoMapBooleanFieldEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final jsonKey = fieldInfo.jsonKey!;
-    final index = fieldInfo.index;
-
+    final mapKey = fieldInfo.mapKey;
     final rawValue = controller.jsonMap[jsonKey];
-    final value = (index != null && rawValue is List)
-        ? rawValue[index] as bool? ?? false
-        : rawValue as bool? ?? false;
+    final value = (fieldInfo.index != null && rawValue is List)
+        ? rawValue[fieldInfo.index!] as bool? ?? false
+        : (mapKey != null && rawValue is Map)
+            ? rawValue[mapKey] as bool? ?? false
+            : rawValue as bool? ?? false;
 
     final theme = ProtoMapEditorTheme.of(context);
 
@@ -42,7 +43,7 @@ class ProtoMapBooleanFieldEditor extends StatelessWidget {
     return ProtoMapIndent(
       depth: fieldInfo.depth,
       child: ProtoMapFieldRow(
-        label: fieldInfo.label ?? fieldInfo.jsonKey ?? '',
+        label: fieldInfo.label ?? mapKey ?? jsonKey,
         labelColor: theme.getLabelColor(fieldInfo.depth),
         tooltip: parentContext.isEmpty ? null : parentContext,
         value: Align(
@@ -53,12 +54,14 @@ class ProtoMapBooleanFieldEditor extends StatelessWidget {
               value: value,
               onChanged: enabled
                   ? (newValue) {
-                      if (index != null) {
+                      if (fieldInfo.index != null) {
                         final list = List.from(
                           controller.jsonMap[jsonKey] as List,
                         );
-                        list[index] = newValue;
+                        list[fieldInfo.index!] = newValue;
                         controller.updateField(jsonKey, list);
+                      } else if (mapKey != null) {
+                        controller.updateMapValue(jsonKey, mapKey, newValue);
                       } else {
                         controller.updateField(jsonKey, newValue);
                       }
@@ -72,7 +75,8 @@ class ProtoMapBooleanFieldEditor extends StatelessWidget {
         trailing: ProtoMapRemoveButton(
           controller: controller,
           jsonKey: jsonKey,
-          index: index,
+          index: fieldInfo.index,
+          mapKey: mapKey,
           enabled: enabled,
         ),
       ),
