@@ -260,7 +260,8 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
     final protoFieldInfo = widget.fieldInfo.fieldInfo;
     if (protoFieldInfo == null) return const SizedBox.shrink();
 
-    final subBuilderInfo = protoFieldInfo.subBuilder?.call().info_;
+    final subBuilderInfo = widget.fieldInfo.submessageBuilderInfo ??
+        protoFieldInfo.subBuilder?.call().info_;
     if (subBuilderInfo == null) return const SizedBox.shrink();
     final subController = ProtoMapSubmessageController(
       initialValue: value,

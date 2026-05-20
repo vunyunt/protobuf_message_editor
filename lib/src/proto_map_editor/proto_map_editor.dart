@@ -15,6 +15,7 @@ class ProtoMapEditor extends StatefulWidget {
   final ProtoMapController? controller;
   final void Function(GeneratedMessage message)? onSave;
   final ProtoMapEditorProvider? provider;
+  final List<Widget>? actions;
 
   const ProtoMapEditor({
     super.key,
@@ -23,6 +24,7 @@ class ProtoMapEditor extends StatefulWidget {
     this.controller,
     this.onSave,
     this.provider,
+    this.actions,
   });
 
   @override
@@ -105,6 +107,10 @@ class _ProtoMapEditorState extends State<ProtoMapEditor> {
                           style: theme.unsavedChangesStyle,
                         ),
                       ),
+                    if (widget.actions != null) ...[
+                      ...widget.actions!,
+                      const SizedBox(width: 8),
+                    ],
                     ElevatedButton(
                       onPressed: _controller.isDirty
                           ? () {

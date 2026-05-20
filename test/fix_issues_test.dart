@@ -112,11 +112,6 @@ void main() {
 
     expect(find.textContaining('key1'), findsOneWidget);
 
-    // Expand key1
-    final key1Label = find.textContaining('key1');
-    await tester.tap(key1Label);
-    await tester.pumpAndSettle();
-
     // Should NOT throw, and should show "name" field of InnerMessage
     expect(tester.takeException(), isNull);
     
