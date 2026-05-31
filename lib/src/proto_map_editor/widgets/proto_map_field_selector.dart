@@ -98,7 +98,7 @@ class _FieldItemState extends State<_FieldItem> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: Container(
-        color: active ? Colors.blue.withOpacity(0.1) : null,
+        color: active ? Colors.blue.withValues(alpha: 0.1) : null,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: showExpanded
             ? _buildExpandedView(active)
@@ -176,8 +176,8 @@ class _TypeBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
         color: isSelected
-            ? Colors.blue.withOpacity(0.2)
-            : theme.collapseToggleColor.withOpacity(0.1),
+            ? Colors.blue.withValues(alpha: 0.2)
+            : theme.collapseToggleColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(2),
       ),
       child: Text(

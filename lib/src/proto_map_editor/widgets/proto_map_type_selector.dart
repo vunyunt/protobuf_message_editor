@@ -94,7 +94,7 @@ class _TypeItem extends StatelessWidget {
     final active = isHighlighted || isSelected;
 
     return Container(
-      color: active ? Colors.blue.withOpacity(0.1) : null,
+      color: active ? Colors.blue.withValues(alpha: 0.1) : null,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
@@ -171,7 +171,7 @@ class _ScrollingPrefixState extends State<_ScrollingPrefix> {
           style: widget.theme.hintTextStyle.copyWith(
             fontSize: 10,
             fontFamily: 'monospace',
-            color: widget.isSelected ? Colors.blue.withOpacity(0.7) : null,
+            color: widget.isSelected ? Colors.blue.withValues(alpha: 0.7) : null,
           ),
         ),
       ),

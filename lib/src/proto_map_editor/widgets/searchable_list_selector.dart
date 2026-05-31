@@ -227,10 +227,10 @@ class _SearchableListSelectorState<T> extends State<SearchableListSelector<T>> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: theme.collapseToggleColor.withOpacity(0.2)),
+        border: Border.all(color: theme.collapseToggleColor.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
