@@ -85,7 +85,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
         !fieldInfo.isScalarMessage &&
         (!fieldInfo.isRepeated || widget.index != null);
 
-    if (isEntryMessage || isRegularMessage) {
+    if ((isEntryMessage || isRegularMessage) && !fieldInfo.isAnyField) {
       final subBuilderInfo = widget.mapKey != null
           ? (fieldInfo as dynamic).valueCreator?.call().info_
           : fieldInfo.subBuilder?.call().info_;
@@ -104,6 +104,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
           builderInfo: subBuilderInfo,
           typeRegistry: widget.controller.typeRegistry,
           isInitialLoad: widget.controller.isInitialLoad,
+          normalize: false,
           onChanged: (newMap) {
             if (widget.index != null) {
               final list = List.from(

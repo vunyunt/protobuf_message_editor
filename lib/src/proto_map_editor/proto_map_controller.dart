@@ -371,16 +371,27 @@ class ProtoMapSubmessageController extends ProtoMapControllerBase {
     TypeRegistry typeRegistry = const TypeRegistry.empty(),
     void Function(Map<String, dynamic>)? onChanged,
     bool isInitialLoad = true,
+    bool normalize = true,
+  }) : this._internal(
+         normalizedValue: normalize
+             ? (ProtoMapControllerBase.normalizeValue(initialValue, typeRegistry)
+                 as Map<String, dynamic>)
+             : (initialValue as Map<String, dynamic>),
+         builderInfo: builderInfo,
+         typeRegistry: typeRegistry,
+         onChanged: onChanged,
+         isInitialLoad: isInitialLoad,
+       );
+
+  ProtoMapSubmessageController._internal({
+    required Map<String, dynamic> normalizedValue,
+    required BuilderInfo builderInfo,
+    required TypeRegistry typeRegistry,
+    void Function(Map<String, dynamic>)? onChanged,
+    required bool isInitialLoad,
   }) : super(
-         initialValue:
-             ProtoMapControllerBase.normalizeValue(initialValue, typeRegistry)
-                 as Map<String, dynamic>,
-         builderInfo: resolveBuilderInfo(
-           builderInfo,
-           ProtoMapControllerBase.normalizeValue(initialValue, typeRegistry)
-               as Map<String, dynamic>,
-           typeRegistry,
-         ),
+         initialValue: normalizedValue,
+         builderInfo: resolveBuilderInfo(builderInfo, normalizedValue, typeRegistry),
          typeRegistry: typeRegistry,
          onChanged: onChanged,
          isInitialLoad: isInitialLoad,

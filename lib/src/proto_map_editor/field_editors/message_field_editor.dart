@@ -117,6 +117,7 @@ class _ProtoMapMessageFieldEditorState
       builderInfo: subBuilderInfo,
       typeRegistry: controller.typeRegistry,
       isInitialLoad: controller.isInitialLoad,
+      normalize: false,
       onChanged: (newMap) {
         if (widget.fieldInfo.index != null) {
           final raw = controller.jsonMap[jsonKey];

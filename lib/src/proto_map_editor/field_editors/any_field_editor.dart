@@ -244,7 +244,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
 
     final qualifiedName = typeUrl?.split('/').last;
     final currentType = (qualifiedName != null
-            ? (customNames?[qualifiedName] ?? qualifiedName)
+            ? (customNames[qualifiedName] ?? qualifiedName)
             : null) ??
         'Select type...';
 
@@ -282,6 +282,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
       builderInfo: subBuilderInfo,
       typeRegistry: widget.customTypeRegistry ?? controller.typeRegistry,
       isInitialLoad: controller.isInitialLoad,
+      normalize: false,
       onChanged: (newMap) {
         final fieldInController = controller.getFieldInfo(jsonKey);
         final isParentController =
@@ -303,6 +304,17 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
         }
       },
     );
+
+    final customEditor = widget.provider?.getSubmessageEditor(
+      controller: subController,
+      fieldInfo: ProtoMapFieldInfo(
+        depth: widget.fieldInfo.depth,
+        parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,
+        parentBuilderInfo: widget.fieldInfo.submessageBuilderInfo,
+        submessageBuilderInfo: subController.builderInfo,
+      ),
+    );
+    if (customEditor != null) return customEditor;
 
     return ProtoMapMessageEditor(
       controller: subController,
