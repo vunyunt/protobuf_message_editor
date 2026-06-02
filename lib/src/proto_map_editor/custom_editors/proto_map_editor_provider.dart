@@ -67,6 +67,10 @@ abstract class ProtoMapEditorProvider {
     required ProtoMapFieldInfo fieldInfo,
   }) => false;
 
+  /// Returns a map of custom display names for message types in `Any` fields.
+  /// Keys are qualified message names, values are display names.
+  Map<String, String>? get customMessageNames => null;
+
   /// Merges multiple providers into one.
   ///
   /// The resulting provider will check each provider in order and return
@@ -83,6 +87,19 @@ class _MergedProtoMapEditorProvider extends ProtoMapEditorProvider {
   final List<ProtoMapEditorProvider> providers;
 
   _MergedProtoMapEditorProvider(this.providers);
+
+  @override
+  Map<String, String>? get customMessageNames {
+    Map<String, String>? merged;
+    for (final provider in providers) {
+      final names = provider.customMessageNames;
+      if (names != null && names.isNotEmpty) {
+        merged ??= {};
+        merged.addAll(names);
+      }
+    }
+    return merged;
+  }
 
   @override
   GeneratedMessage? getSubmessageBuilder({

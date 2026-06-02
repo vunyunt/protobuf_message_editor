@@ -6,21 +6,27 @@ import 'package:protobuf/protobuf.dart';
 class AnyEditorRegistry implements TypeRegistry {
   final Map<String, BuilderInfo> _mapping;
   final Map<String, GeneratedMessage> _messages;
+  final Map<String, String>? customMessageNames;
 
-  AnyEditorRegistry(Iterable<GeneratedMessage> types)
-    : _mapping = Map.fromEntries(
-        types.map(
-          (message) =>
-              MapEntry(message.info_.qualifiedMessageName, message.info_),
+  AnyEditorRegistry(
+    Iterable<GeneratedMessage> types, {
+    this.customMessageNames,
+  })  : _mapping = Map.fromEntries(
+          types.map(
+            (message) =>
+                MapEntry(message.info_.qualifiedMessageName, message.info_),
+          ),
         ),
-      ),
-      _messages = Map.fromEntries(
-        types.map(
-          (message) => MapEntry(message.info_.qualifiedMessageName, message),
-        ),
-      );
+        _messages = Map.fromEntries(
+          types.map(
+            (message) => MapEntry(message.info_.qualifiedMessageName, message),
+          ),
+        );
 
-  const AnyEditorRegistry.empty() : _mapping = const {}, _messages = const {};
+  const AnyEditorRegistry.empty()
+      : _mapping = const {},
+        _messages = const {},
+        customMessageNames = null;
 
   @override
   BuilderInfo? lookup(String qualifiedName) {

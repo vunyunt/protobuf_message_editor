@@ -58,6 +58,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
   void _showTypeSelector(
     BuildContext context,
     List<String> availableTypes,
+    Map<String, String>? customMessageNames,
     ProtoMapEditorTheme theme,
   ) {
     _hideTypeSelector();
@@ -65,6 +66,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
       context: context,
       layerLink: _layerLink,
       availableTypes: availableTypes,
+      customMessageNames: customMessageNames,
       onSelected: (selected) {
         _hideTypeSelector();
         _onTypeSelected(selected);
@@ -233,7 +235,19 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
     ProtoMapEditorTheme theme,
     bool enabled,
   ) {
-    final currentType = typeUrl?.split('/').last ?? 'Select type...';
+    final customNames = {
+      if (registry is AnyEditorRegistry && registry.customMessageNames != null)
+        ...registry.customMessageNames!,
+      if (widget.provider?.customMessageNames != null)
+        ...widget.provider!.customMessageNames!,
+    };
+
+    final qualifiedName = typeUrl?.split('/').last;
+    final currentType = (qualifiedName != null
+            ? (customNames?[qualifiedName] ?? qualifiedName)
+            : null) ??
+        'Select type...';
+
     final typeNames = registry is AnyEditorRegistry
         ? registry.availableMessageNames.toList()
         : <String>[];
@@ -247,7 +261,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
         onSelected: (_) {}, // Handled by our own trigger
         onTap: () {
           if (enabled) {
-            _showTypeSelector(context, typeNames, theme);
+            _showTypeSelector(context, typeNames, customNames, theme);
           }
         },
       ),

@@ -5,6 +5,7 @@ import 'searchable_list_selector.dart';
 /// A searchable type selector for protobuf message types.
 class ProtoMapTypeSelector extends StatelessWidget {
   final List<String> availableTypes;
+  final Map<String, String>? customMessageNames;
   final ValueChanged<String> onSelected;
   final VoidCallback onCancel;
   final String? selectedType;
@@ -12,6 +13,7 @@ class ProtoMapTypeSelector extends StatelessWidget {
   const ProtoMapTypeSelector({
     super.key,
     required this.availableTypes,
+    this.customMessageNames,
     required this.onSelected,
     required this.onCancel,
     this.selectedType,
@@ -22,6 +24,7 @@ class ProtoMapTypeSelector extends StatelessWidget {
     required BuildContext context,
     required LayerLink layerLink,
     required List<String> availableTypes,
+    Map<String, String>? customMessageNames,
     required ValueChanged<String> onSelected,
     required VoidCallback onCancel,
     String? selectedType,
@@ -33,13 +36,17 @@ class ProtoMapTypeSelector extends StatelessWidget {
       items: availableTypes,
       onSelected: onSelected,
       onCancel: onCancel,
-      searchText: (type) => type,
+      searchText: (type) {
+        final customName = customMessageNames?[type];
+        return customName != null ? '$customName $type' : type;
+      },
       maxWidth: 400,
       searchHint: 'Search message type...',
       isSelected: (type) => type == selectedType,
       itemBuilder: (context, type, isHighlighted, isSelected) {
         return _TypeItem(
           type: type,
+          customName: customMessageNames?[type],
           isHighlighted: isHighlighted,
           isSelected: isSelected,
           theme: theme,
@@ -56,13 +63,17 @@ class ProtoMapTypeSelector extends StatelessWidget {
       items: availableTypes,
       onSelected: onSelected,
       onCancel: onCancel,
-      searchText: (type) => type,
+      searchText: (type) {
+        final customName = customMessageNames?[type];
+        return customName != null ? '$customName $type' : type;
+      },
       maxWidth: 400,
       searchHint: 'Search message type...',
       isSelected: (type) => type == selectedType,
       itemBuilder: (context, type, isHighlighted, isSelected) {
         return _TypeItem(
           type: type,
+          customName: customMessageNames?[type],
           isHighlighted: isHighlighted,
           isSelected: isSelected,
           theme: theme,
@@ -74,12 +85,14 @@ class ProtoMapTypeSelector extends StatelessWidget {
 
 class _TypeItem extends StatelessWidget {
   final String type;
+  final String? customName;
   final bool isHighlighted;
   final bool isSelected;
   final ProtoMapEditorTheme theme;
 
   const _TypeItem({
     required this.type,
+    this.customName,
     required this.isHighlighted,
     required this.isSelected,
     required this.theme,
@@ -88,8 +101,8 @@ class _TypeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parts = type.split('.');
-    final messageName = parts.last;
-    final prefix = parts.take(parts.length - 1).join('.');
+    final messageName = customName ?? parts.last;
+    final prefix = customName != null ? type : parts.take(parts.length - 1).join('.');
 
     final active = isHighlighted || isSelected;
 
