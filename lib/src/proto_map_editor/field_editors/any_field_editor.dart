@@ -150,9 +150,9 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
       value = controller.jsonMap;
     } else if (index != null && rawValue is List) {
       final item = (index < rawValue.length ? rawValue[index] : null);
-      value = item is Map<String, dynamic> ? item : <String, dynamic>{};
+      value = item is Map ? Map<String, dynamic>.from(item) : <String, dynamic>{};
     } else {
-      value = rawValue is Map<String, dynamic> ? rawValue : <String, dynamic>{};
+      value = rawValue is Map ? Map<String, dynamic>.from(rawValue) : <String, dynamic>{};
     }
 
     final typeUrl = value['@type'] as String?;

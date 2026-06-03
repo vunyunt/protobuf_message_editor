@@ -376,7 +376,11 @@ class ProtoMapSubmessageController extends ProtoMapControllerBase {
          normalizedValue: normalize
              ? (ProtoMapControllerBase.normalizeValue(initialValue, typeRegistry)
                  as Map<String, dynamic>)
-             : (initialValue as Map<String, dynamic>),
+             : (initialValue is Map<String, dynamic>
+                 ? initialValue
+                 : (initialValue is Map
+                     ? Map<String, dynamic>.from(initialValue)
+                     : <String, dynamic>{})),
          builderInfo: builderInfo,
          typeRegistry: typeRegistry,
          onChanged: onChanged,
