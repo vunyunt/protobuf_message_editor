@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider_scope.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/field_editors.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
@@ -13,6 +14,8 @@ class ProtoMapFieldEditor extends StatefulWidget {
   final String? mapKey;
   final int depth;
   final String? parentFieldName;
+
+  @Deprecated('Use ProtoMapEditorProviderScope instead')
   final ProtoMapEditorProvider? provider;
 
   final bool enabled;
@@ -25,6 +28,7 @@ class ProtoMapFieldEditor extends StatefulWidget {
     this.mapKey,
     this.depth = 0,
     this.parentFieldName,
+    @Deprecated('Use ProtoMapEditorProviderScope instead')
     this.provider,
     this.enabled = true,
   });
@@ -39,6 +43,7 @@ typedef ProtobufJsonFieldEditor = ProtoMapFieldEditor;
 class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
   @override
   Widget build(BuildContext context) {
+    final provider = widget.provider ?? ProtoMapEditorProviderScope.of(context);
     final fieldInfo = widget.controller.getFieldInfo(widget.jsonKey);
 
     if (fieldInfo == null) {
@@ -56,7 +61,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
 
     final fieldMetadata = _createFieldMetadata(fieldInfo);
 
-    if (widget.provider?.shouldExcludeField(
+    if (provider?.shouldExcludeField(
           controller: widget.controller,
           fieldInfo: fieldMetadata,
         ) ??
@@ -64,7 +69,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
       return const SizedBox.shrink();
     }
 
-    final customFieldEditor = widget.provider?.getFieldEditor(
+    final customFieldEditor = provider?.getFieldEditor(
       controller: widget.controller,
       fieldInfo: fieldMetadata,
     );
@@ -76,7 +81,6 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
         fieldInfo.mapValueFieldType != null &&
         (fieldInfo.mapValueFieldType! & PbFieldType.M) != 0;
 
-
     // 2. It's a regular message field (singular or an element of a list).
     // Note: We exclude Map fields here because they are handled by ProtoMapMapFieldEditor
     // unless we are specifically editing an entry value (handled by isEntryMessage above).
@@ -86,47 +90,9 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
         (!fieldInfo.isRepeated || widget.index != null);
 
     if ((isEntryMessage || isRegularMessage) && !fieldInfo.isAnyField) {
-      final subBuilderInfo = widget.mapKey != null
-          ? (fieldInfo as dynamic).valueCreator?.call().info_
-          : fieldInfo.subBuilder?.call().info_;
-      
-      if (subBuilderInfo != null) {
-        final rawValue = widget.controller.jsonMap[widget.jsonKey];
-        final subValue = (widget.index != null && rawValue is List)
-            ? (widget.index! < rawValue.length ? rawValue[widget.index!] : null)
-            : (widget.mapKey != null && rawValue is Map)
-            ? rawValue[widget.mapKey!]
-            : rawValue;
-        
-
-        final subController = ProtoMapSubmessageController(
-          initialValue: subValue is Map
-              ? Map<String, dynamic>.from(subValue)
-              : <String, dynamic>{},
-          builderInfo: subBuilderInfo,
-          typeRegistry: widget.controller.typeRegistry,
-          isInitialLoad: widget.controller.isInitialLoad,
-          normalize: false,
-          onChanged: (newMap) {
-            if (widget.index != null) {
-              final list = List.from(
-                widget.controller.jsonMap[widget.jsonKey] as List,
-              );
-              list[widget.index!] = newMap;
-              widget.controller.updateField(widget.jsonKey, list);
-            } else if (widget.mapKey != null) {
-              widget.controller.updateMapValue(
-                widget.jsonKey,
-                widget.mapKey!,
-                newMap,
-              );
-            } else {
-              widget.controller.updateField(widget.jsonKey, newMap);
-            }
-          },
-        );
-
-        final customEditor = widget.provider?.getSubmessageEditor(
+      if (fieldMetadata.submessageBuilderInfo != null) {
+        final subController = widget.controller.createSubmessageController(fieldMetadata);
+        final customEditor = provider?.getSubmessageEditor(
           controller: subController,
           fieldInfo: fieldMetadata,
         );
@@ -136,7 +102,7 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
 
     final enabled =
         widget.enabled &&
-        !(widget.provider?.isFieldUneditable(
+        !(provider?.isFieldUneditable(
               controller: widget.controller,
               fieldInfo: fieldMetadata,
             ) ??
@@ -149,7 +115,6 @@ class _ProtoMapFieldEditorState extends State<ProtoMapFieldEditor> {
       mapKey: widget.mapKey,
       depth: widget.depth,
       parentFieldName: widget.parentFieldName,
-      provider: widget.provider,
       enabled: enabled,
     );
   }
@@ -197,7 +162,10 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
   final String? mapKey;
   final int depth;
   final String? parentFieldName;
+
+  @Deprecated('Use ProtoMapEditorProviderScope instead')
   final ProtoMapEditorProvider? provider;
+
   final bool enabled;
 
   const ProtoMapDefaultFieldEditor({
@@ -208,6 +176,7 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
     this.mapKey,
     this.depth = 0,
     this.parentFieldName,
+    @Deprecated('Use ProtoMapEditorProviderScope instead')
     this.provider,
     this.enabled = true,
   });
@@ -249,7 +218,6 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
       return ProtoMapMapFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
-        provider: provider,
         enabled: enabled,
       );
     }
@@ -258,7 +226,6 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
       return ProtoMapRepeatedFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
-        provider: provider,
         enabled: enabled,
       );
     }
@@ -276,7 +243,6 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
         return ProtoMapAnyFieldEditor(
           controller: controller,
           fieldInfo: fieldMetadata,
-          provider: provider,
           enabled: enabled,
         );
       }
@@ -284,7 +250,6 @@ class ProtoMapDefaultFieldEditor extends StatelessWidget {
       return ProtoMapMessageFieldEditor(
         controller: controller,
         fieldInfo: fieldMetadata,
-        provider: provider,
         enabled: enabled,
       );
     }

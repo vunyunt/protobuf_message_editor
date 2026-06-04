@@ -12,13 +12,17 @@ import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.da
 class ProtoMapMapFieldEditor extends StatefulWidget {
   final ProtoMapControllerBase controller;
   final ProtoMapFieldInfo fieldInfo;
+
+  @Deprecated('Use ProtoMapEditorProviderScope instead')
   final ProtoMapEditorProvider? provider;
+
   final bool enabled;
 
   const ProtoMapMapFieldEditor({
     super.key,
     required this.controller,
     required this.fieldInfo,
+    @Deprecated('Use ProtoMapEditorProviderScope instead')
     this.provider,
     this.enabled = true,
   });
@@ -134,7 +138,6 @@ class _ProtoMapMapFieldEditorState extends State<ProtoMapMapFieldEditor> {
               mapKey: key,
               depth: depth + 1,
               fieldInfo: fieldInfo,
-              provider: widget.provider,
               enabled: widget.enabled,
             );
           }),
@@ -195,7 +198,7 @@ class _MapEntryRow extends StatefulWidget {
   final String mapKey;
   final int depth;
   final ProtoMapFieldInfo fieldInfo;
-  final ProtoMapEditorProvider? provider;
+
   final bool enabled;
 
   const _MapEntryRow({
@@ -205,7 +208,6 @@ class _MapEntryRow extends StatefulWidget {
     required this.mapKey,
     required this.depth,
     required this.fieldInfo,
-    this.provider,
     required this.enabled,
   });
 
@@ -319,7 +321,6 @@ class _MapEntryRowState extends State<_MapEntryRow> {
           mapKey: widget.mapKey,
           depth: widget.depth,
           parentFieldName: widget.fieldKey,
-          provider: widget.provider,
           enabled: widget.enabled,
         ),
         Positioned(

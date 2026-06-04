@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 
 /// A base controller that manages the JSON representation of a [GeneratedMessage] fragment.
 abstract class ProtoMapControllerBase {
@@ -274,6 +275,70 @@ abstract class ProtoMapControllerBase {
     }
 
     return sanitized;
+  }
+
+  /// Safely reads the value representing [fieldInfo] from the JSON state.
+  dynamic getFieldValue(ProtoMapFieldInfo fieldInfo) {
+    final key = fieldInfo.jsonKey;
+    if (key == null) return null;
+    final raw = _jsonMap[key];
+    if (fieldInfo.index != null && raw is List) {
+      if (fieldInfo.index! >= 0 && fieldInfo.index! < raw.length) {
+        return raw[fieldInfo.index!];
+      }
+      return null;
+    }
+    if (fieldInfo.mapKey != null && raw is Map) {
+      return raw[fieldInfo.mapKey!];
+    }
+    return raw;
+  }
+
+  /// Safely updates the value representing [fieldInfo] in the JSON state.
+  void updateFieldValue(ProtoMapFieldInfo fieldInfo, dynamic newValue) {
+    final key = fieldInfo.jsonKey;
+    if (key == null) return;
+    if (fieldInfo.index != null) {
+      final raw = _jsonMap[key];
+      final list = raw is List ? List.from(raw) : <dynamic>[];
+      if (fieldInfo.index! >= 0 && fieldInfo.index! < list.length) {
+        list[fieldInfo.index!] = newValue;
+      } else {
+        list.add(newValue);
+      }
+      updateField(key, list);
+    } else if (fieldInfo.mapKey != null) {
+      updateMapValue(key, fieldInfo.mapKey!, newValue);
+    } else {
+      updateField(key, newValue);
+    }
+  }
+
+  /// Creates and links a sub-controller for a submessage field.
+  ProtoMapSubmessageController createSubmessageController(ProtoMapFieldInfo fieldInfo) {
+    final key = fieldInfo.jsonKey;
+    final subBuilderInfo = fieldInfo.submessageBuilderInfo;
+    if (key == null || subBuilderInfo == null) {
+      throw ArgumentError('jsonKey and submessageBuilderInfo must not be null');
+    }
+
+    final raw = _jsonMap[key];
+    final subValue = (fieldInfo.index != null && raw is List)
+        ? (fieldInfo.index! < raw.length ? raw[fieldInfo.index!] : null)
+        : (fieldInfo.mapKey != null && raw is Map)
+            ? raw[fieldInfo.mapKey!]
+            : raw;
+
+    return ProtoMapSubmessageController(
+      initialValue: subValue is Map ? Map<String, dynamic>.from(subValue) : <String, dynamic>{},
+      builderInfo: subBuilderInfo,
+      typeRegistry: typeRegistry,
+      isInitialLoad: isInitialLoad,
+      normalize: false,
+      onChanged: (newMap) {
+        updateFieldValue(fieldInfo, newMap);
+      },
+    );
   }
 }
 

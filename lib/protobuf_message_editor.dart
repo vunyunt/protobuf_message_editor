@@ -17,6 +17,7 @@ export 'src/proto_map_editor/field_editors.dart';
 export 'src/proto_map_editor/styled_widgets.dart';
 export 'src/proto_map_editor/proto_map_field_editor.dart';
 export 'src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+export 'src/proto_map_editor/custom_editors/proto_map_editor_provider_scope.dart';
 export 'src/proto_map_editor/proto_map_field_info.dart';
 export 'src/proto_map_editor/proto_map_editor_theme.dart';
 export 'src/proto_map_editor/widgets/searchable_list_selector.dart';

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
-import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
-import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 
 // Mock message with nested message and repeated field
 class TestMessage extends GeneratedMessage {

@@ -11,6 +11,8 @@ import 'package:protobuf_message_editor/src/proto_map_editor/widgets/proto_map_n
 class ProtoMapMessageFieldEditor extends StatefulWidget {
   final ProtoMapControllerBase controller;
   final ProtoMapFieldInfo fieldInfo;
+
+  @Deprecated('Use ProtoMapEditorProviderScope instead')
   final ProtoMapEditorProvider? provider;
 
   final bool enabled;
@@ -19,6 +21,7 @@ class ProtoMapMessageFieldEditor extends StatefulWidget {
     super.key,
     required this.controller,
     required this.fieldInfo,
+    @Deprecated('Use ProtoMapEditorProviderScope instead')
     this.provider,
     this.enabled = true,
   });
@@ -45,15 +48,7 @@ class _ProtoMapMessageFieldEditorState
   Widget build(BuildContext context) {
     final jsonKey = widget.fieldInfo.jsonKey!;
     final index = widget.fieldInfo.index;
-    final mapKey = widget.fieldInfo.mapKey;
 
-    final rawValue = widget.controller.jsonMap[jsonKey];
-    final value = (index != null && rawValue is List)
-        ? (index < rawValue.length ? rawValue[index] : null)
-        : (mapKey != null && rawValue is Map)
-            ? rawValue[mapKey]
-            : rawValue;
-    final mapValue = value is Map ? Map<String, dynamic>.from(value) : <String, dynamic>{};
 
     final theme = ProtoMapEditorTheme.of(context);
 
@@ -103,41 +98,12 @@ class _ProtoMapMessageFieldEditorState
                         widget.fieldInfo.submessageBuilderInfo != null) ...[
                       ProtoMapMaximizeButton(
                         onTap: () {
-                          final subBuilderInfo = widget.fieldInfo.submessageBuilderInfo;
-                          if (subBuilderInfo != null) {
-                            final subController = ProtoMapSubmessageController(
-                              initialValue: mapValue,
-                              builderInfo: subBuilderInfo,
-                              typeRegistry: widget.controller.typeRegistry,
-                              isInitialLoad: widget.controller.isInitialLoad,
-                              normalize: false,
-                              onChanged: (newMap) {
-                                if (widget.fieldInfo.index != null) {
-                                  final raw = widget.controller.jsonMap[jsonKey];
-                                  final list = raw is List ? List.from(raw) : <dynamic>[];
-                                  if (widget.fieldInfo.index! < list.length) {
-                                    list[widget.fieldInfo.index!] = newMap;
-                                  } else {
-                                    list.add(newMap);
-                                  }
-                                  widget.controller.updateField(jsonKey, list);
-                                } else if (widget.fieldInfo.mapKey != null) {
-                                  widget.controller.updateMapValue(
-                                    jsonKey,
-                                    widget.fieldInfo.mapKey!,
-                                    newMap,
-                                  );
-                                } else {
-                                  widget.controller.updateField(jsonKey, newMap);
-                                }
-                              },
-                            );
-                            navigationScope.onPush(
-                              label: widget.fieldInfo.label ?? jsonKey,
-                              controller: subController,
-                              fieldInfo: widget.fieldInfo,
-                            );
-                          }
+                          final subController = widget.controller.createSubmessageController(widget.fieldInfo);
+                          navigationScope.onPush(
+                            label: widget.fieldInfo.label ?? jsonKey,
+                            controller: subController,
+                            fieldInfo: widget.fieldInfo,
+                          );
                         },
                         enabled: widget.enabled,
                       ),
@@ -155,51 +121,20 @@ class _ProtoMapMessageFieldEditorState
             }
           ),
         ),
-        if (!_isCollapsed) ...[_buildSubmessageContent(mapValue)],
+        if (!_isCollapsed) ...[_buildSubmessageContent()],
       ],
     );
   }
 
-  Widget _buildSubmessageContent(Map<String, dynamic> mapValue) {
-    final jsonKey = widget.fieldInfo.jsonKey!;
-    final controller = widget.controller;
-    final subBuilderInfo = widget.fieldInfo.submessageBuilderInfo;
+  Widget _buildSubmessageContent() {
+    if (widget.fieldInfo.submessageBuilderInfo == null) return const SizedBox.shrink();
 
-    if (subBuilderInfo == null) return const SizedBox.shrink();
-
-    final subController = ProtoMapSubmessageController(
-      initialValue: mapValue,
-      builderInfo: subBuilderInfo,
-      typeRegistry: controller.typeRegistry,
-      isInitialLoad: controller.isInitialLoad,
-      normalize: false,
-      onChanged: (newMap) {
-        if (widget.fieldInfo.index != null) {
-          final raw = controller.jsonMap[jsonKey];
-          final list = raw is List ? List.from(raw) : <dynamic>[];
-          if (widget.fieldInfo.index! < list.length) {
-            list[widget.fieldInfo.index!] = newMap;
-          } else {
-            list.add(newMap);
-          }
-          controller.updateField(jsonKey, list);
-        } else if (widget.fieldInfo.mapKey != null) {
-          controller.updateMapValue(
-            jsonKey,
-            widget.fieldInfo.mapKey!,
-            newMap,
-          );
-        } else {
-          controller.updateField(jsonKey, newMap);
-        }
-      },
-    );
+    final subController = widget.controller.createSubmessageController(widget.fieldInfo);
 
     return ProtoMapMessageEditor(
       controller: subController,
       depth: widget.fieldInfo.depth + 1,
       parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,
-      provider: widget.provider,
       enabled: widget.enabled,
     );
   }

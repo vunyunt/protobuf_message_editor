@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider_scope.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
@@ -10,6 +11,8 @@ class ProtoMapAddFieldButton extends StatefulWidget {
   final ProtoMapControllerBase controller;
   final int depth;
   final String? parentFieldName;
+
+  @Deprecated('Use ProtoMapEditorProviderScope instead')
   final ProtoMapEditorProvider? provider;
 
   const ProtoMapAddFieldButton({
@@ -17,6 +20,7 @@ class ProtoMapAddFieldButton extends StatefulWidget {
     required this.controller,
     required this.depth,
     this.parentFieldName,
+    @Deprecated('Use ProtoMapEditorProviderScope instead')
     this.provider,
   });
 
@@ -74,12 +78,14 @@ class _ProtoMapAddFieldButtonState extends State<ProtoMapAddFieldButton> {
           label: field.name,
         );
 
+        final provider = widget.provider ?? ProtoMapEditorProviderScope.of(context);
+
         if (field.isMessageField &&
             !field.isScalarMessage &&
             !field.isRepeated) {
           final subBuilderInfo = field.subBuilder?.call().info_;
           if (subBuilderInfo != null) {
-            final customMessage = widget.provider?.getSubmessageBuilder(
+            final customMessage = provider?.getSubmessageBuilder(
               submessageBuilderInfo: subBuilderInfo,
               fieldInfo: protoFieldInfo,
             );
@@ -95,7 +101,7 @@ class _ProtoMapAddFieldButtonState extends State<ProtoMapAddFieldButton> {
         }
 
         if (initialValue == null) {
-          final customInitialValue = widget.provider?.getFieldInitialValue(
+          final customInitialValue = provider?.getFieldInitialValue(
             controller: widget.controller,
             fieldInfo: protoFieldInfo,
           );

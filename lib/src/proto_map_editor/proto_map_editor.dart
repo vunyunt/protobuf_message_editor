@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider_scope.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
@@ -193,68 +194,70 @@ class _ProtoMapEditorState extends State<ProtoMapEditor> {
 
     return Theme(
       data: Theme.of(context).copyWith(extensions: [theme]),
-      child: ProtoMapNavigationScope(
-        stack: _navigationStack,
-        onPush: _push,
-        onPopUntilDepth: _popUntilDepth,
-        child: Builder(
-          builder: (context) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: theme.contentPadding,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Editing: ${widget.message.info_.qualifiedMessageName}',
-                          style: theme.fieldLabelStyle,
-                        ),
-                      ),
-                      if (_controller.isDirty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ProtoMapEditorProviderScope(
+        provider: widget.provider,
+        child: ProtoMapNavigationScope(
+          stack: _navigationStack,
+          onPush: _push,
+          onPopUntilDepth: _popUntilDepth,
+          child: Builder(
+            builder: (context) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: theme.contentPadding,
+                    child: Row(
+                      children: [
+                        Expanded(
                           child: Text(
-                            'Unsaved Changes',
-                            style: theme.unsavedChangesStyle,
+                            'Editing: ${widget.message.info_.qualifiedMessageName}',
+                            style: theme.fieldLabelStyle,
                           ),
                         ),
-                      if (widget.actions != null) ...[
-                        ...widget.actions!,
-                        const SizedBox(width: 8),
+                        if (_controller.isDirty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'Unsaved Changes',
+                              style: theme.unsavedChangesStyle,
+                            ),
+                          ),
+                        if (widget.actions != null) ...[
+                          ...widget.actions!,
+                          const SizedBox(width: 8),
+                        ],
+                        ElevatedButton(
+                          onPressed: _controller.isDirty
+                              ? () {
+                                  final savedMessage = _controller.save();
+                                  widget.onSave?.call(savedMessage);
+                                }
+                              : null,
+                          child: const Text('Save'),
+                        ),
                       ],
-                      ElevatedButton(
-                        onPressed: _controller.isDirty
-                            ? () {
-                                final savedMessage = _controller.save();
-                                widget.onSave?.call(savedMessage);
-                              }
-                            : null,
-                        child: const Text('Save'),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                const Divider(height: 1),
-                _buildNavigationBar(context, theme),
-                if (_navigationStack.length > 1) const Divider(height: 1),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: theme.contentPadding,
-                      child: ProtoMapMessageEditor(
-                        key: ValueKey(_navigationStack.length),
-                        controller: currentController,
-                        depth: 0,
-                        provider: widget.provider,
+                  const Divider(height: 1),
+                  _buildNavigationBar(context, theme),
+                  if (_navigationStack.length > 1) const Divider(height: 1),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: theme.contentPadding,
+                        child: ProtoMapMessageEditor(
+                          key: ValueKey(_navigationStack.length),
+                          controller: currentController,
+                          depth: 0,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

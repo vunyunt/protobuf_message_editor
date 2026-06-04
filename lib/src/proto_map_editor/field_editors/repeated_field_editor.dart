@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider_scope.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_editor.dart';
@@ -11,6 +12,8 @@ import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.da
 class ProtoMapRepeatedFieldEditor extends StatefulWidget {
   final ProtoMapControllerBase controller;
   final ProtoMapFieldInfo fieldInfo;
+
+  @Deprecated('Use ProtoMapEditorProviderScope instead')
   final ProtoMapEditorProvider? provider;
 
   final bool enabled;
@@ -19,6 +22,7 @@ class ProtoMapRepeatedFieldEditor extends StatefulWidget {
     super.key,
     required this.controller,
     required this.fieldInfo,
+    @Deprecated('Use ProtoMapEditorProviderScope instead')
     this.provider,
     this.enabled = true,
   });
@@ -48,6 +52,7 @@ class _ProtoMapRepeatedFieldEditorState
     final jsonKey = fieldInfo.jsonKey!;
     final depth = fieldInfo.depth;
     final protoFieldInfo = fieldInfo.fieldInfo!;
+    final provider = widget.provider ?? ProtoMapEditorProviderScope.of(context);
 
     final rawValue = controller.jsonMap[jsonKey];
     final value = rawValue is List ? rawValue : [];
@@ -92,7 +97,6 @@ class _ProtoMapRepeatedFieldEditorState
               index: index,
               depth: depth + 1,
               parentFieldName: fieldInfo.label ?? jsonKey,
-              provider: widget.provider,
             );
           }),
         if (!_isCollapsed && widget.enabled)
@@ -110,7 +114,7 @@ class _ProtoMapRepeatedFieldEditorState
                   : null;
 
               if (subBuilderInfo != null) {
-                final customMessage = widget.provider?.getSubmessageBuilder(
+                final customMessage = provider?.getSubmessageBuilder(
                   submessageBuilderInfo: subBuilderInfo,
                   fieldInfo: fieldInfo.copyWith(
                     submessageBuilderInfo: subBuilderInfo,

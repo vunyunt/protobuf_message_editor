@@ -3,6 +3,7 @@ import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_editor_theme.dart';
 import 'package:protobuf_message_editor/src/default_editors/well_known/any/any_editor_registry.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/custom_editors/proto_map_editor_provider_scope.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controller.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
@@ -19,7 +20,10 @@ import 'package:protobuf_message_editor/src/proto_map_editor/widgets/proto_map_n
 class ProtoMapAnyFieldEditor extends StatefulWidget {
   final ProtoMapControllerBase controller;
   final ProtoMapFieldInfo fieldInfo;
+
+  @Deprecated('Use ProtoMapEditorProviderScope instead')
   final ProtoMapEditorProvider? provider;
+
   final TypeRegistry? customTypeRegistry;
 
   final bool enabled;
@@ -28,6 +32,7 @@ class ProtoMapAnyFieldEditor extends StatefulWidget {
     super.key,
     required this.controller,
     required this.fieldInfo,
+    @Deprecated('Use ProtoMapEditorProviderScope instead')
     this.provider,
     this.customTypeRegistry,
     this.enabled = true,
@@ -94,8 +99,9 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
 
     Map<String, dynamic> newValue;
     final resolved = registry.lookup(selected);
+    final provider = widget.provider ?? ProtoMapEditorProviderScope.of(context);
     final customMessage = resolved != null
-        ? widget.provider?.getSubmessageBuilder(
+        ? provider?.getSubmessageBuilder(
             submessageBuilderInfo: resolved,
             fieldInfo: widget.fieldInfo.copyWith(
               submessageBuilderInfo: resolved,
@@ -299,11 +305,12 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
     ProtoMapEditorTheme theme,
     bool enabled,
   ) {
+    final provider = widget.provider ?? ProtoMapEditorProviderScope.of(context);
     final customNames = {
       if (registry is AnyEditorRegistry && registry.customMessageNames != null)
         ...registry.customMessageNames!,
-      if (widget.provider?.customMessageNames != null)
-        ...widget.provider!.customMessageNames!,
+      if (provider?.customMessageNames != null)
+        ...provider!.customMessageNames!,
     };
 
     final qualifiedName = typeUrl?.split('/').last;
@@ -369,12 +376,10 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
       },
     );
 
-    final customEditor = widget.provider?.getSubmessageEditor(
+    final provider = widget.provider ?? ProtoMapEditorProviderScope.of(context);
+    final customEditor = provider?.getSubmessageEditor(
       controller: subController,
-      fieldInfo: ProtoMapFieldInfo(
-        depth: widget.fieldInfo.depth,
-        parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,
-        parentBuilderInfo: widget.fieldInfo.submessageBuilderInfo,
+      fieldInfo: widget.fieldInfo.copyWith(
         submessageBuilderInfo: subController.builderInfo,
       ),
     );
@@ -384,7 +389,6 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
       controller: subController,
       depth: widget.fieldInfo.depth + 1,
       parentFieldName: widget.fieldInfo.label ?? widget.fieldInfo.jsonKey,
-      provider: widget.provider,
       enabled: widget.enabled,
     );
   }

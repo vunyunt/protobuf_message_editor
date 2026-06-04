@@ -13,6 +13,8 @@ class ProtoMapMessageEditor extends StatelessWidget {
   final ProtoMapControllerBase controller;
   final int depth;
   final String? parentFieldName;
+
+  @Deprecated('Use ProtoMapEditorProviderScope instead')
   final ProtoMapEditorProvider? provider;
 
   final bool enabled;
@@ -22,6 +24,7 @@ class ProtoMapMessageEditor extends StatelessWidget {
     required this.controller,
     this.depth = 0,
     this.parentFieldName,
+    @Deprecated('Use ProtoMapEditorProviderScope instead')
     this.provider,
     this.enabled = true,
   });
@@ -39,7 +42,6 @@ class ProtoMapMessageEditor extends StatelessWidget {
             jsonKey: key,
             depth: depth,
             parentFieldName: parentFieldName,
-            provider: provider,
           ),
         ),
         if (enabled)
@@ -47,7 +49,6 @@ class ProtoMapMessageEditor extends StatelessWidget {
             controller: controller,
             depth: depth,
             parentFieldName: parentFieldName,
-            provider: provider,
           ),
       ],
     );
