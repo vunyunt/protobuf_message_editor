@@ -27,7 +27,7 @@ void main() {
 
     // Should show the type name
     expect(
-      find.text('protobuf_message_editor_test.TestSubmessage'),
+      find.text('TestSubmessage'),
       findsWidgets,
     );
 

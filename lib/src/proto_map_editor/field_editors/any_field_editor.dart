@@ -315,7 +315,7 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
 
     final qualifiedName = typeUrl?.split('/').last;
     final currentType = (qualifiedName != null
-            ? (customNames[qualifiedName] ?? qualifiedName)
+            ? (customNames[qualifiedName] ?? qualifiedName.split('.').last)
             : null) ??
         'Select type...';
 
