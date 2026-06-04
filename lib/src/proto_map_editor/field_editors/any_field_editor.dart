@@ -9,6 +9,8 @@ import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_e
 import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
 import 'package:protobuf_message_editor/src/utils/proto_field_type_extensions.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/widgets/proto_map_type_selector.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/widgets/proto_map_navigation_scope.dart';
+
 
 /// A specialized field editor for `google.protobuf.Any` fields.
 ///
@@ -180,28 +182,90 @@ class _ProtoMapAnyFieldEditorState extends State<ProtoMapAnyFieldEditor> {
         if (jsonKey.isNotEmpty)
           ProtoMapIndent(
             depth: widget.fieldInfo.depth,
-            child: ProtoMapFieldRow(
-              label: widget.fieldInfo.label ?? jsonKey,
-              labelColor: theme.getLabelColor(widget.fieldInfo.depth),
-              tooltip: parentContext.isEmpty ? null : parentContext,
-              leading: ProtoMapCollapseToggle(
-                isCollapsed: _isCollapsed,
-                onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
-              ),
-              onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
-              value: _buildTypeSelector(
-                context,
-                typeUrl,
-                registry,
-                theme,
-                widget.enabled,
-              ),
-              trailing: ProtoMapRemoveButton(
-                controller: controller,
-                jsonKey: jsonKey,
-                index: index,
-                enabled: widget.enabled,
-              ),
+            child: Builder(
+              builder: (context) {
+                final navigationScope = ProtoMapNavigationScope.of(context);
+                BuilderInfo? resolvedBuilderInfo;
+                if (typeUrl != null) {
+                  final qualifiedName = typeUrl.split('/').last;
+                  resolvedBuilderInfo = registry.lookup(qualifiedName);
+                }
+
+                return ProtoMapFieldRow(
+                  label: widget.fieldInfo.label ?? jsonKey,
+                  labelColor: theme.getLabelColor(widget.fieldInfo.depth),
+                  tooltip: parentContext.isEmpty ? null : parentContext,
+                  leading: ProtoMapCollapseToggle(
+                    isCollapsed: _isCollapsed,
+                    onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
+                  ),
+                  onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
+                  value: _buildTypeSelector(
+                    context,
+                    typeUrl,
+                    registry,
+                    theme,
+                    widget.enabled,
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (navigationScope != null && resolvedBuilderInfo != null) ...[
+                        ProtoMapMaximizeButton(
+                          onTap: () {
+                            final protoFieldInfo = widget.fieldInfo.fieldInfo;
+                            if (protoFieldInfo != null && protoFieldInfo.subBuilder != null) {
+                              final subController = ProtoMapSubmessageController(
+                                initialValue: value,
+                                builderInfo: protoFieldInfo.subBuilder!.call().info_,
+                                typeRegistry: widget.customTypeRegistry ?? controller.typeRegistry,
+                                isInitialLoad: controller.isInitialLoad,
+                                normalize: false,
+                                onChanged: (newMap) {
+                                  final fieldInController = controller.getFieldInfo(jsonKey);
+                                  final isParentController =
+                                      fieldInController != null && fieldInController.isAnyField;
+
+                                  if (jsonKey.isEmpty || !isParentController) {
+                                    controller.updateFullJson(newMap);
+                                  } else if (widget.fieldInfo.index != null) {
+                                    final raw = controller.jsonMap[jsonKey];
+                                    final list = raw is List ? List.from(raw) : <dynamic>[];
+                                    if (widget.fieldInfo.index! < list.length) {
+                                      list[widget.fieldInfo.index!] = newMap;
+                                    } else {
+                                      list.add(newMap);
+                                    }
+                                    controller.updateField(jsonKey, list);
+                                  } else {
+                                    controller.updateField(jsonKey, newMap);
+                                  }
+                                },
+                              );
+
+                              navigationScope.onPush(
+                                label: widget.fieldInfo.label ?? jsonKey,
+                                controller: subController,
+                                fieldInfo: widget.fieldInfo.copyWith(
+                                  submessageBuilderInfo: subController.builderInfo,
+                                ),
+                              );
+                            }
+                          },
+                          enabled: widget.enabled,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      ProtoMapRemoveButton(
+                        controller: controller,
+                        jsonKey: jsonKey,
+                        index: index,
+                        enabled: widget.enabled,
+                      ),
+                    ],
+                  ),
+                );
+              }
             ),
           )
         else

@@ -4,8 +4,8 @@ version: 0.2.2
 homepage: https://github.com/vunyunt/protobuf_message_editor
 
 environment:
-  sdk: ^3.9.2
-  flutter: ">=1.17.0"
+  sdk: ^3.12.1
+  flutter: ">=3.44.1"
 
 dependencies:
   collection: ^1.19.1

@@ -5,6 +5,7 @@ import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_controlle
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_field_info.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/proto_map_message_editor.dart';
 import 'package:protobuf_message_editor/src/proto_map_editor/styled_widgets.dart';
+import 'package:protobuf_message_editor/src/proto_map_editor/widgets/proto_map_navigation_scope.dart';
 
 /// A field editor for message values (nested objects).
 class ProtoMapMessageFieldEditor extends StatefulWidget {
@@ -73,31 +74,85 @@ class _ProtoMapMessageFieldEditorState
       children: [
         ProtoMapIndent(
           depth: widget.fieldInfo.depth,
-          child: ProtoMapFieldRow(
-            label: widget.fieldInfo.label ?? jsonKey,
-            labelColor: theme.getLabelColor(widget.fieldInfo.depth),
-            tooltip: parentContext.isEmpty ? null : parentContext,
-            leading: ProtoMapCollapseToggle(
-              isCollapsed: _isCollapsed,
-              onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
-            ),
-            onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
-            value: Text(
-              widget.fieldInfo.submessageBuilderInfo?.qualifiedMessageName
-                      .split('.')
-                      .last ??
-                  '',
-              style: theme.fieldValueStyle.copyWith(
-                color: theme.getLabelColor(widget.fieldInfo.depth),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            trailing: ProtoMapRemoveButton(
-              controller: widget.controller,
-              jsonKey: jsonKey,
-              index: index,
-              enabled: widget.enabled,
-            ),
+          child: Builder(
+            builder: (context) {
+              final navigationScope = ProtoMapNavigationScope.of(context);
+              return ProtoMapFieldRow(
+                label: widget.fieldInfo.label ?? jsonKey,
+                labelColor: theme.getLabelColor(widget.fieldInfo.depth),
+                tooltip: parentContext.isEmpty ? null : parentContext,
+                leading: ProtoMapCollapseToggle(
+                  isCollapsed: _isCollapsed,
+                  onToggle: () => setState(() => _isCollapsed = !_isCollapsed),
+                ),
+                onTapLabel: () => setState(() => _isCollapsed = !_isCollapsed),
+                value: Text(
+                  widget.fieldInfo.submessageBuilderInfo?.qualifiedMessageName
+                          .split('.')
+                          .last ??
+                      '',
+                  style: theme.fieldValueStyle.copyWith(
+                    color: theme.getLabelColor(widget.fieldInfo.depth),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (navigationScope != null &&
+                        widget.fieldInfo.submessageBuilderInfo != null) ...[
+                      ProtoMapMaximizeButton(
+                        onTap: () {
+                          final subBuilderInfo = widget.fieldInfo.submessageBuilderInfo;
+                          if (subBuilderInfo != null) {
+                            final subController = ProtoMapSubmessageController(
+                              initialValue: mapValue,
+                              builderInfo: subBuilderInfo,
+                              typeRegistry: widget.controller.typeRegistry,
+                              isInitialLoad: widget.controller.isInitialLoad,
+                              normalize: false,
+                              onChanged: (newMap) {
+                                if (widget.fieldInfo.index != null) {
+                                  final raw = widget.controller.jsonMap[jsonKey];
+                                  final list = raw is List ? List.from(raw) : <dynamic>[];
+                                  if (widget.fieldInfo.index! < list.length) {
+                                    list[widget.fieldInfo.index!] = newMap;
+                                  } else {
+                                    list.add(newMap);
+                                  }
+                                  widget.controller.updateField(jsonKey, list);
+                                } else if (widget.fieldInfo.mapKey != null) {
+                                  widget.controller.updateMapValue(
+                                    jsonKey,
+                                    widget.fieldInfo.mapKey!,
+                                    newMap,
+                                  );
+                                } else {
+                                  widget.controller.updateField(jsonKey, newMap);
+                                }
+                              },
+                            );
+                            navigationScope.onPush(
+                              label: widget.fieldInfo.label ?? jsonKey,
+                              controller: subController,
+                              fieldInfo: widget.fieldInfo,
+                            );
+                          }
+                        },
+                        enabled: widget.enabled,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    ProtoMapRemoveButton(
+                      controller: widget.controller,
+                      jsonKey: jsonKey,
+                      index: index,
+                      enabled: widget.enabled,
+                    ),
+                  ],
+                ),
+              );
+            }
           ),
         ),
         if (!_isCollapsed) ...[_buildSubmessageContent(mapValue)],
