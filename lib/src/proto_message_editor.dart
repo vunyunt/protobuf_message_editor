@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:protobuf_message_editor/protobuf_message_editor.dart';
-import 'package:protobuf_message_editor/src/custom_editor_registry.dart';
 import 'package:protobuf_message_editor/src/default_editors/default_editor_registry.dart';
-import 'package:protobuf_message_editor/src/field_editors/proto_field_editor.dart';
-import 'package:protobuf_message_editor/src/utils/proto_message_extensions.dart';
 import 'package:provider/provider.dart';
 
 typedef SubmessageBuilder =

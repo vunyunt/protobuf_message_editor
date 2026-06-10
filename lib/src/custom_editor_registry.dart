@@ -95,6 +95,7 @@ class CustomEditorRegistry implements CustomEditorProvider {
     );
   }
 
+  @override
   CustomFieldEditorBuilder? getCustomFieldBuilder(FieldIdentifier identifier) {
     return customFieldBuilders[identifier];
   }
